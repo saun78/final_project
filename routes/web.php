@@ -1,0 +1,48 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ManageController;
+
+Route::get('/', function () {
+    return view('dashboard');
+});
+
+// Authentication Routes
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Protected Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', function () {
+        return redirect()->route('dashboard');
+    });
+
+    // Product Routes
+    Route::resource('products', ProductController::class);
+    
+    // Category Routes
+    Route::resource('categories', CategoryController::class);
+    
+    // Brand Routes
+    Route::resource('brands', BrandController::class);
+    
+    // Manage Categories & Brands Routes
+    Route::get('/manage', [ManageController::class, 'index'])->name('manage.index');
+    Route::post('/manage/category', [ManageController::class, 'storeCategory'])->name('manage.category.store');
+    Route::put('/manage/category/{category}', [ManageController::class, 'updateCategory'])->name('manage.category.update');
+    Route::delete('/manage/category/{category}', [ManageController::class, 'destroyCategory'])->name('manage.category.destroy');
+    Route::post('/manage/brand', [ManageController::class, 'storeBrand'])->name('manage.brand.store');
+    Route::put('/manage/brand/{brand}', [ManageController::class, 'updateBrand'])->name('manage.brand.update');
+    Route::delete('/manage/brand/{brand}', [ManageController::class, 'destroyBrand'])->name('manage.brand.destroy');
+});
