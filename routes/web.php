@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ManageController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -36,6 +37,13 @@ Route::middleware(['auth'])->group(function () {
     
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    
+    // Order/Receipt Routes
+    Route::resource('orders', OrderController::class);
+    Route::get('/orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+    Route::get('/orders/{order}/print-pdf', [OrderController::class, 'printSingle'])->name('orders.print.pdf');
+    Route::get('/orders/export/pdf', [OrderController::class, 'exportPdf'])->name('orders.export.pdf');
+    Route::get('/orders/export/excel', [OrderController::class, 'exportExcel'])->name('orders.export.excel');
     
     // Manage Categories & Brands Routes
     Route::get('/manage', [ManageController::class, 'index'])->name('manage.index');

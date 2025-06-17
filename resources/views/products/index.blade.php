@@ -125,10 +125,7 @@
                             <td>${{ number_format($product->selling_price, 2) }}</td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-primary" 
-                                        title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    
                                     <button type="button" class="btn btn-sm btn-outline-info" 
                                         title="Quick View" 
                                         onclick="showProductModal({
@@ -147,6 +144,10 @@
                                         })">
                                         <i class="bi bi-eye"></i>
                                     </button>
+                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-warning" 
+                                    title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                     <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')

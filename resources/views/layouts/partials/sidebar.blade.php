@@ -14,6 +14,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i>
+                    Receipts
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('manage.index') }}" class="nav-link {{ request()->routeIs('manage.*') ? 'active' : '' }}">
                     <i class="bi bi-plus-circle"></i>
                     Add
