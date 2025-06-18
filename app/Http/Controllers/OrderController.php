@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -105,7 +106,7 @@ class OrderController extends Controller
             'amount' => $totalAmount
         ]);
 
-        // Create order items and update stock
+        // Create order items, update stock, and create report entries
         foreach ($request->items as $item) {
             // Create order item
             OrderItem::create([
@@ -119,6 +120,14 @@ class OrderController extends Controller
             $product = Product::find($item['product_id']);
             $product->quantity -= $item['quantity'];
             $product->save();
+
+            // Create report entry
+            Report::create([
+                'product_id' => $item['product_id'],
+                'quantity_sold' => $item['quantity'],
+                'total_amount' => $item['quantity'] * $item['price'],
+                'sale_date' => now()
+            ]);
         }
 
         return redirect()->route('orders.index')->with('success', 'Receipt created successfully! Product stock updated.');

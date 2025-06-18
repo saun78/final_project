@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ManageController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -37,6 +38,11 @@ Route::middleware(['auth'])->group(function () {
     
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    
+    // Reports Routes
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/top-selling', [ReportController::class, 'topSelling'])->name('reports.top-selling');
+    Route::get('/reports/sales-by-period', [ReportController::class, 'salesByPeriod'])->name('reports.sales-by-period');
     
     // Order/Receipt Routes
     Route::resource('orders', OrderController::class);

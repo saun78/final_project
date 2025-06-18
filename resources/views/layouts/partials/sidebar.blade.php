@@ -14,15 +14,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                    <i class="bi bi-receipt"></i>
-                    Receipts
+                <a href="{{ route('manage.index') }}" class="nav-link {{ request()->routeIs('manage.*') ? 'active' : '' }}">
+                    <i class="bi bi-gear"></i>
+                    Manage
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('manage.index') }}" class="nav-link {{ request()->routeIs('manage.*') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle"></i>
-                    Add
+                <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i>
+                    Receipts
                 </a>
             </li>
             <li class="nav-item">
@@ -31,6 +31,7 @@
                     Inventory
                 </a>
             </li>
+
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="bi bi-truck"></i>
@@ -44,7 +45,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
                     <i class="bi bi-graph-up"></i>
                     Reports
                 </a>
