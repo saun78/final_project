@@ -38,7 +38,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="category_id" class="form-label mb-0">Category</label>
-                                    <a href="{{ route('manage.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
                                 </div>
@@ -58,7 +58,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="brand_id" class="form-label mb-0">Brand</label>
-                                    <a href="{{ route('manage.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
                                 </div>

@@ -139,7 +139,7 @@
                                         <th class="border-0 fw-semibold">Receipt Number</th>
                                         <th class="border-0 fw-semibold">Items Summary</th>
                                         <th class="border-0 fw-semibold">Amount</th>
-                                        <th class="border-0 fw-semibold">Time</th>
+                                        <th class="border-0 fw-semibold">Date</th>
                                         <th class="border-0 fw-semibold text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -162,7 +162,7 @@
                                                 <span class="fw-bold text-success fs-6">${{ number_format($order->amount, 2) }}</span>
                                             </td>
                                             <td>
-                                                <small class="text-muted">{{ $order->created_at->format('g:i A') }}</small>
+                                                <small class="text-muted">{{ $order->created_at->format('M j, Y') }}</small>
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">

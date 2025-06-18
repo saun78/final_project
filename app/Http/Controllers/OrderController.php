@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -17,13 +18,13 @@ class OrderController extends Controller
     {
         $query = Order::with('orderItems.product');
 
-        // Filter by date range if provided
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->end_date);
+        // Filter by specific date if provided (from date picker)
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        } else {
+            // If no date filter, show all orders (or you can limit to recent orders)
+            // For performance, you might want to limit to last 30 days
+            $query->whereDate('created_at', '>=', now()->subDays(30));
         }
 
         // Get all orders sorted by date desc
@@ -81,8 +82,16 @@ class OrderController extends Controller
         ]);
 
         // Check stock availability for all items first
+        $productIds = collect($request->items)->pluck('product_id')->unique();
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        
         foreach ($request->items as $item) {
-            $product = Product::find($item['product_id']);
+            $product = $products->get($item['product_id']);
+            if (!$product) {
+                return redirect()->back()
+                    ->withErrors(['stock' => "Product not found."])
+                    ->withInput();
+            }
             if ($product->quantity < $item['quantity']) {
                 return redirect()->back()
                     ->withErrors(['stock' => "Insufficient stock for {$product->name}. Available: {$product->quantity}, Required: {$item['quantity']}"])
@@ -105,21 +114,22 @@ class OrderController extends Controller
             'amount' => $totalAmount
         ]);
 
-        // Create order items and update stock
-        foreach ($request->items as $item) {
-            // Create order item
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price']
-            ]);
+        // Create order items and update stock (using transaction)
+        DB::transaction(function () use ($request, $order, $products) {
+            foreach ($request->items as $item) {
+                // Create order item
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price']
+                ]);
 
-            // Update product stock
-            $product = Product::find($item['product_id']);
-            $product->quantity -= $item['quantity'];
-            $product->save();
-        }
+                // Update product stock
+                $product = $products->get($item['product_id']);
+                $product->decrement('quantity', $item['quantity']);
+            }
+        });
 
         return redirect()->route('orders.index')->with('success', 'Receipt created successfully! Product stock updated.');
     }
@@ -271,9 +281,26 @@ class OrderController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Receipts_' . $formattedDate);
 
+        // Add report title and date
+        $sheet->setCellValue('A1', 'RECEIPTS REPORT');
+        $sheet->mergeCells('A1:G1');
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+        ];
+        $sheet->getStyle('A1')->applyFromArray($titleStyle);
+
+        $sheet->setCellValue('A2', 'Report for ' . \Carbon\Carbon::parse($selectedDate)->format('l, F j, Y'));
+        $sheet->mergeCells('A2:G2');
+        $dateStyle = [
+            'font' => ['italic' => true, 'size' => 12],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+        ];
+        $sheet->getStyle('A2')->applyFromArray($dateStyle);
+
         // Set headers
-        $headers = ['Order Number', 'Date', 'Product Name', 'Quantity', 'Unit Price', 'Subtotal', 'Order Total'];
-        $sheet->fromArray($headers, null, 'A1');
+        $headers = ['Order Number', 'Product Name', 'Part Number', 'Quantity', 'Unit Price', 'Subtotal', 'Order Total'];
+        $sheet->fromArray($headers, null, 'A4');
 
         // Style headers
         $headerStyle = [
@@ -290,16 +317,16 @@ class OrderController extends Controller
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
             ]
         ];
-        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+        $sheet->getStyle('A4:G4')->applyFromArray($headerStyle);
 
         // Add data
-        $row = 2;
+        $row = 5;
         foreach ($orders as $order) {
             foreach ($order->orderItems as $index => $item) {
                 $data = [
                     $index === 0 ? $order->order_number : '',
-                    $index === 0 ? $order->created_at->format('Y-m-d') : '',
                     $item->product->name ?? 'N/A',
+                    $item->product->part_number ?? '',
                     $item->quantity,
                     $item->price,
                     $item->quantity * $item->price,
@@ -308,10 +335,40 @@ class OrderController extends Controller
                 $sheet->fromArray($data, null, 'A' . $row);
                 $row++;
             }
+            
+            // Add order total row for visual separation
+            $totalRowData = [
+                '', '', '', 'Order Total (' . $order->orderItems->sum('quantity') . ' items):', '', '', $order->amount
+            ];
+            $sheet->fromArray($totalRowData, null, 'A' . $row);
+            
+            // Style the total row with more prominent separation
+            $totalRowStyle = [
+                'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'D6D6D6']  // Darker gray for better separation
+                ],
+                'borders' => [
+                    'top' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                        'color' => ['rgb' => '888888']
+                    ],
+                    'bottom' => [
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                        'color' => ['rgb' => '888888']
+                    ]
+                ]
+            ];
+            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($totalRowStyle);
+            $row++;
+            
+            // Add empty row for visual separation
+            $row++;
         }
 
         // Format price columns as currency
-        $sheet->getStyle('E2:G' . ($row - 1))->getNumberFormat()
+        $sheet->getStyle('E5:G' . ($row - 1))->getNumberFormat()
               ->setFormatCode('$#,##0.00');
 
         // Auto-size columns
@@ -319,7 +376,7 @@ class OrderController extends Controller
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
-        // Add borders
+        // Add borders to data area
         $borderStyle = [
             'borders' => [
                 'allBorders' => [
@@ -328,7 +385,37 @@ class OrderController extends Controller
                 ]
             ]
         ];
-        $sheet->getStyle('A1:G' . ($row - 1))->applyFromArray($borderStyle);
+        $sheet->getStyle('A4:G' . ($row - 1))->applyFromArray($borderStyle);
+
+        // Add summary at the end
+        $summaryStartRow = $row + 2;
+        $totalOrders = $orders->count();
+        $totalAmount = $orders->sum('amount');
+        $totalItems = $orders->sum(function($order) { return $order->orderItems->sum('quantity'); });
+
+        $sheet->setCellValue('A' . $summaryStartRow, 'SUMMARY');
+        $sheet->mergeCells('A' . $summaryStartRow . ':G' . $summaryStartRow);
+        $sheet->getStyle('A' . $summaryStartRow)->applyFromArray($titleStyle);
+
+        $summaryStartRow++;
+        $sheet->setCellValue('A' . $summaryStartRow, 'Total Orders:');
+        $sheet->setCellValue('B' . $summaryStartRow, $totalOrders);
+        $summaryStartRow++;
+        $sheet->setCellValue('A' . $summaryStartRow, 'Total Items Sold:');
+        $sheet->setCellValue('B' . $summaryStartRow, $totalItems);
+        $summaryStartRow++;
+        $sheet->setCellValue('A' . $summaryStartRow, 'Total Amount:');
+        $sheet->setCellValue('B' . $summaryStartRow, '$' . number_format($totalAmount, 2));
+
+        // Style summary section
+        $summaryStyle = [
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E9ECEF']
+            ]
+        ];
+        $sheet->getStyle('A' . ($summaryStartRow - 2) . ':B' . $summaryStartRow)->applyFromArray($summaryStyle);
 
         $filename = 'receipts_' . $formattedDate . '.xlsx';
 

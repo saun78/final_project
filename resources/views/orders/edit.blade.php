@@ -61,6 +61,7 @@
                                                             data-price="{{ $product->selling_price }}"
                                                             data-stock="{{ $product->quantity }}"
                                                             data-part-number="{{ $product->part_number ?? '' }}"
+                                                            data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}"
                                                             {{ $orderItem->product_id == $product->id ? 'selected' : '' }}>
                                                         @if($product->part_number)
                                                             [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} (Stock: {{ $product->quantity }})
@@ -81,7 +82,7 @@
                                             <label class="form-label">Selling Price</label>
                                             <input type="number" name="items[{{ $index }}][price]" 
                                                    class="form-control price-input" 
-                                                   step="0.01" min="0" value="{{ $orderItem->price }}" required>
+                                                   step="0.01" min="0" value="{{ $orderItem->price }}" required readonly>
                                         </div>
                                         <div class="col-md-2">
                                             <label class="form-label">Subtotal</label>
@@ -154,6 +155,8 @@ $(document).ready(function() {
             placeholder: 'Search product name or part number...',
             allowClear: true,
             width: '100%',
+            templateResult: formatProductOption,
+            templateSelection: formatProductSelection,
             matcher: function(params, data) {
                 // Always return data if no search term
                 if ($.trim(params.term) === '') {
@@ -180,6 +183,49 @@ $(document).ready(function() {
                 return null;
             }
         });
+    }
+    
+    function formatProductOption(product) {
+        if (!product.id || !product.element) {
+            return product.text;
+        }
+        
+        var $product = $(product.element);
+        var imageUrl = $product.data('image');
+        var price = $product.data('price');
+        var stock = $product.data('stock');
+        var partNumber = $product.data('part-number');
+        
+        // Check if image URL contains a valid path
+        var hasValidImage = imageUrl && imageUrl.trim() !== '' && imageUrl.includes('storage');
+        
+        var imageElement = '';
+        if (hasValidImage) {
+            imageElement = '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />';
+        }
+        
+        var placeholderElement = '<div style="width: 40px; height: 40px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-right: 10px; display: ' + (hasValidImage ? 'none' : 'flex') + '; align-items: center; justify-content: center; font-size: 12px; color: #6c757d;"><i class="bi bi-image"></i></div>';
+        
+        var $container = $(
+            '<div class="d-flex align-items-center">' +
+                imageElement +
+                placeholderElement +
+                '<div>' +
+                    '<div style="font-weight: 500;">' + product.text.split(' - ')[0] + '</div>' +
+                    '<small class="text-muted">$' + price + ' - Stock: ' + stock + '</small>' +
+                '</div>' +
+            '</div>'
+        );
+        
+        return $container;
+    }
+    
+    function formatProductSelection(product) {
+        if (!product.id || !product.element) {
+            return product.text;
+        }
+        
+        return product.text.split(' - ')[0];
     }
     
     function updateSubtotal(row) {

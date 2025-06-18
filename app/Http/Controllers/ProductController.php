@@ -22,16 +22,38 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        // Get search parameters
-        $search = $request->input('search');
-        $categoryId = $request->input('category');
-        $brandId = $request->input('brand');
-        $isSearching = $request->filled('search') || $request->filled('category') || $request->filled('brand');
+        // Get all filter parameters
+        $filters = $request->only([
+            'search', 
+            'category', 
+            'brand', 
+            'location', 
+            'stock_status', 
+            'min_price', 
+            'max_price'
+        ]);
 
-        $products = $this->productService->getFilteredProducts($search, $categoryId, $brandId, $isSearching);
+        // Remove empty values
+        $filters = array_filter($filters, function($value) {
+            return $value !== null && $value !== '';
+        });
 
-        if (!$isSearching) {
-            $products->appends($request->only(['search', 'category', 'brand']));
+        $products = $this->productService->getFilteredProducts($filters);
+
+        // Check if any filters are applied
+        $isSearching = !empty($filters);
+
+        // Append query parameters to pagination links
+        if (!$isSearching && method_exists($products, 'appends')) {
+            $products->appends($request->only([
+                'search', 
+                'category', 
+                'brand', 
+                'location', 
+                'stock_status', 
+                'min_price', 
+                'max_price'
+            ]));
         }
 
         $formData = $this->productService->getFormData();

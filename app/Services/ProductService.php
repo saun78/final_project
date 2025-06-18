@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    public function getFilteredProducts($search = null, $categoryId = null, $brandId = null, $isSearching = false)
+    public function getFilteredProducts($filters = [])
     {
         $query = Product::query();
 
         // Apply search filters
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function($q) use ($search) {
                 $q->where('part_number', 'like', "%{$search}%")
                   ->orWhere('name', 'like', "%{$search}%")
@@ -22,21 +23,50 @@ class ProductService
             });
         }
 
-        if ($categoryId) {
-            $query->where('category_id', $categoryId);
+        // Filter by category
+        if (!empty($filters['category'])) {
+            $query->where('category_id', $filters['category']);
         }
 
-        if ($brandId) {
-            $query->where('brand_id', $brandId);
+        // Filter by brand
+        if (!empty($filters['brand'])) {
+            $query->where('brand_id', $filters['brand']);
         }
 
-        // If searching, limit to 100 results without pagination
-        // If not searching, use normal pagination
-        if ($isSearching) {
-            return $query->with(['category', 'brand'])->latest()->limit(100)->get();
-        } else {
-            return $query->with(['category', 'brand'])->latest()->paginate(10);
+        // Filter by location
+        if (!empty($filters['location'])) {
+            $query->where('location', 'like', "%{$filters['location']}%");
         }
+
+        // Filter by stock status
+        if (!empty($filters['stock_status'])) {
+            switch ($filters['stock_status']) {
+                case 'in_stock':
+                    $query->where('quantity', '>', 0);
+                    break;
+                case 'low_stock':
+                    $query->whereBetween('quantity', [1, 10]);
+                    break;
+                case 'good_stock':
+                    $query->where('quantity', '>', 10);
+                    break;
+                case 'out_of_stock':
+                    $query->where('quantity', 0);
+                    break;
+            }
+        }
+
+        // Filter by price range
+        if (!empty($filters['min_price'])) {
+            $query->where('selling_price', '>=', $filters['min_price']);
+        }
+
+        if (!empty($filters['max_price'])) {
+            $query->where('selling_price', '<=', $filters['max_price']);
+        }
+
+        // 总是使用分页，提高性能和用户体验
+        return $query->with(['category:id,name', 'brand:id,name'])->latest()->paginate(12);
     }
 
     public function createProduct(array $data)
@@ -74,9 +104,18 @@ class ProductService
 
     public function getFormData()
     {
+        // 缓存分类和品牌数据，避免重复查询
+        $categories = cache()->remember('categories_for_select', 600, function () {
+            return Category::orderBy('name')->get(['id', 'name']);
+        });
+
+        $brands = cache()->remember('brands_for_select', 600, function () {
+            return Brand::orderBy('name')->get(['id', 'name']);
+        });
+
         return [
-            'categories' => Category::orderBy('name')->get(),
-            'brands' => Brand::orderBy('name')->get(),
+            'categories' => $categories,
+            'brands' => $brands,
         ];
     }
 

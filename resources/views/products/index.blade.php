@@ -8,55 +8,139 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Parts & Accessories</h1>
         <div class="btn-group">
-        <a href="{{ route('products.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add New Part
-        </a>
-            <a href="{{ route('manage.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-gear"></i> Manage Categories & Brands
+            <a href="{{ route('products.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Part
             </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-grid"></i> Manage Categories
+                </a>
+                <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-tags"></i> Manage Brands
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Search and Filter -->
-    <div class="card mb-4">
+    <!-- Search Bar (Always Visible) -->
+    <div class="card mb-3">
         <div class="card-body">
-            <form action="{{ route('products.index') }}" method="GET" class="row g-3" id="searchForm">
-                <div class="col-md-4">
-                    <div class="position-relative">
-                        <input type="text" name="search" class="form-control" placeholder="Search parts... (Press / to focus)" value="{{ request('search') }}" id="searchInput">
-                        <div class="position-absolute top-50 end-0 translate-middle-y pe-3" id="searchLoader" style="display: none;">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Searching...</span>
+            <form action="{{ route('products.index') }}" method="GET" id="searchForm">
+                <!-- Hidden inputs to preserve other filter values -->
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                <input type="hidden" name="brand" value="{{ request('brand') }}">
+                <input type="hidden" name="location" value="{{ request('location') }}">
+                <input type="hidden" name="stock_status" value="{{ request('stock_status') }}">
+                <input type="hidden" name="min_price" value="{{ request('min_price') }}">
+                <input type="hidden" name="max_price" value="{{ request('max_price') }}">
+                
+                <div class="row">
+                    <div class="col-12">
+                        <label for="searchInput" class="form-label">Search Products</label>
+                        <div class="position-relative">
+                            <input type="text" name="search" class="form-control" placeholder="Search by part number, name, or description..." value="{{ request('search') }}" id="searchInput">
+                            <div class="position-absolute top-50 end-0 translate-middle-y pe-3" id="searchLoader" style="display: none;">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Searching...</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select name="category" class="form-select" id="categorySelect">
-                        <option value="">All Categories</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select name="brand" class="form-select" id="brandSelect">
-                        <option value="">All Brands</option>
-                        @foreach($brands as $brand)
-                            <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <div class="d-grid">
-                        @if(request('search') || request('category') || request('brand'))
-                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-lg"></i> Clear
+            </form>
+        </div>
+    </div>
+
+    <!-- Advanced Filters (Collapsible) -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="bi bi-funnel"></i> Advanced Filters
+                    @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+                        <span class="badge bg-primary ms-2">Active</span>
+                    @endif
+                </h6>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse" id="filterToggleBtn">
+                    <i class="bi bi-chevron-down" id="filterIcon"></i> 
+                    <span id="filterText">Show Filters</span>
+                </button>
+            </div>
+        </div>
+        <div class="collapse" id="filterCollapse">
+            <div class="card-body">
+                <form action="{{ route('products.index') }}" method="GET" id="filterForm">
+                    <!-- Preserve search value -->
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+
+                    <!-- Category and Brand Filters -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="categorySelect" class="form-label">Category</label>
+                            <select name="category" class="form-select" id="categorySelect">
+                                <option value="">All Categories</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="brandSelect" class="form-label">Brand</label>
+                            <select name="brand" class="form-select" id="brandSelect">
+                                <option value="">All Brands</option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Location and Stock Status -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="locationFilter" class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" id="locationFilter" placeholder="Filter by location..." value="{{ request('location') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="stockStatus" class="form-label">Stock Status</label>
+                            <select name="stock_status" class="form-select" id="stockStatus">
+                                <option value="">All Stock Levels</option>
+                                <option value="in_stock" {{ request('stock_status') == 'in_stock' ? 'selected' : '' }}>In Stock (> 0)</option>
+                                <option value="low_stock" {{ request('stock_status') == 'low_stock' ? 'selected' : '' }}>Low Stock (1-10)</option>
+                                <option value="good_stock" {{ request('stock_status') == 'good_stock' ? 'selected' : '' }}>Good Stock (> 10)</option>
+                                <option value="out_of_stock" {{ request('stock_status') == 'out_of_stock' ? 'selected' : '' }}>Out of Stock (0)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="minPrice" class="form-label">Min Price ($)</label>
+                            <input type="number" name="min_price" class="form-control" id="minPrice" placeholder="0.00" step="0.01" value="{{ request('min_price') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="maxPrice" class="form-label">Max Price ($)</label>
+                            <input type="number" name="max_price" class="form-control" id="maxPrice" placeholder="999.99" step="0.01" value="{{ request('max_price') }}">
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Apply Filters
+                        </button>
+                        @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+                        <a href="{{ route('products.index') }}{{ request('search') ? '?search=' . urlencode(request('search')) : '' }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg"></i> Clear Filters
                         </a>
                         @endif
+                        <button type="button" class="btn btn-outline-secondary ms-auto" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                            <i class="bi bi-chevron-up"></i> Hide Filters
+                        </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -76,66 +160,111 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Part Number</th>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Brand</th>
-                            <th>Location</th>
-                            <th>Quantity</th>
-                            <th>Purchase Price</th>
-                            <th>Selling Price</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($products as $product)
-                        <tr>
-                            <td>{{ $product->part_number }}</td>
-                            <td>
-                                @if($product->picture)
-                                    <img src="{{ asset('storage/' . $product->picture) }}" alt="{{ $product->name }}" 
-                                        class="img-thumbnail" style="max-width: 50px; max-height: 50px;">
-                                @else
-                                    <div class="bg-light text-center" style="width: 50px; height: 50px; line-height: 50px;">
-                                        <i class="bi bi-image"></i>
-                                    </div>
-                                @endif
-                            </td>
-                            <td>{{ $product->name }}</td>
-                            <td>
-                                <span class="badge bg-info">{{ $product->category ? $product->category->name : 'Unknown' }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">{{ $product->brand ? $product->brand->name : 'Unknown' }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-primary">{{ $product->location ?: 'Unknown' }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-{{ $product->quantity > 10 ? 'success' : ($product->quantity > 0 ? 'warning' : 'danger') }}">
-                                    {{ $product->quantity }}
+            <!-- Products Grid -->
+            <div class="row g-4">
+                @forelse($products as $product)
+                <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
+                    <div class="card h-100 product-card">
+                        <!-- Product Image -->
+                        <div class="card-img-container" style="height: 200px; overflow: hidden; position: relative;">
+                            @if($product->picture)
+                                <img src="{{ asset('storage/' . $product->picture) }}" 
+                                     alt="{{ $product->name }}" 
+                                     class="card-img-top" 
+                                     style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+                                     onclick="showProductModal({
+                                        id: {{ $product->id }},
+                                        name: '{{ addslashes($product->name) }}',
+                                        part_number: '{{ $product->part_number }}',
+                                        category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
+                                        brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                        location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
+                                        quantity: {{ $product->quantity }},
+                                        purchase_price: {{ $product->purchase_price }},
+                                        selling_price: {{ $product->selling_price }},
+                                        description: '{{ addslashes($product->description ?? '') }}',
+                                        picture: '{{ $product->picture }}',
+                                        edit_url: '{{ route('products.edit', $product) }}'
+                                     })">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted"
+                                     style="cursor: pointer;"
+                                     onclick="showProductModal({
+                                        id: {{ $product->id }},
+                                        name: '{{ addslashes($product->name) }}',
+                                        part_number: '{{ $product->part_number }}',
+                                        category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
+                                        brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                        location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
+                                        quantity: {{ $product->quantity }},
+                                        purchase_price: {{ $product->purchase_price }},
+                                        selling_price: {{ $product->selling_price }},
+                                        description: '{{ addslashes($product->description ?? '') }}',
+                                        picture: '{{ $product->picture }}',
+                                        edit_url: '{{ route('products.edit', $product) }}'
+                                     })">
+                                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                </div>
+                            @endif
+                            
+                            <!-- Quantity Badge -->
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-{{ $product->quantity > 10 ? 'success' : ($product->quantity > 0 ? 'warning' : 'danger') }} px-2 py-1">
+                                    {{ $product->quantity }} in stock
                                 </span>
-                            </td>
-                            <td>${{ number_format($product->purchase_price, 2) }}</td>
-                            <td>${{ number_format($product->selling_price, 2) }}</td>
-                            <td>
-                                <div class="btn-group">
-                                    
-                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body d-flex flex-column">
+                            <!-- Part Number -->
+                            <small class="text-muted mb-1">{{ $product->part_number }}</small>
+                            
+                            <!-- Product Name -->
+                            <h6 class="card-title mb-2 fw-bold" style="min-height: 2.4rem; line-height: 1.2;">
+                                {{ $product->name }}
+                            </h6>
+                            
+                            <!-- Category & Brand -->
+                            <div class="mb-2">
+                                <span class="badge bg-info me-1">{{ $product->category ? $product->category->name : 'Unknown' }}</span>
+                                <span class="badge bg-secondary">{{ $product->brand ? $product->brand->name : 'Unknown' }}</span>
+                            </div>
+                            
+                            <!-- Location -->
+                            @if($product->location)
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-geo-alt"></i> {{ $product->location }}
+                                </small>
+                            </div>
+                            @endif
+                            
+                            <!-- Prices -->
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <small class="text-muted d-block">Purchase</small>
+                                        <span class="fw-semibold">${{ number_format($product->purchase_price, 2) }}</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted d-block">Selling</small>
+                                        <span class="fw-semibold text-success">${{ number_format($product->selling_price, 2) }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                    <button type="button" class="btn btn-sm btn-outline-info flex-fill" 
                                         title="Quick View" 
                                         onclick="showProductModal({
                                             id: {{ $product->id }},
                                             name: '{{ addslashes($product->name) }}',
-                                                                        part_number: '{{ $product->part_number }}',
-                            category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
-                            brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                            location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
-                            quantity: {{ $product->quantity }},
+                                            part_number: '{{ $product->part_number }}',
+                                            category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
+                                            brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                            location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
+                                            quantity: {{ $product->quantity }},
                                             purchase_price: {{ $product->purchase_price }},
                                             selling_price: {{ $product->selling_price }},
                                             description: '{{ addslashes($product->description ?? '') }}',
@@ -144,39 +273,41 @@
                                         })">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-warning" 
-                                    title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                    <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
+                                    <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-warning flex-fill" 
+                                       title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline flex-fill">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100" 
                                             title="Delete" onclick="return confirm('Are you sure you want to delete this part?')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
                                 </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="10" class="text-center py-5">
-                                @if(isset($isSearching) && $isSearching)
-                                    <i class="bi bi-search fs-1 text-muted"></i>
-                                    <p class="mt-3 mb-2">No parts found matching your search criteria.</p>
-                                    <p class="text-muted small">Try adjusting your search terms or filters.</p>
-                                @else
-                                    <i class="bi bi-box fs-1 text-muted"></i>
-                                    <p class="mt-3 mb-2">No parts available.</p>
-                                    <p class="text-muted small">Add some parts to get started.</p>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        @if(isset($isSearching) && $isSearching)
+                            <i class="bi bi-search fs-1 text-muted"></i>
+                            <p class="mt-3 mb-2 h5">No parts found matching your search criteria.</p>
+                            <p class="text-muted">Try adjusting your search terms or filters.</p>
+                        @else
+                            <i class="bi bi-box fs-1 text-muted"></i>
+                            <p class="mt-3 mb-2 h5">No parts available.</p>
+                            <p class="text-muted">Add some parts to get started.</p>
+                        @endif
+                    </div>
+                </div>
+                @endforelse
             </div>
+
+
 
             <!-- Pagination with Info -->
             @if(isset($isSearching) && $isSearching)
@@ -243,8 +374,134 @@
 </div>
 @endsection 
 
+@push('styles')
+<style>
+.product-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid #e3e6f0;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-img-container:hover img {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.btn-sm {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .col-xl-4, .col-lg-4, .col-md-4, .col-sm-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Loading animation for images */
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+/* Ensure consistent card heights */
+.product-card {
+    min-height: 400px;
+}
+
+/* Better responsive grid spacing */
+.row.g-4 {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 1.5rem;
+}
+</style>
+@endpush
+
 @push('scripts')
 <script>
+// Filter collapse toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterCollapse = document.getElementById('filterCollapse');
+    const filterIcon = document.getElementById('filterIcon');
+    const filterText = document.getElementById('filterText');
+    
+    if (filterCollapse && filterIcon && filterText) {
+        filterCollapse.addEventListener('show.bs.collapse', function() {
+            filterIcon.className = 'bi bi-chevron-up';
+            filterText.textContent = 'Hide Filters';
+        });
+        
+        filterCollapse.addEventListener('hide.bs.collapse', function() {
+            filterIcon.className = 'bi bi-chevron-down';
+            filterText.textContent = 'Show Filters';
+        });
+        
+        // Auto-open filters if any filter is active (excluding search)
+        @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+            new bootstrap.Collapse(filterCollapse, {show: true});
+        @endif
+    }
+});
+
+// Search functionality (for the main search bar)
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    const searchLoader = document.getElementById('searchLoader');
+    
+    let lastSearchValue = searchInput ? searchInput.value : '';
+    let isSearching = false;
+    
+    // Function to show/hide loading spinner
+    function showSearchLoader() {
+        if (!isSearching && searchLoader) {
+            searchLoader.style.display = 'block';
+            isSearching = true;
+        }
+    }
+    
+    function hideSearchLoader() {
+        if (searchLoader) {
+            searchLoader.style.display = 'none';
+        }
+        isSearching = false;
+    }
+    
+    // Auto-focus search input if there's a search term (after page load)
+    if (searchInput && searchInput.value.trim() !== '') {
+        setTimeout(function() {
+            searchInput.focus();
+            // Move cursor to end of text
+            const length = searchInput.value.length;
+            searchInput.setSelectionRange(length, length);
+        }, 100);
+    }
+    
+    // Auto-submit on search input (no delay)
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const currentValue = this.value.trim();
+            
+            if (currentValue !== lastSearchValue) {
+                lastSearchValue = currentValue;
+                showSearchLoader();
+                searchForm.submit();
+            }
+        });
+    }
+    
+    // Hide loader when page loads
+    window.addEventListener('load', function() {
+        hideSearchLoader();
+    });
+});
+
 function showProductModal(product) {
     // Update modal title
     document.getElementById('productModalLabel').textContent = product.name;
@@ -252,7 +509,7 @@ function showProductModal(product) {
     // Update product image
     const imageContainer = document.getElementById('productImage');
     if (product.picture) {
-        imageContainer.innerHTML = `<img src="{{ asset('storage/') }}/${product.picture}" alt="${product.name}" class="img-fluid rounded">`;
+        imageContainer.innerHTML = `<img src="/storage/${product.picture}" alt="${product.name}" class="img-fluid rounded">`;
     } else {
         imageContainer.innerHTML = `
             <div class="bg-light text-center p-5 rounded">
@@ -279,95 +536,6 @@ function showProductModal(product) {
     modal.show();
 }
 
-// Auto-search functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const categorySelect = document.getElementById('categorySelect');
-    const brandSelect = document.getElementById('brandSelect');
-    const searchForm = document.getElementById('searchForm');
-    const searchLoader = document.getElementById('searchLoader');
-    
-    let searchTimer;
-    let lastSearchValue = searchInput.value;
-    let isSearching = false;
-    
-    // Function to show/hide loading spinner
-    function showLoader() {
-        if (!isSearching) {
-            searchLoader.style.display = 'block';
-            isSearching = true;
-        }
-    }
-    
-    function hideLoader() {
-        searchLoader.style.display = 'none';
-        isSearching = false;
-    }
-    
-    // Function to submit form with delay
-    function submitFormWithDelay() {
-        clearTimeout(searchTimer);
-        showLoader();
-        searchTimer = setTimeout(function() {
-            searchForm.submit();
-        }, 300); // Reduced delay to 300ms for better responsiveness
-    }
-    
-    // Auto-submit on text input (with delay)
-    searchInput.addEventListener('input', function() {
-        const currentValue = this.value.trim();
-        
-        // Only trigger search if value actually changed
-        if (currentValue !== lastSearchValue) {
-            lastSearchValue = currentValue;
-            
-            // If input is empty, submit immediately to clear results
-            if (currentValue === '') {
-                showLoader();
-                searchForm.submit();
-            } else {
-                submitFormWithDelay();
-            }
-        }
-    });
-    
-    // Auto-submit on dropdown change (immediate)
-    categorySelect.addEventListener('change', function() {
-        showLoader();
-        searchForm.submit();
-    });
-    
-    brandSelect.addEventListener('change', function() {
-        showLoader();
-        searchForm.submit();
-    });
-    
-    // Hide loader when page loads (in case of browser back button)
-    window.addEventListener('load', function() {
-        hideLoader();
-    });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Focus search input when pressing '/'
-        if (e.key === '/' && !searchInput.matches(':focus') && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            searchInput.focus();
-            searchInput.select();
-        }
-        
-        // Clear search when pressing Escape (if search input is focused)
-        if (e.key === 'Escape' && searchInput.matches(':focus')) {
-            if (searchInput.value) {
-                searchInput.value = '';
-                lastSearchValue = '';
-                showLoader();
-                searchForm.submit();
-            } else {
-                searchInput.blur();
-            }
-        }
-    });
-});
+
 </script>
 @endpush 
