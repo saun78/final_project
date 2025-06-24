@@ -2,12 +2,27 @@
 
 @section('title', 'Parts & Accessories')
 
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 @section('content')
 <div class="container-fluid">
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Parts & Accessories</h1>
-        <div class="btn-group">
+        <div class="d-flex gap-2">
+            <!-- View Toggle -->
+            <div class="btn-group" role="group" aria-label="View Toggle">
+                <button type="button" class="btn btn-outline-secondary active" id="gridViewBtn" onclick="switchView('grid')">
+                    <i class="bi bi-grid-3x3-gap"></i> Grid
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="tableViewBtn" onclick="switchView('table')">
+                    <i class="bi bi-table"></i> Table
+                </button>
+            </div>
+            
+            <!-- Action Buttons -->
             <a href="{{ route('products.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Add New Part
             </a>
@@ -21,6 +36,8 @@
             </div>
         </div>
     </div>
+
+
 
     <!-- Search Bar (Always Visible) -->
     <div class="card mb-3">
@@ -160,8 +177,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-            <!-- Products Grid -->
-            <div class="row g-4">
+            <!-- Grid View -->
+            <div class="row g-4" id="gridView">
                 @forelse($products as $product)
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
                     <div class="card h-100 product-card">
@@ -244,8 +261,13 @@
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <small class="text-muted d-block">Purchase</small>
-                                        <span class="fw-semibold">${{ number_format($product->purchase_price, 2) }}</span>
+                                        <small class="text-muted d-block">Avg. Cost</small>
+                                        @php
+                                            $avgCost = $product->inventoryBatches()->where('quantity', '>', 0)->exists() 
+                                                ? $product->inventoryBatches()->where('quantity', '>', 0)->get()->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $product->inventoryBatches()->where('quantity', '>', 0)->sum('quantity')
+                                                : $product->purchase_price;
+                                        @endphp
+                                        <span class="fw-semibold">${{ number_format($avgCost, 2) }}</span>
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted d-block">Selling</small>
@@ -253,8 +275,24 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Batch Information -->
+                                @if($product->inventoryBatches()->where('quantity', '>', 0)->exists())
+                                <div class="mb-2">
+                                    <small class="text-info">
+                                        <i class="bi bi-layers"></i> 
+                                        {{ $product->inventoryBatches()->where('quantity', '>', 0)->count() }} batches
+                                        @php
+                                            $profitMargin = $avgCost > 0 ? (($product->selling_price - $avgCost) / $avgCost) * 100 : 0;
+                                        @endphp
+                                        | <span class="text-{{ $profitMargin >= 0 ? 'success' : 'danger' }}">{{ number_format($profitMargin, 1) }}% margin</span>
+                                    </small>
+                                </div>
+                                @endif
+                                
                                 <!-- Action Buttons -->
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <div class="d-grid gap-1">
+                                    <!-- Top Row -->
+                                    <div class="d-flex gap-1">
                                     <button type="button" class="btn btn-sm btn-outline-info flex-fill" 
                                         title="Quick View" 
                                         onclick="showProductModal({
@@ -285,6 +323,18 @@
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    </div>
+                                    <!-- Bottom Row - Batch Management -->
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ route('products.stock-in.form', $product) }}" class="btn btn-sm btn-success flex-fill" 
+                                           title="Stock In">
+                                            <i class="bi bi-box-arrow-in-down"></i> Stock In
+                                        </a>
+                                        <a href="{{ route('products.batches', $product) }}" class="btn btn-sm btn-outline-primary flex-fill" 
+                                           title="View Batches">
+                                            <i class="bi bi-list-ul"></i> Batches
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -307,7 +357,174 @@
                 @endforelse
             </div>
 
-
+            <!-- Table View -->
+            <div class="table-responsive" id="tableView" style="display: none;">
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-nowrap">Product Name</th>
+                            <th class="text-nowrap">Part Number</th>
+                            <th class="text-nowrap">Category</th>
+                            <th class="text-nowrap">Brand</th>
+                            <th class="text-nowrap">Location</th>
+                            <th class="text-nowrap text-center">Stock</th>
+                            <th class="text-nowrap text-end">Avg. Cost</th>
+                            <th class="text-nowrap text-end">Selling Price</th>
+                            <th class="text-nowrap text-center">Batches</th>
+                            <th class="text-nowrap text-center" style="width: 60px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($products as $product)
+                        <tr style="cursor: pointer;" onclick="showProductModal({
+                            id: {{ $product->id }},
+                            name: '{{ addslashes($product->name) }}',
+                            part_number: '{{ $product->part_number }}',
+                            category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
+                            brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                            location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
+                            quantity: {{ $product->quantity }},
+                            purchase_price: {{ $product->purchase_price }},
+                            selling_price: {{ $product->selling_price }},
+                            description: '{{ addslashes($product->description ?? '') }}',
+                            picture: '{{ $product->picture }}',
+                            edit_url: '{{ route('products.edit', $product) }}'
+                        })">
+                            <!-- Product Name -->
+                            <td class="align-middle">
+                                <div class="fw-semibold">{{ $product->name }}</div>
+                                @if($product->description)
+                                    <small class="text-muted d-block">{{ Str::limit($product->description, 50) }}</small>
+                                @endif
+                            </td>
+                            
+                            <!-- Part Number -->
+                            <td class="align-middle">
+                                <code class="text-primary">{{ $product->part_number }}</code>
+                            </td>
+                            
+                            <!-- Category -->
+                            <td class="align-middle">
+                                <span class="text-nowrap">{{ $product->category ? $product->category->name : '-' }}</span>
+                            </td>
+                            
+                            <!-- Brand -->
+                            <td class="align-middle">
+                                <span class="text-nowrap">{{ $product->brand ? $product->brand->name : '-' }}</span>
+                            </td>
+                            
+                            <!-- Location -->
+                            <td class="align-middle">
+                                <span class="text-nowrap">{{ $product->location ?? '-' }}</span>
+                            </td>
+                            
+                            <!-- Stock -->
+                            <td class="align-middle text-center">
+                                <span class="fw-semibold @if($product->quantity <= 0) text-danger @elseif($product->quantity <= 10) text-warning @else text-success @endif">
+                                    {{ $product->quantity }}
+                                </span>
+                            </td>
+                            
+                            <!-- Average Cost -->
+                            <td class="align-middle text-end">
+                                @php
+                                    $avgCost = $product->inventoryBatches()->where('quantity', '>', 0)->exists() 
+                                        ? $product->inventoryBatches()->where('quantity', '>', 0)->get()->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $product->inventoryBatches()->where('quantity', '>', 0)->sum('quantity')
+                                        : $product->purchase_price;
+                                @endphp
+                                <span class="text-nowrap">${{ number_format($avgCost, 2) }}</span>
+                            </td>
+                            
+                            <!-- Selling Price -->
+                            <td class="align-middle text-end">
+                                <span class="text-nowrap fw-semibold">${{ number_format($product->selling_price, 2) }}</span>
+                            </td>
+                            
+                            <!-- Batch Info -->
+                            <td class="align-middle text-center">
+                                @if($product->inventoryBatches()->where('quantity', '>', 0)->exists())
+                                    {{ $product->inventoryBatches()->where('quantity', '>', 0)->count() }}
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            
+                            <!-- Actions -->
+                            <td class="align-middle text-center" onclick="event.stopPropagation();">
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" 
+                                                onclick="showProductModal({
+                                                    id: {{ $product->id }},
+                                                    name: '{{ addslashes($product->name) }}',
+                                                    part_number: '{{ $product->part_number }}',
+                                                    category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
+                                                    brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                                    location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
+                                                    quantity: {{ $product->quantity }},
+                                                    purchase_price: {{ $product->purchase_price }},
+                                                    selling_price: {{ $product->selling_price }},
+                                                    description: '{{ addslashes($product->description ?? '') }}',
+                                                    picture: '{{ $product->picture }}',
+                                                    edit_url: '{{ route('products.edit', $product) }}'
+                                                })">
+                                                <i class="bi bi-eye me-2"></i>View Details
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('products.edit', $product) }}">
+                                                <i class="bi bi-pencil me-2"></i>Edit Product
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('products.stock-in.form', $product) }}">
+                                                <i class="bi bi-box-arrow-in-down me-2"></i>Stock In
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('products.batches', $product) }}">
+                                                <i class="bi bi-list-ul me-2"></i>View Batches
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger" 
+                                                    onclick="return confirm('Are you sure you want to delete this part?')">
+                                                    <i class="bi bi-trash me-2"></i>Delete Product
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="10" class="text-center py-5">
+                                @if(isset($isSearching) && $isSearching)
+                                    <i class="bi bi-search fs-1 text-muted"></i>
+                                    <p class="mt-3 mb-2 h5">No parts found matching your search criteria.</p>
+                                    <p class="text-muted">Try adjusting your search terms or filters.</p>
+                                @else
+                                    <i class="bi bi-box fs-1 text-muted"></i>
+                                    <p class="mt-3 mb-2 h5">No parts available.</p>
+                                    <p class="text-muted">Add some parts to get started.</p>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination with Info -->
             @if(isset($isSearching) && $isSearching)
@@ -364,10 +581,20 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <a href="#" class="btn btn-primary" id="modalEditBtn">
-                    <i class="bi bi-pencil"></i> Edit
-                </a>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="me-auto">
+                    <button type="button" class="btn btn-danger" id="modalDeleteBtn" onclick="deleteProductFromModal()">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-success" id="modalStockInBtn">
+                        <i class="bi bi-box-arrow-in-down"></i> Stock In
+                    </a>
+                    <a href="#" class="btn btn-primary" id="modalEditBtn">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
@@ -420,13 +647,104 @@
     --bs-gutter-x: 1.5rem;
     --bs-gutter-y: 1.5rem;
 }
+
+/* Table view optimizations */
+#tableView .table {
+    margin-bottom: 0;
+}
+
+#tableView .table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-bottom: 2px solid #dee2e6;
+    padding: 1rem 0.75rem;
+}
+
+#tableView .table td {
+    font-size: 0.875rem;
+    padding: 1rem 0.75rem;
+    border: 1px solid #dee2e6;
+}
+
+#tableView .table-bordered {
+    border: 2px solid #dee2e6;
+}
+
+#tableView .table-bordered th,
+#tableView .table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+#tableView .table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transition: background-color 0.15s ease-in-out;
+}
+
+#tableView .table tbody tr[style*="cursor: pointer"]:hover {
+    background-color: rgba(0, 123, 255, 0.15);
+}
+
+/* Dropdown improvements */
+#tableView .dropdown-menu {
+    min-width: 160px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+#tableView .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+#tableView .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+#tableView .dropdown-divider {
+    margin: 0.25rem 0;
+}
+
+/* Responsive table improvements */
+@media (max-width: 1200px) {
+    #tableView .table td, #tableView .table th {
+        font-size: 0.75rem;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    #tableView .dropdown-item {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+/* Text alignment improvements */
+#tableView .text-nowrap {
+    white-space: nowrap;
+}
+
+#tableView .align-middle {
+    vertical-align: middle !important;
+}
+
+/* View toggle buttons */
+.btn-group .btn.active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+
 </style>
 @endpush
 
 @push('scripts')
 <script>
-// Filter collapse toggle functionality
+// Filter collapse toggle functionality and view initialization
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize view preference
+    const savedView = localStorage.getItem('productsViewPreference') || 'grid';
+    switchView(savedView);
+    
+    // Filter collapse functionality
     const filterCollapse = document.getElementById('filterCollapse');
     const filterIcon = document.getElementById('filterIcon');
     const filterText = document.getElementById('filterText');
@@ -502,7 +820,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// View switching functionality
+function switchView(viewType) {
+    const gridView = document.getElementById('gridView');
+    const tableView = document.getElementById('tableView');
+    const gridBtn = document.getElementById('gridViewBtn');
+    const tableBtn = document.getElementById('tableViewBtn');
+    
+    if (viewType === 'grid') {
+        gridView.style.display = 'flex';
+        tableView.style.display = 'none';
+        gridBtn.classList.add('active');
+        tableBtn.classList.remove('active');
+        localStorage.setItem('productsViewPreference', 'grid');
+    } else {
+        gridView.style.display = 'none';
+        tableView.style.display = 'block';
+        tableBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        localStorage.setItem('productsViewPreference', 'table');
+    }
+}
+
+// Load user's view preference on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedView = localStorage.getItem('productsViewPreference') || 'grid';
+    switchView(savedView);
+});
+
+// Global variable to store current product data for modal actions
+let currentModalProduct = null;
+
 function showProductModal(product) {
+    // Store product data globally for modal actions
+    currentModalProduct = product;
+    
     // Update modal title
     document.getElementById('productModalLabel').textContent = product.name;
     
@@ -528,12 +880,45 @@ function showProductModal(product) {
     document.getElementById('modalSellingPrice').textContent = product.selling_price.toFixed(2);
     document.getElementById('modalDescription').textContent = product.description || 'No description available';
     
-    // Update edit button link
+    // Update button links
     document.getElementById('modalEditBtn').href = product.edit_url;
+    document.getElementById('modalStockInBtn').href = `/products/${product.id}/stock-in`;
     
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('productModal'));
     modal.show();
+}
+
+function deleteProductFromModal() {
+    if (!currentModalProduct) return;
+    
+    if (confirm(`Are you sure you want to delete "${currentModalProduct.name}"? This action cannot be undone.`)) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/products/${currentModalProduct.id}`;
+        
+        // Add CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken.getAttribute('content');
+            form.appendChild(csrfInput);
+        }
+        
+        // Add method override for DELETE
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 

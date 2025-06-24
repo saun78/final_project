@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <!-- Success Message -->
+    <!-- Success/Error Messages -->
     @if(session('success'))
         <div class="row mb-4">
             <div class="col-12">
@@ -89,6 +89,31 @@
             </div>
         </div>
     @endif
+
+    @if(session('error'))
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- System Notice -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-info-circle me-2 mt-1 text-info"></i>
+                    <div>
+                        <strong>Batch Inventory System Active:</strong> Order editing and deletion are disabled to maintain accurate batch inventory tracking and audit trail. All sales are recorded using FIFO (First In, First Out) cost calculation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="row">
@@ -169,14 +194,16 @@
                                                     <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-primary btn-sm" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm" title="Edit">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
                                                     <a href="{{ route('orders.print', $order) }}" class="btn btn-outline-success btn-sm" target="_blank" title="Print">
                                                         <i class="bi bi-printer"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-outline-danger btn-sm" title="Delete"
-                                                            onclick="confirmDelete({{ $order->id }}, '{{ $order->order_number }}')">
+                                                    <!-- Edit and Delete disabled for batch system integrity -->
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
+                                                            title="Editing disabled to maintain batch inventory integrity">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled
+                                                            title="Deletion disabled to maintain audit trail and batch inventory integrity">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>

@@ -96,38 +96,44 @@
                             @enderror
                         </div>
 
+                        <!-- Pricing Information (Read-Only) -->
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-exclamation-triangle"></i> Price Management</h6>
+                            <p class="mb-0 small">
+                                Prices cannot be edited here. Use <strong>"Stock In"</strong> for new batches with different purchase prices, 
+                                or use <strong>"Batches"</strong> page to update selling prices for all future transactions.
+                            </p>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="quantity" class="form-label">Quantity</label>
-                                <input type="number" class="form-control @error('quantity') is-invalid @enderror" 
-                                    id="quantity" name="quantity" value="{{ old('quantity', $product->quantity) }}" min="0" required>
-                                @error('quantity')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label for="quantity" class="form-label">Current Total Quantity</label>
+                                <input type="number" class="form-control bg-light" 
+                                    id="quantity" name="quantity" value="{{ $product->quantity }}" readonly>
+                                <small class="text-muted">Managed through batch system</small>
                             </div>
                             <div class="col-md-4">
-                                <label for="purchase_price" class="form-label">Purchase Price</label>
+                                <label for="purchase_price" class="form-label">Average Purchase Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control @error('purchase_price') is-invalid @enderror" 
-                                        id="purchase_price" name="purchase_price" value="{{ old('purchase_price', $product->purchase_price) }}" 
-                                        step="0.01" min="0" required>
+                                    <input type="number" class="form-control bg-light" 
+                                        id="purchase_price" name="purchase_price" 
+                                        value="{{ $product->inventoryBatches()->where('quantity', '>', 0)->exists() 
+                                                    ? number_format($product->inventoryBatches()->where('quantity', '>', 0)->get()->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $product->inventoryBatches()->where('quantity', '>', 0)->sum('quantity'), 2)
+                                                    : number_format($product->purchase_price, 2) }}" 
+                                        readonly>
                                 </div>
-                                @error('purchase_price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <small class="text-muted">Calculated from active batches</small>
                             </div>
                             <div class="col-md-4">
-                                <label for="selling_price" class="form-label">Selling Price</label>
+                                <label for="selling_price" class="form-label">Current Selling Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="number" class="form-control @error('selling_price') is-invalid @enderror" 
-                                        id="selling_price" name="selling_price" value="{{ old('selling_price', $product->selling_price) }}" 
-                                        step="0.01" min="0" required>
+                                    <input type="number" class="form-control bg-light" 
+                                        id="selling_price" name="selling_price" value="{{ number_format($product->selling_price, 2) }}" 
+                                        readonly>
                                 </div>
-                                @error('selling_price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <small class="text-muted">Update via Batches page</small>
                             </div>
                         </div>
 

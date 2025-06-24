@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductInventory;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OrderController extends Controller
 {
+
     public function index(Request $request)
     {
         $query = Order::with('orderItems.product');
@@ -81,7 +84,7 @@ class OrderController extends Controller
             'items.*.price' => 'required|numeric|min:0'
         ]);
 
-        // Check stock availability for all items first
+        // Check stock availability for all items first (using batch inventory)
         $productIds = collect($request->items)->pluck('product_id')->unique();
         $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
         
@@ -92,9 +95,12 @@ class OrderController extends Controller
                     ->withErrors(['stock' => "Product not found."])
                     ->withInput();
             }
-            if ($product->quantity < $item['quantity']) {
+            
+            // Check real stock from batch inventory
+            $availableStock = ProductInventory::getTotalStock($item['product_id']);
+            if ($availableStock < $item['quantity']) {
                 return redirect()->back()
-                    ->withErrors(['stock' => "Insufficient stock for {$product->name}. Available: {$product->quantity}, Required: {$item['quantity']}"])
+                    ->withErrors(['stock' => "Insufficient stock for {$product->name}. Available: {$availableStock}, Required: {$item['quantity']}"])
                     ->withInput();
             }
         }
@@ -114,20 +120,33 @@ class OrderController extends Controller
             'amount' => $totalAmount
         ]);
 
-        // Create order items and update stock (using transaction)
+        // Create order items and update stock using FIFO (using transaction)
         DB::transaction(function () use ($request, $order, $products) {
             foreach ($request->items as $item) {
-                // Create order item
+                $product = $products->get($item['product_id']);
+                
+                // Deduct stock using FIFO method
+                try {
+                    $batchDeductions = $product->deductStock($item['quantity']);
+                    
+
+                    
+                } catch (\Exception $e) {
+                    throw new \Exception("Failed to deduct stock for {$product->name}: " . $e->getMessage());
+                }
+
+                // Create order item with cost information from FIFO
+                $totalCost = collect($batchDeductions)->sum('cost');
+                $averageCost = $totalCost / $item['quantity'];
+                
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'price' => $item['price']
+                    'price' => $item['price'],
+                    // Note: You might want to add a cost_price field to order_item table
+                    // 'cost_price' => $averageCost,
                 ]);
-
-                // Update product stock
-                $product = $products->get($item['product_id']);
-                $product->decrement('quantity', $item['quantity']);
             }
         });
 
@@ -149,6 +168,12 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
+        // NOTE: Order editing with batch system is complex and risky
+        // For now, we'll prevent order editing to maintain data integrity
+        return redirect()->back()->with('error', 'Order editing is disabled to maintain batch inventory integrity. Please create a new order instead.');
+        
+        // TODO: Implement proper order editing with batch reversal/reallocation logic
+        /*
         $request->validate([
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:product,id',
@@ -156,76 +181,38 @@ class OrderController extends Controller
             'items.*.price' => 'required|numeric|min:0'
         ]);
 
-        // First, restore stock from existing order items
-        foreach ($order->orderItems as $existingItem) {
-            $product = Product::find($existingItem->product_id);
-            $product->quantity += $existingItem->quantity;
-            $product->save();
-        }
-
-        // Check stock availability for new items
-        foreach ($request->items as $item) {
-            $product = Product::find($item['product_id']);
-            if ($product->quantity < $item['quantity']) {
-                // Restore the stock we just added back
-                foreach ($order->orderItems as $existingItem) {
-                    $restoreProduct = Product::find($existingItem->product_id);
-                    $restoreProduct->quantity -= $existingItem->quantity;
-                    $restoreProduct->save();
-                }
-                
-                return redirect()->back()
-                    ->withErrors(['stock' => "Insufficient stock for {$product->name}. Available: {$product->quantity}, Required: {$item['quantity']}"])
-                    ->withInput();
-            }
-        }
-
-        // Calculate new total amount
-        $totalAmount = 0;
-        foreach ($request->items as $item) {
-            $totalAmount += $item['quantity'] * $item['price'];
-        }
-
-        // Update order
-        $order->update([
-            'amount' => $totalAmount
-        ]);
-
-        // Delete existing order items
-        $order->orderItems()->delete();
-
-        // Create new order items and update stock
-        foreach ($request->items as $item) {
-            // Create order item
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'price' => $item['price']
-            ]);
-
-            // Update product stock
-            $product = Product::find($item['product_id']);
-            $product->quantity -= $item['quantity'];
-            $product->save();
-        }
-
-        return redirect()->route('orders.index')->with('success', 'Receipt updated successfully! Product stock updated.');
+        DB::transaction(function () use ($request, $order) {
+            // This would require complex logic to:
+            // 1. Reverse the original FIFO deductions
+            // 2. Re-add stock to original batches in correct order
+            // 3. Apply new FIFO deductions for updated quantities
+            // 4. Handle cases where original batches may have been further depleted
+            
+            // For data integrity, this feature is disabled for now
+            throw new \Exception('Order editing with batch system not yet implemented');
+        });
+        */
     }
 
     public function destroy(Order $order)
     {
-        // Restore stock for all order items before deleting
-        foreach ($order->orderItems as $orderItem) {
-            $product = Product::find($orderItem->product_id);
-            $product->quantity += $orderItem->quantity;
-            $product->save();
-        }
-
-        $order->orderItems()->delete();
-        $order->delete();
-
-        return redirect()->route('orders.index')->with('success', 'Receipt deleted successfully! Product stock restored.');
+        // NOTE: Order deletion with batch system restoration is complex
+        // For now, we'll prevent order deletion to maintain data integrity
+        return redirect()->back()->with('error', 'Order deletion is disabled to maintain batch inventory integrity. Orders are kept for audit trail.');
+        
+        // TODO: Implement proper batch restoration logic
+        /*
+        DB::transaction(function () use ($order) {
+            // This would require complex logic to:
+            // 1. Track which specific batches were deducted for this order
+            // 2. Restore quantities to the exact same batches
+            // 3. Handle cases where those batches might have been modified since
+            
+            // For data integrity, this feature is disabled for now
+            $order->orderItems()->delete();
+            $order->delete();
+        });
+        */
     }
 
     public function print(Order $order)

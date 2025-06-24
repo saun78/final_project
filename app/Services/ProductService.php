@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductInventory;
 use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
+
     public function getFilteredProducts($filters = [])
     {
         $query = Product::query();
@@ -65,8 +67,19 @@ class ProductService
             $query->where('selling_price', '<=', $filters['max_price']);
         }
 
-        // 总是使用分页，提高性能和用户体验
-        return $query->with(['category:id,name', 'brand:id,name'])->latest()->paginate(12);
+        // Check if any filters are applied for pagination
+        $isSearching = !empty($filters['search']) || !empty($filters['category']) || 
+                       !empty($filters['brand']) || !empty($filters['location']) || 
+                       !empty($filters['stock_status']) || !empty($filters['min_price']) || 
+                       !empty($filters['max_price']);
+
+        // If searching, limit to 100 results without pagination
+        // If not searching, use normal pagination
+        if ($isSearching) {
+            return $query->with(['category', 'brand'])->latest()->limit(100)->get();
+        } else {
+            return $query->with(['category', 'brand'])->latest()->paginate(10);
+        }
     }
 
     public function createProduct(array $data)
@@ -75,11 +88,29 @@ class ProductService
             $data['picture'] = $data['picture']->store('products', 'public');
         }
 
-        return Product::create($data);
+        $product = Product::create($data);
+        
+        // Create initial batch if product has initial quantity
+        if (isset($data['quantity']) && $data['quantity'] > 0) {
+            $batchData = [
+                'quantity' => $data['quantity'],
+                'purchase_price' => $data['purchase_price'] ?? 0,
+                'received_date' => now()->toDateString(),
+                'supplier_ref' => null,
+                'notes' => 'Initial stock (created with product)',
+            ];
+            
+            $this->addStock($product, $batchData);
+        }
+        
+        return $product;
     }
 
     public function updateProduct(Product $product, array $data)
     {
+        // Store original data for activity logging
+        $originalData = $product->getOriginal();
+        
         if (isset($data['picture']) && $data['picture']) {
             // Delete old picture if exists
             if ($product->picture) {
@@ -89,6 +120,7 @@ class ProductService
         }
 
         $product->update($data);
+        
         return $product;
     }
 
@@ -104,18 +136,9 @@ class ProductService
 
     public function getFormData()
     {
-        // 缓存分类和品牌数据，避免重复查询
-        $categories = cache()->remember('categories_for_select', 600, function () {
-            return Category::orderBy('name')->get(['id', 'name']);
-        });
-
-        $brands = cache()->remember('brands_for_select', 600, function () {
-            return Brand::orderBy('name')->get(['id', 'name']);
-        });
-
         return [
-            'categories' => $categories,
-            'brands' => $brands,
+            'categories' => Category::orderBy('name')->get(),
+            'brands' => Brand::orderBy('name')->get(),
         ];
     }
 
@@ -133,5 +156,49 @@ class ProductService
         return Product::with(['category', 'brand'])
             ->where('quantity', 0)
             ->get();
+    }
+
+    /**
+     * Add stock to product (create new batch)
+     */
+    public function addStock(Product $product, array $data)
+    {
+        $batch = $product->addStock(
+            $data['quantity'],
+            $data['purchase_price'],
+            $data['received_date'] ?? null,
+            $data['supplier_ref'] ?? null,
+            $data['notes'] ?? null
+        );
+
+        return $batch;
+    }
+
+    /**
+     * Get batch inventory for a product
+     */
+    public function getProductBatches($productId)
+    {
+        return ProductInventory::where('product_id', $productId)
+            ->where('quantity', '>', 0)
+            ->orderBy('received_date', 'asc')
+            ->orderBy('batch_no', 'asc')
+            ->get();
+    }
+
+    /**
+     * Get low stock products using batch system
+     */
+    public function getLowStockProductsWithBatches($threshold = 10)
+    {
+        // Get products with total batch stock <= threshold
+        $products = Product::with(['category', 'brand', 'inventoryBatches'])
+            ->get()
+            ->filter(function($product) use ($threshold) {
+                $totalStock = $product->inventoryBatches->sum('quantity');
+                return $totalStock > 0 && $totalStock <= $threshold;
+            });
+
+        return $products;
     }
 } 

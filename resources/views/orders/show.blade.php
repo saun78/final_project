@@ -19,9 +19,10 @@
                             </a>
                         </div>
                         <div class="btn-group ms-2" role="group">
-                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-warning btn-sm">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled
+                                    title="Editing disabled to maintain batch inventory integrity">
                                 <i class="bi bi-pencil"></i> Edit
-                            </a>
+                            </button>
                             <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
                                 <i class="bi bi-arrow-left"></i> Back
                             </a>

@@ -14,16 +14,20 @@ return new class extends Migration
         Schema::create('product', function (Blueprint $table) {
             $table->id();
             $table->string("part_number");
-            $table->string("category_id");
-            $table->string("brand_id");
+            $table->unsignedBigInteger("category_id");
+            $table->unsignedBigInteger("brand_id");
             $table->string("location")->nullable();
             $table->string("description")->nullable();
             $table->string("name");
             $table->integer("quantity");
-            $table->integer("purchase_price");
-            $table->integer("selling_price");
+            $table->decimal("purchase_price", 10, 2)->default(0.00);
+            $table->decimal("selling_price", 10, 2)->default(0.00);
             $table->string("picture")->nullable();
             $table->timestamps();
+
+            // Add foreign key constraints
+            $table->foreign('category_id')->references('id')->on('category')->onDelete('cascade');
+            $table->foreign('brand_id')->references('id')->on('brand')->onDelete('cascade');
         });
     }
 
