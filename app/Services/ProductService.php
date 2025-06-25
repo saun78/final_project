@@ -3,18 +3,21 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductInventory;
 use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    public function getFilteredProducts($search = null, $categoryId = null, $brandId = null, $isSearching = false)
+
+    public function getFilteredProducts($filters = [])
     {
         $query = Product::query();
 
         // Apply search filters
-        if ($search) {
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
             $query->where(function($q) use ($search) {
                 $q->where('part_number', 'like', "%{$search}%")
                   ->orWhere('name', 'like', "%{$search}%")
@@ -22,13 +25,53 @@ class ProductService
             });
         }
 
-        if ($categoryId) {
-            $query->where('category_id', $categoryId);
+        // Filter by category
+        if (!empty($filters['category'])) {
+            $query->where('category_id', $filters['category']);
         }
 
-        if ($brandId) {
-            $query->where('brand_id', $brandId);
+        // Filter by brand
+        if (!empty($filters['brand'])) {
+            $query->where('brand_id', $filters['brand']);
         }
+
+        // Filter by location
+        if (!empty($filters['location'])) {
+            $query->where('location', 'like', "%{$filters['location']}%");
+        }
+
+        // Filter by stock status
+        if (!empty($filters['stock_status'])) {
+            switch ($filters['stock_status']) {
+                case 'in_stock':
+                    $query->where('quantity', '>', 0);
+                    break;
+                case 'low_stock':
+                    $query->whereBetween('quantity', [1, 10]);
+                    break;
+                case 'good_stock':
+                    $query->where('quantity', '>', 10);
+                    break;
+                case 'out_of_stock':
+                    $query->where('quantity', 0);
+                    break;
+            }
+        }
+
+        // Filter by price range
+        if (!empty($filters['min_price'])) {
+            $query->where('selling_price', '>=', $filters['min_price']);
+        }
+
+        if (!empty($filters['max_price'])) {
+            $query->where('selling_price', '<=', $filters['max_price']);
+        }
+
+        // Check if any filters are applied for pagination
+        $isSearching = !empty($filters['search']) || !empty($filters['category']) || 
+                       !empty($filters['brand']) || !empty($filters['location']) || 
+                       !empty($filters['stock_status']) || !empty($filters['min_price']) || 
+                       !empty($filters['max_price']);
 
         // If searching, limit to 100 results without pagination
         // If not searching, use normal pagination
@@ -45,11 +88,29 @@ class ProductService
             $data['picture'] = $data['picture']->store('products', 'public');
         }
 
-        return Product::create($data);
+        $product = Product::create($data);
+        
+        // Create initial batch if product has initial quantity
+        if (isset($data['quantity']) && $data['quantity'] > 0) {
+            $batchData = [
+                'quantity' => $data['quantity'],
+                'purchase_price' => $data['purchase_price'] ?? 0,
+                'received_date' => now()->toDateString(),
+                'supplier_ref' => null,
+                'notes' => 'Initial stock (created with product)',
+            ];
+            
+            $this->addStock($product, $batchData);
+        }
+        
+        return $product;
     }
 
     public function updateProduct(Product $product, array $data)
     {
+        // Store original data for activity logging
+        $originalData = $product->getOriginal();
+        
         if (isset($data['picture']) && $data['picture']) {
             // Delete old picture if exists
             if ($product->picture) {
@@ -59,6 +120,7 @@ class ProductService
         }
 
         $product->update($data);
+        
         return $product;
     }
 
@@ -94,5 +156,49 @@ class ProductService
         return Product::with(['category', 'brand'])
             ->where('quantity', 0)
             ->get();
+    }
+
+    /**
+     * Add stock to product (create new batch)
+     */
+    public function addStock(Product $product, array $data)
+    {
+        $batch = $product->addStock(
+            $data['quantity'],
+            $data['purchase_price'],
+            $data['received_date'] ?? null,
+            $data['supplier_ref'] ?? null,
+            $data['notes'] ?? null
+        );
+
+        return $batch;
+    }
+
+    /**
+     * Get batch inventory for a product
+     */
+    public function getProductBatches($productId)
+    {
+        return ProductInventory::where('product_id', $productId)
+            ->where('quantity', '>', 0)
+            ->orderBy('received_date', 'asc')
+            ->orderBy('batch_no', 'asc')
+            ->get();
+    }
+
+    /**
+     * Get low stock products using batch system
+     */
+    public function getLowStockProductsWithBatches($threshold = 10)
+    {
+        // Get products with total batch stock <= threshold
+        $products = Product::with(['category', 'brand', 'inventoryBatches'])
+            ->get()
+            ->filter(function($product) use ($threshold) {
+                $totalStock = $product->inventoryBatches->sum('quantity');
+                return $totalStock > 0 && $totalStock <= $threshold;
+            });
+
+        return $products;
     }
 } 

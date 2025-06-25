@@ -31,22 +31,9 @@ class ProductUpdateRequest extends FormRequest
             'brand_id' => 'required|exists:brand,id',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:0',
-            'purchase_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0|gte:purchase_price', // 售价不能低于成本价
             'picture' => 'nullable|image|max:2048', // Max 2MB
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [
-            'selling_price.gte' => 'The selling price cannot be lower than the purchase price.',
-        ];
-    }
+
 }

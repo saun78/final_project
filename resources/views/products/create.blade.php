@@ -37,7 +37,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="category_id" class="form-label mb-0">Category</label>
-                                    <a href="{{ route('manage.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
                                 </div>
@@ -57,7 +57,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="brand_id" class="form-label mb-0">Brand</label>
-                                    <a href="{{ route('manage.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                    <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
                                 </div>
@@ -95,11 +95,21 @@
                             @enderror
                         </div>
 
+                        <!-- Initial Stock and Pricing -->
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-info-circle"></i> Initial Stock & Batch Creation</h6>
+                            <p class="mb-0 small">
+                                If you set an initial quantity > 0, the system will automatically create the first batch record 
+                                with the specified purchase price. You can add more stock batches later using the "Stock In" feature.
+                            </p>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="quantity" class="form-label">Quantity</label>
+                                <label for="quantity" class="form-label">Initial Quantity</label>
                                 <input type="number" class="form-control @error('quantity') is-invalid @enderror" 
                                     id="quantity" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
+                                <small class="text-muted">Will create initial batch if > 0</small>
                                 @error('quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -112,6 +122,7 @@
                                         id="purchase_price" name="purchase_price" value="{{ old('purchase_price') }}" 
                                         step="0.01" min="0" required>
                                 </div>
+                                <small class="text-muted">Cost price for initial batch</small>
                                 @error('purchase_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -124,6 +135,7 @@
                                         id="selling_price" name="selling_price" value="{{ old('selling_price') }}" 
                                         step="0.01" min="0" required>
                                 </div>
+                                <small class="text-muted">Sales price for all transactions</small>
                                 @error('selling_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

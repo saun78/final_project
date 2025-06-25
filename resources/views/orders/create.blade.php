@@ -56,7 +56,8 @@
                                                 <option value="{{ $product->id }}" 
                                                         data-price="{{ $product->selling_price }}" 
                                                         data-stock="{{ $product->quantity }}"
-                                                        data-part-number="{{ $product->part_number ?? '' }}">
+                                                        data-part-number="{{ $product->part_number ?? '' }}"
+                                                        data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
                                                     @if($product->part_number)
                                                         [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} (Stock: {{ $product->quantity }})
                                                     @else
@@ -74,7 +75,7 @@
                                     <div class="col-md-2">
                                         <label class="form-label">Selling Price</label>
                                         <input type="number" name="items[0][price]" class="form-control price-input" 
-                                               step="0.01" min="0" required>
+                                               step="0.01" min="0" required readonly>
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Subtotal</label>
@@ -97,10 +98,42 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 offset-md-6">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>Payment Details</h5>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Payment Method</label>
+                                            <select name="payment_method" class="form-select" required>
+                                                <option value="">Select Payment Method</option>
+                                                <option value="cash">Cash</option>
+                                                <option value="card">Card</option>
+                                                <option value="tng_wallet">TNG Wallet</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Labor Fee</label>
+                                            <input type="number" name="labor_fee" id="laborFee" class="form-control" 
+                                                   step="0.01" min="0" value="0" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h5>Order Summary</h5>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Subtotal:</span>
+                                            <span id="subtotalAmount">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Labor Fee:</span>
+                                            <span id="laborFeeDisplay">$0.00</span>
+                                        </div>
+                                        <hr>
                                         <div class="d-flex justify-content-between">
                                             <strong>Total Amount:</strong>
                                             <strong id="totalAmount">$0.00</strong>
@@ -141,9 +174,11 @@ $(document).ready(function() {
     function initializeSelect2(selectElement) {
         $(selectElement).select2({
             theme: 'bootstrap4',
-            placeholder: 'Search product name or part number...',
+            placeholder: 'Search product name or part number',
             allowClear: true,
             width: '100%',
+            templateResult: formatProductOption,
+            templateSelection: formatProductSelection,
             matcher: function(params, data) {
                 // Always return data if no search term
                 if ($.trim(params.term) === '') {
@@ -172,6 +207,49 @@ $(document).ready(function() {
         });
     }
     
+    function formatProductOption(product) {
+        if (!product.id || !product.element) {
+            return product.text;
+        }
+        
+        var $product = $(product.element);
+        var imageUrl = $product.data('image');
+        var price = $product.data('price');
+        var stock = $product.data('stock');
+        var partNumber = $product.data('part-number');
+        
+        // Check if image URL contains a valid path
+        var hasValidImage = imageUrl && imageUrl.trim() !== '' && imageUrl.includes('storage');
+        
+        var imageElement = '';
+        if (hasValidImage) {
+            imageElement = '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />';
+        }
+        
+        var placeholderElement = '<div style="width: 40px; height: 40px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-right: 10px; display: ' + (hasValidImage ? 'none' : 'flex') + '; align-items: center; justify-content: center; font-size: 12px; color: #6c757d;"><i class="bi bi-image"></i></div>';
+        
+        var $container = $(
+            '<div class="d-flex align-items-center">' +
+                imageElement +
+                placeholderElement +
+                '<div>' +
+                    '<div style="font-weight: 500;">' + product.text.split(' - ')[0] + '</div>' +
+                    '<small class="text-muted">$' + price + ' - Stock: ' + stock + '</small>' +
+                '</div>' +
+            '</div>'
+        );
+        
+        return $container;
+    }
+    
+    function formatProductSelection(product) {
+        if (!product.id || !product.element) {
+            return product.text;
+        }
+        
+        return product.text.split(' - ')[0];
+    }
+    
     function updateSubtotal(row) {
         const quantity = parseFloat($(row).find('.quantity-input').val()) || 0;
         const price = parseFloat($(row).find('.price-input').val()) || 0;
@@ -181,12 +259,18 @@ $(document).ready(function() {
     }
     
     function updateTotal() {
-        let total = 0;
+        let subtotal = 0;
         $('.order-item').each(function() {
             const quantity = parseFloat($(this).find('.quantity-input').val()) || 0;
             const price = parseFloat($(this).find('.price-input').val()) || 0;
-            total += quantity * price;
+            subtotal += quantity * price;
         });
+        
+        const laborFee = parseFloat($('#laborFee').val()) || 0;
+        const total = subtotal + laborFee;
+        
+        $('#subtotalAmount').text('$' + subtotal.toFixed(2));
+        $('#laborFeeDisplay').text('$' + laborFee.toFixed(2));
         $('#totalAmount').text('$' + total.toFixed(2));
     }
     
@@ -271,6 +355,11 @@ $(document).ready(function() {
     // Initialize first item
     $('.order-item').each(function() {
         attachEventListeners(this);
+    });
+    
+    // Add event listener for labor fee
+    $('#laborFee').on('input', function() {
+        updateTotal();
     });
     
     updateRemoveButtons();

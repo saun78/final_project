@@ -14,7 +14,7 @@
                             <h2 class="mt-2 mb-0">1,234</h2>
                         </div>
                         <div class="icon">
-                            <i class="bi bi-box-seam"></i>
+                            <i cla1ss="bi bi-box-seam"></i>
                         </div>
                     </div>
                 </div>

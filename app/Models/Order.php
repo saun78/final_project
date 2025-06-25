@@ -13,11 +13,14 @@ class Order extends Model
 
     protected $fillable = [
         'order_number',
-        'amount'
+        'amount',
+        'payment_method',
+        'labor_fee'
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2'
+        'amount' => 'decimal:2',
+        'labor_fee' => 'decimal:2'
     ];
 
     public function orderItems()

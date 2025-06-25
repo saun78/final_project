@@ -19,7 +19,8 @@
                             </a>
                         </div>
                         <div class="btn-group ms-2" role="group">
-                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-warning btn-sm">
+                            <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm"
+                               title="Edit payment method and labor fee">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
                             <a href="{{ route('orders.index') }}" class="btn btn-secondary btn-sm">
@@ -36,6 +37,28 @@
                                 <tr>
                                     <td><strong>Order Number:</strong></td>
                                     <td>{{ $order->order_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Payment Method:</strong></td>
+                                    <td>
+                                        @if($order->payment_method)
+                                            @switch($order->payment_method)
+                                                @case('cash')
+                                                    <span class="badge bg-success">Cash</span>
+                                                    @break
+                                                @case('card')
+                                                    <span class="badge bg-primary">Card</span>
+                                                    @break
+                                                @case('tng_wallet')
+                                                    <span class="badge bg-warning">TNG Wallet</span>
+                                                    @break
+                                                @default
+                                                    <span class="text-muted">{{ ucfirst(str_replace('_', ' ', $order->payment_method)) }}</span>
+                                            @endswitch
+                                        @else
+                                            <span class="text-muted">Not specified</span>
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><strong>Created Date:</strong></td>
@@ -55,6 +78,22 @@
                                         <span>Total Items:</span>
                                         <span>{{ $order->orderItems->sum('quantity') }}</span>
                                     </div>
+                                    @php
+                                        $itemsSubtotal = $order->orderItems->sum(function($item) {
+                                            return $item->quantity * $item->price;
+                                        });
+                                    @endphp
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Items Subtotal:</span>
+                                        <span>${{ number_format($itemsSubtotal, 2) }}</span>
+                                    </div>
+                                    @if($order->labor_fee > 0)
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Labor Fee:</span>
+                                            <span>${{ number_format($order->labor_fee, 2) }}</span>
+                                        </div>
+                                    @endif
+                                    <hr>
                                     <div class="d-flex justify-content-between">
                                         <strong>Total Amount:</strong>
                                         <strong>${{ number_format($order->amount, 2) }}</strong>
@@ -91,6 +130,21 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
+                                @php
+                                    $itemsTotal = $order->orderItems->sum(function($item) {
+                                        return $item->quantity * $item->price;
+                                    });
+                                @endphp
+                                <tr>
+                                    <th colspan="3" class="text-end">Items Subtotal:</th>
+                                    <th>${{ number_format($itemsTotal, 2) }}</th>
+                                </tr>
+                                @if($order->labor_fee > 0)
+                                    <tr>
+                                        <th colspan="3" class="text-end">Labor Fee:</th>
+                                        <th>${{ number_format($order->labor_fee, 2) }}</th>
+                                    </tr>
+                                @endif
                                 <tr class="table-active">
                                     <th colspan="3" class="text-end">Total:</th>
                                     <th>${{ number_format($order->amount, 2) }}</th>

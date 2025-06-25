@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <!-- Success Message -->
+    <!-- Success/Error Messages -->
     @if(session('success'))
         <div class="row mb-4">
             <div class="col-12">
@@ -89,6 +89,31 @@
             </div>
         </div>
     @endif
+
+    @if(session('error'))
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- System Notice -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle me-2 mt-1 text-warning"></i>
+                    <div>
+                        <strong>Limited Edit/Delete Functions:</strong> You can edit payment method and labor fee only. Product items cannot be changed to maintain batch inventory integrity. Deletion does NOT restore inventory - use only for correcting mistakes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <div class="row">
@@ -139,7 +164,7 @@
                                         <th class="border-0 fw-semibold">Receipt Number</th>
                                         <th class="border-0 fw-semibold">Items Summary</th>
                                         <th class="border-0 fw-semibold">Amount</th>
-                                        <th class="border-0 fw-semibold">Time</th>
+                                        <th class="border-0 fw-semibold">Date</th>
                                         <th class="border-0 fw-semibold text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -162,21 +187,24 @@
                                                 <span class="fw-bold text-success fs-6">${{ number_format($order->amount, 2) }}</span>
                                             </td>
                                             <td>
-                                                <small class="text-muted">{{ $order->created_at->format('g:i A') }}</small>
+                                                <small class="text-muted">{{ $order->created_at->format('M j, Y') }}</small>
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('orders.show', $order) }}" class="btn btn-outline-primary btn-sm" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm" title="Edit">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
                                                     <a href="{{ route('orders.print', $order) }}" class="btn btn-outline-success btn-sm" target="_blank" title="Print">
                                                         <i class="bi bi-printer"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-outline-danger btn-sm" title="Delete"
-                                                            onclick="confirmDelete({{ $order->id }}, '{{ $order->order_number }}')">
+                                                    <!-- Limited edit and delete functionality -->
+                                                    <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm" 
+                                                       title="Edit payment method and labor fee only">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                            onclick="confirmDelete({{ $order->id }}, '{{ $order->order_number }}')"
+                                                            title="Delete order (WARNING: Does not restore inventory)">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
@@ -211,9 +239,9 @@
                 <div class="text-center mb-4">
                     <strong class="fs-5" id="orderNumber"></strong>
                 </div>
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <small>This action will automatically restore all product stock quantities from this receipt.</small>
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <small><strong>WARNING:</strong> This will only delete the order record. Product inventory will NOT be restored. Use this only to correct mistakes.</small>
                 </div>
             </div>
             <div class="modal-footer">

@@ -59,6 +59,7 @@
             padding: 10px 6px;
             border: 1px solid #333;
             font-size: 10px;
+            text-align: center;
         }
         
         .orders-table td {
@@ -67,12 +68,39 @@
             font-size: 10px;
         }
         
+        .orders-table .order-header {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
+        
         .orders-table .order-number {
             font-weight: bold;
         }
         
         .orders-table .amount {
             text-align: right;
+            font-weight: bold;
+        }
+        
+        .orders-table .product-name {
+            text-align: left;
+        }
+        
+        .orders-table .qty {
+            text-align: center;
+        }
+        
+        .orders-table .price {
+            text-align: right;
+        }
+        
+        .orders-table .subtotal {
+            text-align: right;
+        }
+        
+        .order-total-row {
+            background-color: #f8f9fa;
             font-weight: bold;
         }
         
@@ -111,7 +139,7 @@
                 Generated on {{ now()->format('M d, Y') }}
             @endif
         </div>
-        <div class="report-subtitle">Generated on {{ now()->format('M d, Y \a\t g:i A') }}</div>
+        
     </div>
 
     @php
@@ -155,23 +183,78 @@
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th style="width: 25%">Order Number</th>
-                        <th style="width: 45%">Items</th>
-                        <th style="width: 15%">Quantity</th>
-                        <th style="width: 15%">Amount</th>
+                        <th style="width: 15%">Order Number</th>
+                        <th style="width: 10%">Payment</th>
+                        <th style="width: 25%">Product Name</th>
+                        <th style="width: 10%">Quantity</th>
+                        <th style="width: 10%">Unit Price</th>
+                        <th style="width: 10%">Subtotal</th>
+                        <th style="width: 10%">Labor Fee</th>
+                        <th style="width: 10%">Order Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($dayOrders as $order)
-                        <tr>
-                            <td class="order-number">{{ $order->order_number }}</td>
-                            <td>
-                                @foreach($order->orderItems as $item)
-                                    {{ $item->product->name ?? 'N/A' }}@if(!$loop->last), @endif
-                                @endforeach
+                        @foreach($order->orderItems as $index => $item)
+                            <tr>
+                                <td class="order-number">
+                                    @if($index === 0)
+                                        {{ $order->order_number }}
+                                    @endif
+                                </td>
+                                <td style="text-align: center;">
+                                    @if($index === 0)
+                                        @switch($order->payment_method)
+                                            @case('cash')
+                                                Cash
+                                                @break
+                                            @case('card')
+                                                Card
+                                                @break
+                                            @case('tng_wallet')
+                                                TNG
+                                                @break
+                                            @default
+                                                {{ $order->payment_method ?? 'N/A' }}
+                                        @endswitch
+                                    @endif
+                                </td>
+                                <td class="product-name">
+                                    {{ $item->product->name ?? 'N/A' }}
+                                    @if(isset($item->product->part_number))
+                                        <br><small style="color: #666;">Part #: {{ $item->product->part_number }}</small>
+                                    @endif
+                                </td>
+                                <td class="qty">{{ $item->quantity }}</td>
+                                <td class="price">${{ number_format($item->price, 2) }}</td>
+                                <td class="subtotal">${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                <td style="text-align: right;">
+                                    @if($index === 0)
+                                        ${{ number_format($order->labor_fee ?? 0, 2) }}
+                                    @endif
+                                </td>
+                                <td class="amount">
+                                    @if($index === 0)
+                                        ${{ number_format($order->amount, 2) }}
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        <!-- Order Total Row -->
+                        <tr class="order-total-row">
+                            <td colspan="6" style="text-align: right; padding-right: 10px;">
+                                <strong>Order Total ({{ $order->orderItems->sum('quantity') }} items):</strong>
                             </td>
-                            <td style="text-align: center;">{{ $order->orderItems->sum('quantity') }}</td>
-                            <td class="amount">${{ number_format($order->amount, 2) }}</td>
+                            <td style="text-align: right;">
+                                <strong>${{ number_format($order->labor_fee ?? 0, 2) }}</strong>
+                            </td>
+                            <td class="amount">
+                                <strong>${{ number_format($order->amount, 2) }}</strong>
+                            </td>
+                        </tr>
+                        <!-- Spacer row for visual separation -->
+                        <tr>
+                            <td colspan="8" style="padding: 5px; border: none;"></td>
                         </tr>
                     @endforeach
                 </tbody>

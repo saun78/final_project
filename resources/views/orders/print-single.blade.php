@@ -108,6 +108,22 @@
             {{ $order->created_at->format('M d, Y') }}
         </div>
         <div class="info-row">
+            <span class="info-label">Payment Method:</span>
+            @switch($order->payment_method)
+                @case('cash')
+                    Cash
+                    @break
+                @case('card')
+                    Card
+                    @break
+                @case('tng_wallet')
+                    TNG Wallet
+                    @break
+                @default
+                    {{ $order->payment_method ?? 'Not specified' }}
+            @endswitch
+        </div>
+        <div class="info-row">
             <span class="info-label">Total Items:</span>
             {{ $order->orderItems->sum('quantity') }}
         </div>
@@ -141,10 +157,21 @@
 
     <div class="receipt-total">
         <table class="total-table">
+            @php
+                $itemsSubtotal = $order->orderItems->sum(function($item) {
+                    return $item->quantity * $item->price;
+                });
+            @endphp
             <tr>
-                <td><strong>Subtotal:</strong></td>
-                <td style="text-align: right;">${{ number_format($order->amount, 2) }}</td>
+                <td><strong>Items Subtotal:</strong></td>
+                <td style="text-align: right;">${{ number_format($itemsSubtotal, 2) }}</td>
             </tr>
+            @if($order->labor_fee > 0)
+                <tr>
+                    <td><strong>Labor Fee:</strong></td>
+                    <td style="text-align: right;">${{ number_format($order->labor_fee, 2) }}</td>
+                </tr>
+            @endif
             <tr class="total-row">
                 <td><strong>TOTAL:</strong></td>
                 <td style="text-align: right;"><strong>${{ number_format($order->amount, 2) }}</strong></td>
