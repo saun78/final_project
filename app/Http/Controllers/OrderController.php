@@ -81,7 +81,9 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:product,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0'
+            'items.*.price' => 'required|numeric|min:0',
+            'payment_method' => 'required|in:cash,card,tng_wallet',
+            'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
         // Check stock availability for all items first (using batch inventory)
@@ -108,16 +110,21 @@ class OrderController extends Controller
         // Generate order number
         $orderNumber = 'ORD-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
-        // Calculate total amount
-        $totalAmount = 0;
+        // Calculate total amount (including labor fee)
+        $itemsTotal = 0;
         foreach ($request->items as $item) {
-            $totalAmount += $item['quantity'] * $item['price'];
+            $itemsTotal += $item['quantity'] * $item['price'];
         }
+        
+        $laborFee = $request->labor_fee ?? 0;
+        $totalAmount = $itemsTotal + $laborFee;
 
         // Create order
         $order = Order::create([
             'order_number' => $orderNumber,
-            'amount' => $totalAmount
+            'amount' => $totalAmount,
+            'payment_method' => $request->payment_method,
+            'labor_fee' => $laborFee
         ]);
 
         // Create order items and update stock using FIFO (using transaction)
@@ -168,51 +175,34 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
-        // NOTE: Order editing with batch system is complex and risky
-        // For now, we'll prevent order editing to maintain data integrity
-        return redirect()->back()->with('error', 'Order editing is disabled to maintain batch inventory integrity. Please create a new order instead.');
-        
-        // TODO: Implement proper order editing with batch reversal/reallocation logic
-        /*
         $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:product,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0'
+            'payment_method' => 'required|in:cash,card,tng_wallet',
+            'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
-        DB::transaction(function () use ($request, $order) {
-            // This would require complex logic to:
-            // 1. Reverse the original FIFO deductions
-            // 2. Re-add stock to original batches in correct order
-            // 3. Apply new FIFO deductions for updated quantities
-            // 4. Handle cases where original batches may have been further depleted
-            
-            // For data integrity, this feature is disabled for now
-            throw new \Exception('Order editing with batch system not yet implemented');
-        });
-        */
+        // Update only payment method and labor fee (non-inventory fields)
+        // Items cannot be changed to maintain batch inventory integrity
+        $order->update([
+            'payment_method' => $request->payment_method,
+            'labor_fee' => $request->labor_fee ?? 0,
+            'amount' => $order->orderItems->sum(function($item) {
+                return $item->quantity * $item->price;
+            }) + ($request->labor_fee ?? 0)
+        ]);
+
+        return redirect()->route('orders.show', $order)->with('success', 'Order payment details updated successfully.');
     }
 
     public function destroy(Order $order)
     {
-        // NOTE: Order deletion with batch system restoration is complex
-        // For now, we'll prevent order deletion to maintain data integrity
-        return redirect()->back()->with('error', 'Order deletion is disabled to maintain batch inventory integrity. Orders are kept for audit trail.');
-        
-        // TODO: Implement proper batch restoration logic
-        /*
+        // WARNING: This only deletes the order record, does NOT restore inventory
+        // Use with extreme caution - this is for correcting mistakes only
         DB::transaction(function () use ($order) {
-            // This would require complex logic to:
-            // 1. Track which specific batches were deducted for this order
-            // 2. Restore quantities to the exact same batches
-            // 3. Handle cases where those batches might have been modified since
-            
-            // For data integrity, this feature is disabled for now
             $order->orderItems()->delete();
             $order->delete();
         });
-        */
+
+        return redirect()->route('orders.index')->with('warning', 'Order deleted successfully. Note: Inventory was NOT restored - use this feature only for correcting mistakes.');
     }
 
     public function print(Order $order)
@@ -286,7 +276,7 @@ class OrderController extends Controller
         $sheet->getStyle('A2')->applyFromArray($dateStyle);
 
         // Set headers
-        $headers = ['Order Number', 'Product Name', 'Part Number', 'Quantity', 'Unit Price', 'Subtotal', 'Order Total'];
+        $headers = ['Order Number', 'Payment Method', 'Product Name', 'Part Number', 'Quantity', 'Unit Price', 'Subtotal', 'Labor Fee', 'Order Total'];
         $sheet->fromArray($headers, null, 'A4');
 
         // Style headers
@@ -304,19 +294,38 @@ class OrderController extends Controller
                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
             ]
         ];
-        $sheet->getStyle('A4:G4')->applyFromArray($headerStyle);
+        $sheet->getStyle('A4:I4')->applyFromArray($headerStyle);
 
         // Add data
         $row = 5;
         foreach ($orders as $order) {
             foreach ($order->orderItems as $index => $item) {
+                $paymentMethod = '';
+                if ($index === 0) {
+                    switch ($order->payment_method) {
+                        case 'cash':
+                            $paymentMethod = 'Cash';
+                            break;
+                        case 'card':
+                            $paymentMethod = 'Card';
+                            break;
+                        case 'tng_wallet':
+                            $paymentMethod = 'TNG Wallet';
+                            break;
+                        default:
+                            $paymentMethod = $order->payment_method ?? 'N/A';
+                    }
+                }
+                
                 $data = [
                     $index === 0 ? $order->order_number : '',
+                    $paymentMethod,
                     $item->product->name ?? 'N/A',
                     $item->product->part_number ?? '',
                     $item->quantity,
                     $item->price,
                     $item->quantity * $item->price,
+                    $index === 0 ? ($order->labor_fee ?? 0) : '',
                     $index === 0 ? $order->amount : ''
                 ];
                 $sheet->fromArray($data, null, 'A' . $row);
@@ -325,7 +334,7 @@ class OrderController extends Controller
             
             // Add order total row for visual separation
             $totalRowData = [
-                '', '', '', 'Order Total (' . $order->orderItems->sum('quantity') . ' items):', '', '', $order->amount
+                '', '', '', '', 'Order Total (' . $order->orderItems->sum('quantity') . ' items):', '', '', ($order->labor_fee ?? 0), $order->amount
             ];
             $sheet->fromArray($totalRowData, null, 'A' . $row);
             
@@ -347,7 +356,7 @@ class OrderController extends Controller
                     ]
                 ]
             ];
-            $sheet->getStyle('A' . $row . ':G' . $row)->applyFromArray($totalRowStyle);
+            $sheet->getStyle('A' . $row . ':I' . $row)->applyFromArray($totalRowStyle);
             $row++;
             
             // Add empty row for visual separation
@@ -355,11 +364,11 @@ class OrderController extends Controller
         }
 
         // Format price columns as currency
-        $sheet->getStyle('E5:G' . ($row - 1))->getNumberFormat()
+        $sheet->getStyle('E5:I' . ($row - 1))->getNumberFormat()
               ->setFormatCode('$#,##0.00');
 
         // Auto-size columns
-        foreach (range('A', 'G') as $column) {
+        foreach (range('A', 'I') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 
@@ -372,7 +381,7 @@ class OrderController extends Controller
                 ]
             ]
         ];
-        $sheet->getStyle('A4:G' . ($row - 1))->applyFromArray($borderStyle);
+        $sheet->getStyle('A4:I' . ($row - 1))->applyFromArray($borderStyle);
 
         // Add summary at the end
         $summaryStartRow = $row + 2;
@@ -381,7 +390,7 @@ class OrderController extends Controller
         $totalItems = $orders->sum(function($order) { return $order->orderItems->sum('quantity'); });
 
         $sheet->setCellValue('A' . $summaryStartRow, 'SUMMARY');
-        $sheet->mergeCells('A' . $summaryStartRow . ':G' . $summaryStartRow);
+        $sheet->mergeCells('A' . $summaryStartRow . ':I' . $summaryStartRow);
         $sheet->getStyle('A' . $summaryStartRow)->applyFromArray($titleStyle);
 
         $summaryStartRow++;

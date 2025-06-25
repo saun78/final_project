@@ -104,11 +104,11 @@
     <!-- System Notice -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="alert alert-info" role="alert">
+            <div class="alert alert-warning" role="alert">
                 <div class="d-flex align-items-start">
-                    <i class="bi bi-info-circle me-2 mt-1 text-info"></i>
+                    <i class="bi bi-exclamation-triangle me-2 mt-1 text-warning"></i>
                     <div>
-                        <strong>Batch Inventory System Active:</strong> Order editing and deletion are disabled to maintain accurate batch inventory tracking and audit trail. All sales are recorded using FIFO (First In, First Out) cost calculation.
+                        <strong>Limited Edit/Delete Functions:</strong> You can edit payment method and labor fee only. Product items cannot be changed to maintain batch inventory integrity. Deletion does NOT restore inventory - use only for correcting mistakes.
                     </div>
                 </div>
             </div>
@@ -197,13 +197,14 @@
                                                     <a href="{{ route('orders.print', $order) }}" class="btn btn-outline-success btn-sm" target="_blank" title="Print">
                                                         <i class="bi bi-printer"></i>
                                                     </a>
-                                                    <!-- Edit and Delete disabled for batch system integrity -->
-                                                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
-                                                            title="Editing disabled to maintain batch inventory integrity">
+                                                    <!-- Limited edit and delete functionality -->
+                                                    <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm" 
+                                                       title="Edit payment method and labor fee only">
                                                         <i class="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary btn-sm" disabled
-                                                            title="Deletion disabled to maintain audit trail and batch inventory integrity">
+                                                    </a>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                            onclick="confirmDelete({{ $order->id }}, '{{ $order->order_number }}')"
+                                                            title="Delete order (WARNING: Does not restore inventory)">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
@@ -238,9 +239,9 @@
                 <div class="text-center mb-4">
                     <strong class="fs-5" id="orderNumber"></strong>
                 </div>
-                <div class="alert alert-warning d-flex align-items-center" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <small>This action will automatically restore all product stock quantities from this receipt.</small>
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <small><strong>WARNING:</strong> This will only delete the order record. Product inventory will NOT be restored. Use this only to correct mistakes.</small>
                 </div>
             </div>
             <div class="modal-footer">

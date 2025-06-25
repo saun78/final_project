@@ -183,11 +183,14 @@
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th style="width: 20%">Order Number</th>
-                        <th style="width: 35%">Product Name</th>
-                        <th style="width: 15%">Quantity</th>
-                        <th style="width: 15%">Unit Price</th>
-                        <th style="width: 15%">Subtotal</th>
+                        <th style="width: 15%">Order Number</th>
+                        <th style="width: 10%">Payment</th>
+                        <th style="width: 25%">Product Name</th>
+                        <th style="width: 10%">Quantity</th>
+                        <th style="width: 10%">Unit Price</th>
+                        <th style="width: 10%">Subtotal</th>
+                        <th style="width: 10%">Labor Fee</th>
+                        <th style="width: 10%">Order Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -199,6 +202,23 @@
                                         {{ $order->order_number }}
                                     @endif
                                 </td>
+                                <td style="text-align: center;">
+                                    @if($index === 0)
+                                        @switch($order->payment_method)
+                                            @case('cash')
+                                                Cash
+                                                @break
+                                            @case('card')
+                                                Card
+                                                @break
+                                            @case('tng_wallet')
+                                                TNG
+                                                @break
+                                            @default
+                                                {{ $order->payment_method ?? 'N/A' }}
+                                        @endswitch
+                                    @endif
+                                </td>
                                 <td class="product-name">
                                     {{ $item->product->name ?? 'N/A' }}
                                     @if(isset($item->product->part_number))
@@ -208,12 +228,25 @@
                                 <td class="qty">{{ $item->quantity }}</td>
                                 <td class="price">${{ number_format($item->price, 2) }}</td>
                                 <td class="subtotal">${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                <td style="text-align: right;">
+                                    @if($index === 0)
+                                        ${{ number_format($order->labor_fee ?? 0, 2) }}
+                                    @endif
+                                </td>
+                                <td class="amount">
+                                    @if($index === 0)
+                                        ${{ number_format($order->amount, 2) }}
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                         <!-- Order Total Row -->
                         <tr class="order-total-row">
-                            <td colspan="4" style="text-align: right; padding-right: 10px;">
+                            <td colspan="6" style="text-align: right; padding-right: 10px;">
                                 <strong>Order Total ({{ $order->orderItems->sum('quantity') }} items):</strong>
+                            </td>
+                            <td style="text-align: right;">
+                                <strong>${{ number_format($order->labor_fee ?? 0, 2) }}</strong>
                             </td>
                             <td class="amount">
                                 <strong>${{ number_format($order->amount, 2) }}</strong>
@@ -221,7 +254,7 @@
                         </tr>
                         <!-- Spacer row for visual separation -->
                         <tr>
-                            <td colspan="5" style="padding: 5px; border: none;"></td>
+                            <td colspan="8" style="padding: 5px; border: none;"></td>
                         </tr>
                     @endforeach
                 </tbody>

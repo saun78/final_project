@@ -98,10 +98,42 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 offset-md-6">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>Payment Details</h5>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Payment Method</label>
+                                            <select name="payment_method" class="form-select" required>
+                                                <option value="">Select Payment Method</option>
+                                                <option value="cash">Cash</option>
+                                                <option value="card">Card</option>
+                                                <option value="tng_wallet">TNG Wallet</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Labor Fee</label>
+                                            <input type="number" name="labor_fee" id="laborFee" class="form-control" 
+                                                   step="0.01" min="0" value="0" placeholder="0.00">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h5>Order Summary</h5>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Subtotal:</span>
+                                            <span id="subtotalAmount">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Labor Fee:</span>
+                                            <span id="laborFeeDisplay">$0.00</span>
+                                        </div>
+                                        <hr>
                                         <div class="d-flex justify-content-between">
                                             <strong>Total Amount:</strong>
                                             <strong id="totalAmount">$0.00</strong>
@@ -227,12 +259,18 @@ $(document).ready(function() {
     }
     
     function updateTotal() {
-        let total = 0;
+        let subtotal = 0;
         $('.order-item').each(function() {
             const quantity = parseFloat($(this).find('.quantity-input').val()) || 0;
             const price = parseFloat($(this).find('.price-input').val()) || 0;
-            total += quantity * price;
+            subtotal += quantity * price;
         });
+        
+        const laborFee = parseFloat($('#laborFee').val()) || 0;
+        const total = subtotal + laborFee;
+        
+        $('#subtotalAmount').text('$' + subtotal.toFixed(2));
+        $('#laborFeeDisplay').text('$' + laborFee.toFixed(2));
         $('#totalAmount').text('$' + total.toFixed(2));
     }
     
@@ -317,6 +355,11 @@ $(document).ready(function() {
     // Initialize first item
     $('.order-item').each(function() {
         attachEventListeners(this);
+    });
+    
+    // Add event listener for labor fee
+    $('#laborFee').on('input', function() {
+        updateTotal();
     });
     
     updateRemoveButtons();
