@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ManageController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
-use App\Http\Controllers\ManageController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ReportController;
 
+use App\Http\Controllers\ReportController;
 Route::get('/', function () {
     return view('dashboard');
 });
@@ -27,7 +27,10 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/', function () {
-        return redirect()->route('dashboard');
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return redirect()->route('login');
     });
 
     // Product Routes
