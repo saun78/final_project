@@ -46,6 +46,7 @@
                 <!-- Hidden inputs to preserve other filter values -->
                 <input type="hidden" name="category" value="{{ request('category') }}">
                 <input type="hidden" name="brand" value="{{ request('brand') }}">
+                <input type="hidden" name="supplier" value="{{ request('supplier') }}">
                 <input type="hidden" name="location" value="{{ request('location') }}">
                 <input type="hidden" name="stock_status" value="{{ request('stock_status') }}">
                 <input type="hidden" name="min_price" value="{{ request('min_price') }}">
@@ -74,7 +75,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h6 class="mb-0">
                     <i class="bi bi-funnel"></i> Advanced Filters
-                    @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+                    @if(request('category') || request('brand') || request('supplier') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
                         <span class="badge bg-primary ms-2">Active</span>
                     @endif
                 </h6>
@@ -90,9 +91,9 @@
                     <!-- Preserve search value -->
                     <input type="hidden" name="search" value="{{ request('search') }}">
 
-                    <!-- Category and Brand Filters -->
+                    <!-- Category, Brand and Supplier Filters -->
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="categorySelect" class="form-label">Category</label>
                             <select name="category" class="form-select" id="categorySelect">
                                 <option value="">All Categories</option>
@@ -101,12 +102,21 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="brandSelect" class="form-label">Brand</label>
                             <select name="brand" class="form-select" id="brandSelect">
                                 <option value="">All Brands</option>
                                 @foreach($brands as $brand)
                                     <option value="{{ $brand->id }}" {{ request('brand') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="supplierSelect" class="form-label">Supplier</label>
+                            <select name="supplier" class="form-select" id="supplierSelect">
+                                <option value="">All Suppliers</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -147,7 +157,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search"></i> Apply Filters
                         </button>
-                        @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+                        @if(request('category') || request('brand') || request('supplier') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
                         <a href="{{ route('products.index') }}{{ request('search') ? '?search=' . urlencode(request('search')) : '' }}" class="btn btn-outline-secondary">
                             <i class="bi bi-x-lg"></i> Clear Filters
                         </a>
@@ -195,6 +205,7 @@
                                         part_number: '{{ $product->part_number }}',
                                         category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                         brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
                                         location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                         quantity: {{ $product->quantity }},
                                         purchase_price: {{ $product->purchase_price }},
@@ -212,6 +223,7 @@
                                         part_number: '{{ $product->part_number }}',
                                         category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                         brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
                                         location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                         quantity: {{ $product->quantity }},
                                         purchase_price: {{ $product->purchase_price }},
@@ -242,10 +254,11 @@
                                 {{ $product->name }}
                             </h6>
                             
-                            <!-- Category & Brand -->
+                            <!-- Category, Brand & Supplier -->
                             <div class="mb-2">
                                 <span class="badge bg-info me-1">{{ $product->category ? $product->category->name : 'Unknown' }}</span>
-                                <span class="badge bg-secondary">{{ $product->brand ? $product->brand->name : 'Unknown' }}</span>
+                                <span class="badge bg-secondary me-1">{{ $product->brand ? $product->brand->name : 'Unknown' }}</span>
+                                <span class="badge bg-success">{{ $product->supplier ? $product->supplier->name : 'Unknown' }}</span>
                             </div>
                             
                             <!-- Location -->
@@ -301,6 +314,7 @@
                                             part_number: '{{ $product->part_number }}',
                                             category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                             brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                            supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
                                             location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                             quantity: {{ $product->quantity }},
                                             purchase_price: {{ $product->purchase_price }},
@@ -366,6 +380,7 @@
                             <th class="text-nowrap">Part Number</th>
                             <th class="text-nowrap">Category</th>
                             <th class="text-nowrap">Brand</th>
+                            <th class="text-nowrap">Supplier</th>
                             <th class="text-nowrap">Location</th>
                             <th class="text-nowrap text-center">Stock</th>
                             <th class="text-nowrap text-end">Avg. Cost</th>
@@ -382,6 +397,7 @@
                             part_number: '{{ $product->part_number }}',
                             category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                             brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                            supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
                             location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                             quantity: {{ $product->quantity }},
                             purchase_price: {{ $product->purchase_price }},
@@ -411,6 +427,11 @@
                             <!-- Brand -->
                             <td class="align-middle">
                                 <span class="text-nowrap">{{ $product->brand ? $product->brand->name : '-' }}</span>
+                            </td>
+                            
+                            <!-- Supplier -->
+                            <td class="align-middle">
+                                <span class="text-nowrap">{{ $product->supplier ? $product->supplier->name : '-' }}</span>
                             </td>
                             
                             <!-- Location -->
@@ -456,7 +477,7 @@
                                             data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-three-dots"></i>
                                     </button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
                                             <button class="dropdown-item" 
                                                 onclick="showProductModal({
@@ -465,6 +486,7 @@
                                                     part_number: '{{ $product->part_number }}',
                                                     category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                                     brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
+                                                    supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
                                                     location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                                     quantity: {{ $product->quantity }},
                                                     purchase_price: {{ $product->purchase_price }},
@@ -509,7 +531,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center py-5">
+                            <td colspan="11" class="text-center py-5">
                                 @if(isset($isSearching) && $isSearching)
                                     <i class="bi bi-search fs-1 text-muted"></i>
                                     <p class="mt-3 mb-2 h5">No parts found matching your search criteria.</p>
@@ -571,6 +593,7 @@
                         <p><strong>Part Number:</strong> <span id="modalPartNumber"></span></p>
                         <p><strong>Category:</strong> <span id="modalCategory"></span></p>
                         <p><strong>Brand:</strong> <span id="modalBrand"></span></p>
+                        <p><strong>Supplier:</strong> <span id="modalSupplier"></span></p>
                         <p><strong>Location:</strong> <span id="modalLocation"></span></p>
                         <p><strong>Quantity:</strong> <span id="modalQuantity"></span></p>
                         <p><strong>Purchase Price:</strong> $<span id="modalPurchasePrice"></span></p>
@@ -688,6 +711,8 @@
 #tableView .dropdown-menu {
     min-width: 160px;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    position: fixed !important;
+    z-index: 9999;
 }
 
 #tableView .dropdown-item {
@@ -761,7 +786,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Auto-open filters if any filter is active (excluding search)
-        @if(request('category') || request('brand') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+        @if(request('category') || request('brand') || request('supplier') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
             new bootstrap.Collapse(filterCollapse, {show: true});
         @endif
     }
@@ -874,6 +899,7 @@ function showProductModal(product) {
     document.getElementById('modalPartNumber').textContent = product.part_number;
     document.getElementById('modalCategory').textContent = product.category;
     document.getElementById('modalBrand').textContent = product.brand;
+    document.getElementById('modalSupplier').textContent = product.supplier;
     document.getElementById('modalLocation').textContent = product.location;
     document.getElementById('modalQuantity').textContent = product.quantity;
     document.getElementById('modalPurchasePrice').textContent = product.purchase_price.toFixed(2);

@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductInventory;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
@@ -33,6 +34,11 @@ class ProductService
         // Filter by brand
         if (!empty($filters['brand'])) {
             $query->where('brand_id', $filters['brand']);
+        }
+
+        // Filter by supplier
+        if (!empty($filters['supplier'])) {
+            $query->where('supplier_id', $filters['supplier']);
         }
 
         // Filter by location
@@ -69,16 +75,16 @@ class ProductService
 
         // Check if any filters are applied for pagination
         $isSearching = !empty($filters['search']) || !empty($filters['category']) || 
-                       !empty($filters['brand']) || !empty($filters['location']) || 
-                       !empty($filters['stock_status']) || !empty($filters['min_price']) || 
-                       !empty($filters['max_price']);
+                       !empty($filters['brand']) || !empty($filters['supplier']) ||
+                       !empty($filters['location']) || !empty($filters['stock_status']) || 
+                       !empty($filters['min_price']) || !empty($filters['max_price']);
 
         // If searching, limit to 100 results without pagination
         // If not searching, use normal pagination
         if ($isSearching) {
-            return $query->with(['category', 'brand'])->latest()->limit(100)->get();
+            return $query->with(['category', 'brand', 'supplier'])->latest()->limit(100)->get();
         } else {
-            return $query->with(['category', 'brand'])->latest()->paginate(10);
+            return $query->with(['category', 'brand', 'supplier'])->latest()->paginate(10);
         }
     }
 
@@ -139,12 +145,13 @@ class ProductService
         return [
             'categories' => Category::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
+            'suppliers' => Supplier::orderBy('name')->get(),
         ];
     }
 
     public function getLowStockProducts($threshold = 10)
     {
-        return Product::with(['category', 'brand'])
+        return Product::with(['category', 'brand', 'supplier'])
             ->where('quantity', '>', 0)
             ->where('quantity', '<=', $threshold)
             ->orderBy('quantity', 'asc')
@@ -153,7 +160,7 @@ class ProductService
 
     public function getOutOfStockProducts()
     {
-        return Product::with(['category', 'brand'])
+        return Product::with(['category', 'brand', 'supplier'])
             ->where('quantity', 0)
             ->get();
     }
@@ -192,7 +199,7 @@ class ProductService
     public function getLowStockProductsWithBatches($threshold = 10)
     {
         // Get products with total batch stock <= threshold
-        $products = Product::with(['category', 'brand', 'inventoryBatches'])
+        $products = Product::with(['category', 'brand', 'supplier', 'inventoryBatches'])
             ->get()
             ->filter(function($product) use ($threshold) {
                 $totalStock = $product->inventoryBatches->sum('quantity');

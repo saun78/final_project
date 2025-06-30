@@ -132,9 +132,10 @@
     <table class="receipt-table">
         <thead>
             <tr>
-                <th style="width: 50%">Product/Part</th>
-                <th style="width: 15%">Qty</th>
-                <th style="width: 20%">Unit Price</th>
+                <th style="width: 40%">Product/Part</th>
+                <th style="width: 20%">Supplier</th>
+                <th style="width: 10%">Qty</th>
+                <th style="width: 15%">Unit Price</th>
                 <th style="width: 15%">Subtotal</th>
             </tr>
         </thead>
@@ -146,6 +147,9 @@
                         @if(isset($item->product->part_number))
                             <br><small>Part #: {{ $item->product->part_number }}</small>
                         @endif
+                    </td>
+                    <td style="text-align: center;">
+                        <small>{{ $item->product->supplier->name ?? 'N/A' }}</small>
                     </td>
                     <td>{{ $item->quantity }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>

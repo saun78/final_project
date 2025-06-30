@@ -23,10 +23,11 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'part_number' => 'required|string|max:50|unique:product,part_number',
-            'name' => 'required|string|max:255',
+            'part_number' => 'nullable|string|max:50|unique:product,part_number',
+            'name' => 'required|string|max:255|unique:product,name',
             'category_id' => 'required|exists:category,id',
             'brand_id' => 'required|exists:brand,id',
+            'supplier_id' => 'required|exists:supplier,id',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:0',
@@ -44,6 +45,8 @@ class ProductStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.unique' => 'A product with this name already exists. Please choose a different name.',
+            'part_number.unique' => 'A product with this part number already exists. Please choose a different part number.',
             'selling_price.gte' => 'The selling price cannot be lower than the purchase price.',
         ];
     }

@@ -20,13 +20,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link {{ request()->routeIs(['categories.*', 'brands.*']) ? 'active' : '' }}" 
+                <a href="#" class="nav-link {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'active' : '' }}" 
                    onclick="toggleSubmenu(event)" id="addNavLink">
                     <i class="bi bi-plus-circle"></i>
                     Add
-                    <i class="bi bi-chevron-down ms-auto" id="addChevron" style="transform: {{ request()->routeIs(['categories.*', 'brands.*']) ? 'rotate(180deg)' : 'rotate(0deg)' }};"></i>
+                    <i class="bi bi-chevron-down ms-auto" id="addChevron" style="transform: {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'rotate(180deg)' : 'rotate(0deg)' }};"></i>
                 </a>
-                <ul class="nav nav-pills flex-column ms-3" id="addSubmenu" style="display: {{ request()->routeIs(['categories.*', 'brands.*']) ? 'block' : 'none' }};">
+                <ul class="nav nav-pills flex-column ms-3" id="addSubmenu" style="display: {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'block' : 'none' }};">
                     <li class="nav-item">
                         <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                             <i class="bi bi-grid"></i>
@@ -39,18 +39,18 @@
                             Brands
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('suppliers.index') }}" class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                            <i class="bi bi-truck"></i>
+                            Suppliers
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="bi bi-arrow-left-right"></i>
                     Inventory
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-truck"></i>
-                    Suppliers
                 </a>
             </li>
             <li class="nav-item">

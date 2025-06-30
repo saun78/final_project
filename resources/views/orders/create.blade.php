@@ -16,6 +16,16 @@
 .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
     height: calc(2.25rem + 2px) !important;
 }
+.supplier-display {
+    background-color: #f8f9fa !important;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    font-weight: 500;
+}
+.supplier-display::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
 </style>
 @endpush
 
@@ -48,7 +58,7 @@
                             <h5>Order Items</h5>
                             <div id="orderItems">
                                 <div class="order-item row mb-3">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <label class="form-label">Product/Part</label>
                                         <select name="items[0][product_id]" class="form-select product-select" required>
                                             <option value="">Select Product</option>
@@ -57,15 +67,22 @@
                                                         data-price="{{ $product->selling_price }}" 
                                                         data-stock="{{ $product->quantity }}"
                                                         data-part-number="{{ $product->part_number ?? '' }}"
+                                                        data-category="{{ $product->category->name ?? 'N/A' }}"
+                                                        data-brand="{{ $product->brand->name ?? 'N/A' }}"
+                                                        data-supplier="{{ $product->supplier->name ?? 'N/A' }}"
                                                         data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
                                                     @if($product->part_number)
-                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} (Stock: {{ $product->quantity }})
+                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                                                     @else
-                                                        {{ $product->name }} - ${{ $product->selling_price }} (Stock: {{ $product->quantity }})
+                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                                                     @endif
                                                 </option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Supplier</label>
+                                        <input type="text" class="form-control supplier-display bg-light" readonly placeholder="Select product first">
                                     </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Quantity</label>
@@ -81,7 +98,7 @@
                                         <label class="form-label">Subtotal</label>
                                         <input type="text" class="form-control subtotal-display" readonly>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-1">
                                         <label class="form-label">&nbsp;</label>
                                         <div>
                                             <button type="button" class="btn btn-danger btn-sm remove-item" style="display:none;">
@@ -157,6 +174,61 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden template for new items - moved outside form -->
+<div id="itemTemplate" style="display: none;">
+    <div class="order-item row mb-3">
+        <div class="col-md-3">
+            <label class="form-label">Product/Part</label>
+            <select name="items[INDEX][product_id]" class="form-select product-select" required>
+                <option value="">Select Product</option>
+                @foreach($products as $product)
+                    <option value="{{ $product->id }}" 
+                            data-price="{{ $product->selling_price }}" 
+                            data-stock="{{ $product->quantity }}"
+                            data-part-number="{{ $product->part_number ?? '' }}"
+                            data-category="{{ $product->category->name ?? 'N/A' }}"
+                            data-brand="{{ $product->brand->name ?? 'N/A' }}"
+                            data-supplier="{{ $product->supplier->name ?? 'N/A' }}"
+                            data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
+                        @if($product->part_number)
+                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                        @else
+                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                        @endif
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Supplier</label>
+            <input type="text" class="form-control supplier-display bg-light" readonly placeholder="Select product first">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input type="number" name="items[INDEX][quantity]" class="form-control quantity-input" 
+                   min="1" value="1" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Selling Price</label>
+            <input type="number" name="items[INDEX][price]" class="form-control price-input" 
+                   step="0.01" min="0" required readonly>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Subtotal</label>
+            <input type="text" class="form-control subtotal-display" readonly>
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">&nbsp;</label>
+            <div>
+                <button type="button" class="btn btn-danger btn-sm remove-item">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -171,8 +243,9 @@ if (typeof jQuery === 'undefined') {
 $(document).ready(function() {
     let itemIndex = 1;
     
-    function initializeSelect2(selectElement) {
-        $(selectElement).select2({
+    // Initialize Select2 configuration
+    function initializeSelect2(element) {
+        $(element).select2({
             theme: 'bootstrap4',
             placeholder: 'Search product name or part number',
             allowClear: true,
@@ -180,73 +253,54 @@ $(document).ready(function() {
             templateResult: formatProductOption,
             templateSelection: formatProductSelection,
             matcher: function(params, data) {
-                // Always return data if no search term
-                if ($.trim(params.term) === '') {
-                    return data;
-                }
-
-                // Don't match the placeholder
-                if (!data.id) {
-                    return null;
-                }
+                if ($.trim(params.term) === '') return data;
+                if (!data.id) return null;
 
                 var text = data.text || '';
                 var $elem = $(data.element);
                 var partNumber = $elem.attr('data-part-number') || '';
-                
                 var searchTerm = params.term.toLowerCase();
                 
-                // Search in text and part number
                 if (text.toLowerCase().indexOf(searchTerm) > -1 || 
                     partNumber.toLowerCase().indexOf(searchTerm) > -1) {
                     return data;
                 }
-
                 return null;
             }
         });
     }
     
     function formatProductOption(product) {
-        if (!product.id || !product.element) {
-            return product.text;
-        }
+        if (!product.id || !product.element) return product.text;
         
         var $product = $(product.element);
         var imageUrl = $product.data('image');
         var price = $product.data('price');
         var stock = $product.data('stock');
-        var partNumber = $product.data('part-number');
-        
-        // Check if image URL contains a valid path
+        var category = $product.data('category');
+        var brand = $product.data('brand');
+        var supplier = $product.data('supplier');
         var hasValidImage = imageUrl && imageUrl.trim() !== '' && imageUrl.includes('storage');
         
-        var imageElement = '';
-        if (hasValidImage) {
-            imageElement = '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />';
-        }
+        var imageElement = hasValidImage ? 
+            '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' : '';
         
         var placeholderElement = '<div style="width: 40px; height: 40px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-right: 10px; display: ' + (hasValidImage ? 'none' : 'flex') + '; align-items: center; justify-content: center; font-size: 12px; color: #6c757d;"><i class="bi bi-image"></i></div>';
         
-        var $container = $(
-            '<div class="d-flex align-items-center">' +
-                imageElement +
-                placeholderElement +
-                '<div>' +
-                    '<div style="font-weight: 500;">' + product.text.split(' - ')[0] + '</div>' +
-                    '<small class="text-muted">$' + price + ' - Stock: ' + stock + '</small>' +
-                '</div>' +
-            '</div>'
-        );
+        var productName = product.text.split(' - ')[0];
+        var categoryBrandSupplier = category + '/' + brand + '/' + supplier;
         
-        return $container;
+        return $('<div class="d-flex align-items-center">' +
+                    imageElement + placeholderElement +
+                    '<div>' +
+                        '<div style="font-weight: 500;">' + productName + '</div>' +
+                        '<small class="text-muted">$' + price + ' - ' + categoryBrandSupplier + ' - Stock: ' + stock + '</small>' +
+                    '</div>' +
+                '</div>');
     }
     
     function formatProductSelection(product) {
-        if (!product.id || !product.element) {
-            return product.text;
-        }
-        
+        if (!product.id || !product.element) return product.text;
         return product.text.split(' - ')[0];
     }
     
@@ -260,7 +314,7 @@ $(document).ready(function() {
     
     function updateTotal() {
         let subtotal = 0;
-        $('.order-item').each(function() {
+        $('#orderItems .order-item').each(function() {
             const quantity = parseFloat($(this).find('.quantity-input').val()) || 0;
             const price = parseFloat($(this).find('.price-input').val()) || 0;
             subtotal += quantity * price;
@@ -274,94 +328,78 @@ $(document).ready(function() {
         $('#totalAmount').text('$' + total.toFixed(2));
     }
     
-    function attachEventListeners(row) {
-        const $row = $(row);
-        const $productSelect = $row.find('select[name*="product_id"]');
-        const $quantityInput = $row.find('.quantity-input');
-        const $priceInput = $row.find('.price-input');
-        const $removeBtn = $row.find('.remove-item');
+    function setupOrderItem(item) {
+        const $item = $(item);
+        const $select = $item.find('.product-select');
+        const $quantity = $item.find('.quantity-input');
+        const $price = $item.find('.price-input');
+        const $supplier = $item.find('.supplier-display');
+        const $remove = $item.find('.remove-item');
         
-        // Initialize Select2 for new selects
-        if (!$productSelect.hasClass('select2-hidden-accessible')) {
-            initializeSelect2($productSelect[0]);
-        }
+        // Initialize Select2
+        initializeSelect2($select);
         
-        $productSelect.on('change', function() {
+        // Product selection change
+        $select.on('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.dataset.price) {
-                $priceInput.val(selectedOption.dataset.price);
-                // Set max quantity based on stock
+                $price.val(selectedOption.dataset.price);
+                $supplier.val(selectedOption.dataset.supplier || 'N/A');
                 if (selectedOption.dataset.stock) {
-                    $quantityInput.attr('max', selectedOption.dataset.stock);
-                    $quantityInput.attr('title', 'Available stock: ' + selectedOption.dataset.stock);
+                    $quantity.attr('max', selectedOption.dataset.stock);
+                    $quantity.attr('title', 'Available stock: ' + selectedOption.dataset.stock);
                 }
-                updateSubtotal(row);
+                updateSubtotal(item);
+            } else {
+                // Clear fields when no product is selected
+                $price.val('');
+                $supplier.val('');
+                $quantity.removeAttr('max').removeAttr('title');
             }
         });
         
-        $quantityInput.on('input', () => updateSubtotal(row));
-        $priceInput.on('input', () => updateSubtotal(row));
+        // Quantity and price changes
+        $quantity.on('input', () => updateSubtotal(item));
+        $price.on('input', () => updateSubtotal(item));
         
-        $removeBtn.on('click', function() {
-            $row.remove();
+        // Remove item
+        $remove.on('click', function() {
+            if ($select.hasClass('select2-hidden-accessible')) {
+                $select.select2('destroy');
+            }
+            $item.remove();
             updateTotal();
             updateRemoveButtons();
         });
     }
     
     function updateRemoveButtons() {
-        const items = $('.order-item');
-        items.each(function() {
-            const $removeBtn = $(this).find('.remove-item');
-            if (items.length > 1) {
-                $removeBtn.show();
-            } else {
-                $removeBtn.hide();
-            }
-        });
+        const $items = $('#orderItems .order-item');
+        $items.find('.remove-item').toggle($items.length > 1);
     }
     
-    // Add item functionality
+    // Add new item using template
     $('#addItem').on('click', function() {
-        const $container = $('#orderItems');
-        const $originalItem = $container.find('.order-item:first');
-        const $newItem = $originalItem.clone(false);
+        const templateHtml = $('#itemTemplate').html();
+        const newHtml = templateHtml.replace(/INDEX/g, itemIndex);
         
-        // Remove Select2 classes and data
-        $newItem.find('.select2-container').remove();
-        $newItem.find('select').removeClass('select2-hidden-accessible').removeData('select2');
+        $('#orderItems').append(newHtml);
+        const $newItem = $('#orderItems .order-item:last');
         
-        // Update field names and reset values
-        $newItem.find('input, select').each(function() {
-            const $field = $(this);
-            if ($field.attr('name')) {
-                $field.attr('name', $field.attr('name').replace(/\[\d+\]/, '[' + itemIndex + ']'));
-            }
-            if ($field.is('select')) {
-                $field.val('');
-            } else if ($field.hasClass('quantity-input')) {
-                $field.val('1');
-            } else if (!$field.is('[type="button"]')) {
-                $field.val('');
-            }
-        });
-        
-        $container.append($newItem);
-        attachEventListeners($newItem[0]);
+        setupOrderItem($newItem);
         itemIndex++;
         updateRemoveButtons();
     });
     
-    // Initialize first item
-    $('.order-item').each(function() {
-        attachEventListeners(this);
+    // Initialize existing items
+    $('#orderItems .order-item').each(function() {
+        setupOrderItem(this);
     });
     
-    // Add event listener for labor fee
-    $('#laborFee').on('input', function() {
-        updateTotal();
-    });
+    // Labor fee changes
+    $('#laborFee').on('input', updateTotal);
     
+    // Initial setup
     updateRemoveButtons();
 });
 </script>

@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\SupplierController;
 
 use App\Http\Controllers\OrderController;
 
@@ -47,6 +48,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    
+    // Supplier Routes
+    Route::resource('suppliers', SupplierController::class);
     
     // Order/Receipt Routes
     Route::resource('orders', OrderController::class);
