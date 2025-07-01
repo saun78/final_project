@@ -109,6 +109,7 @@
                             <thead>
                                 <tr>
                                     <th>Product/Part</th>
+                                    <th>Supplier</th>
                                     <th>Quantity</th>
                                     <th>Selling Price</th>
                                     <th>Subtotal</th>
@@ -119,9 +120,12 @@
                                     <tr>
                                         <td>
                                             {{ $item->product->name }}
-                                            @if($item->product->sku)
-                                                <br><small class="text-muted">SKU: {{ $item->product->sku }}</small>
+                                            @if($item->product->part_number)
+                                                <br><small class="text-muted">Part #: {{ $item->product->part_number }}</small>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ $item->product->supplier->name ?? 'N/A' }}</span>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>${{ number_format($item->price, 2) }}</td>
@@ -136,17 +140,17 @@
                                     });
                                 @endphp
                                 <tr>
-                                    <th colspan="3" class="text-end">Items Subtotal:</th>
+                                    <th colspan="4" class="text-end">Items Subtotal:</th>
                                     <th>${{ number_format($itemsTotal, 2) }}</th>
                                 </tr>
                                 @if($order->labor_fee > 0)
                                     <tr>
-                                        <th colspan="3" class="text-end">Labor Fee:</th>
+                                        <th colspan="4" class="text-end">Labor Fee:</th>
                                         <th>${{ number_format($order->labor_fee, 2) }}</th>
                                     </tr>
                                 @endif
                                 <tr class="table-active">
-                                    <th colspan="3" class="text-end">Total:</th>
+                                    <th colspan="4" class="text-end">Total:</th>
                                     <th>${{ number_format($order->amount, 2) }}</th>
                                 </tr>
                             </tfoot>

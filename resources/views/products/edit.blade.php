@@ -19,7 +19,7 @@
                             <div class="col-md-6">
                                 <label for="part_number" class="form-label">Part Number</label>
                                 <input type="text" class="form-control @error('part_number') is-invalid @enderror" 
-                                    id="part_number" name="part_number" value="{{ old('part_number', $product->part_number) }}" required>
+                                    id="part_number" name="part_number" value="{{ old('part_number', $product->part_number) }}">
                                 @error('part_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="category_id" class="form-label mb-0">Category</label>
                                     <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
@@ -55,7 +55,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="brand_id" class="form-label mb-0">Brand</label>
                                     <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
@@ -72,6 +72,26 @@
                                     @endforeach
                                 </select>
                                 @error('brand_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="supplier_id" class="form-label mb-0">Supplier</label>
+                                    <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                        <i class="bi bi-plus-lg"></i> Add New
+                                    </a>
+                                </div>
+                                <select class="form-select @error('supplier_id') is-invalid @enderror" 
+                                    id="supplier_id" name="supplier_id" required>
+                                    <option value="">Select Supplier</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}" {{ old('supplier_id', $product->supplier_id) == $supplier->id ? 'selected' : '' }}>
+                                            {{ $supplier->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('supplier_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

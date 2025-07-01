@@ -28,6 +28,7 @@ class ProductController extends Controller
             'search', 
             'category', 
             'brand', 
+            'supplier',
             'location', 
             'stock_status', 
             'min_price', 
@@ -50,6 +51,7 @@ class ProductController extends Controller
                 'search', 
                 'category', 
                 'brand', 
+                'supplier',
                 'location', 
                 'stock_status', 
                 'min_price', 
@@ -63,6 +65,7 @@ class ProductController extends Controller
             'products' => $products,
             'categories' => $formData['categories'],
             'brands' => $formData['brands'],
+            'suppliers' => $formData['suppliers'],
             'isSearching' => $isSearching,
         ]);
     }

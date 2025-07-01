@@ -183,14 +183,15 @@
             <table class="orders-table">
                 <thead>
                     <tr>
-                        <th style="width: 15%">Order Number</th>
-                        <th style="width: 10%">Payment</th>
-                        <th style="width: 25%">Product Name</th>
-                        <th style="width: 10%">Quantity</th>
-                        <th style="width: 10%">Unit Price</th>
-                        <th style="width: 10%">Subtotal</th>
-                        <th style="width: 10%">Labor Fee</th>
-                        <th style="width: 10%">Order Total</th>
+                        <th style="width: 12%">Order Number</th>
+                        <th style="width: 9%">Payment</th>
+                        <th style="width: 20%">Product Name</th>
+                        <th style="width: 14%">Supplier</th>
+                        <th style="width: 9%">Quantity</th>
+                        <th style="width: 9%">Unit Price</th>
+                        <th style="width: 9%">Subtotal</th>
+                        <th style="width: 9%">Labor Fee</th>
+                        <th style="width: 9%">Order Total</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -225,6 +226,9 @@
                                         <br><small style="color: #666;">Part #: {{ $item->product->part_number }}</small>
                                     @endif
                                 </td>
+                                <td style="text-align: center; font-size: 9px;">
+                                    {{ $item->product->supplier->name ?? 'N/A' }}
+                                </td>
                                 <td class="qty">{{ $item->quantity }}</td>
                                 <td class="price">${{ number_format($item->price, 2) }}</td>
                                 <td class="subtotal">${{ number_format($item->quantity * $item->price, 2) }}</td>
@@ -242,7 +246,7 @@
                         @endforeach
                         <!-- Order Total Row -->
                         <tr class="order-total-row">
-                            <td colspan="6" style="text-align: right; padding-right: 10px;">
+                            <td colspan="7" style="text-align: right; padding-right: 10px;">
                                 <strong>Order Total ({{ $order->orderItems->sum('quantity') }} items):</strong>
                             </td>
                             <td style="text-align: right;">
@@ -254,7 +258,7 @@
                         </tr>
                         <!-- Spacer row for visual separation -->
                         <tr>
-                            <td colspan="8" style="padding: 5px; border: none;"></td>
+                            <td colspan="9" style="padding: 5px; border: none;"></td>
                         </tr>
                     @endforeach
                 </tbody>

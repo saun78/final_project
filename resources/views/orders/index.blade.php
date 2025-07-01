@@ -102,7 +102,7 @@
     @endif
 
     <!-- System Notice -->
-    <div class="row mb-4">
+    {{-- <div class="row mb-4">
         <div class="col-12">
             <div class="alert alert-warning" role="alert">
                 <div class="d-flex align-items-start">
@@ -113,7 +113,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Main Content -->
     <div class="row">

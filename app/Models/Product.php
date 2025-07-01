@@ -18,6 +18,7 @@ class Product extends Model
         'name',
         'category_id',
         'brand_id',
+        'supplier_id', // Required
         'location',
         'description',
         'quantity',
@@ -48,6 +49,14 @@ class Product extends Model
         return $this->belongsTo(Brand::class, 'brand_id');
     }
 
+    /**
+     * Get the supplier that owns the product.
+     */
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
 
 
     /**
@@ -68,6 +77,12 @@ class Product extends Model
     public function getBrandNameAttribute()
     {
         return $this->brand ? $this->brand->name : 'Unknown';
+    }
+
+    // Get the supplier name
+    public function getSupplierNameAttribute()
+    {
+        return $this->supplier ? $this->supplier->name : 'Unknown';
     }
 
     // Get stock status

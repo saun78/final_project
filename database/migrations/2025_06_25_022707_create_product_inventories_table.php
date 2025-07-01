@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('received_date'); 
             $table->string('supplier_ref')->nullable(); 
             $table->text('notes')->nullable(); 
-            $table->timestamps();
+            $table->timestamps();   
 
             // 外键约束
             $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');

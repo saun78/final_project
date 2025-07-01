@@ -20,7 +20,34 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="#reportsSubmenu" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" data-bs-toggle="collapse">
+                <a href="#" class="nav-link {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'active' : '' }}" 
+                   onclick="toggleSubmenu(event)" id="addNavLink">
+                    <i class="bi bi-plus-circle"></i>
+                    Add
+                    <i class="bi bi-chevron-down ms-auto" id="addChevron" style="transform: {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'rotate(180deg)' : 'rotate(0deg)' }};"></i>
+                </a>
+                <ul class="nav nav-pills flex-column ms-3" id="addSubmenu" style="display: {{ request()->routeIs(['categories.*', 'brands.*', 'suppliers.*']) ? 'block' : 'none' }};">
+                    <li class="nav-item">
+                        <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <i class="bi bi-grid"></i>
+                            Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('brands.index') }}" class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}">
+                            <i class="bi bi-tags"></i>
+                            Brands
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('suppliers.index') }}" class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                            <i class="bi bi-truck"></i>
+                            Suppliers
+                        </a>
+                    </li>
+                </ul>
+                <li class="nav-item">
+                    <a href="#reportsSubmenu" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" data-bs-toggle="collapse">
                     <i class="bi bi-graph-up"></i>
                     Reports
                     <i class="bi bi-chevron-down ms-auto"></i>
@@ -34,78 +61,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('reports.sales-by-period') }}" class="nav-link {{ request()->routeIs('reports.sales-by-period') ? 'active' : '' }}">
-                                <i class="bi bi-calendar-check"></i>
-                                Summary
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <a href="#" class="nav-link {{ request()->routeIs(['categories.*', 'brands.*']) ? 'active' : '' }}" 
-                   onclick="toggleSubmenu(event)" id="addNavLink">
-                    <i class="bi bi-plus-circle"></i>
-                    Add
-                    <i class="bi bi-chevron-down ms-auto" id="addChevron" style="transform: {{ request()->routeIs(['categories.*', 'brands.*']) ? 'rotate(180deg)' : 'rotate(0deg)' }};"></i>
-                </a>
-                <ul class="nav nav-pills flex-column ms-3" id="addSubmenu" style="display: {{ request()->routeIs(['categories.*', 'brands.*']) ? 'block' : 'none' }};">
-                    <li class="nav-item">
-                        <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                            <i class="bi bi-grid"></i>
-                            Categories
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('brands.index') }}" class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}">
-                            <i class="bi bi-tags"></i>
-                            Brands
-                        </a>
+                        <a href="{{ route('reports.sales-by-period') }}" class="nav-link {{ request()->routeIs('reports.sales-by-period') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-check"></i>
+                            Summary
+                       </a>
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-arrow-left-right"></i>
-                    Inventory
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-truck"></i>
-                    Suppliers
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-people"></i>
-                    Customers
-                </a>
-            </li>
         </ul>
     </div>
-</nav>
-
-<style>
-.sidebar .nav-link[data-bs-toggle="collapse"] {
-    position: relative;
-}
-
-.sidebar .nav-link[data-bs-toggle="collapse"] .bi-chevron-down {
-    transition: transform 0.2s;
-}
-
-.sidebar .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] .bi-chevron-down {
-    transform: rotate(180deg);
-}
-
-.sidebar .collapse .nav-link {
-    padding-left: 2.5rem;
-    font-size: 0.9rem;
-}
-
-.sidebar .collapse .nav-link i {
-    font-size: 0.8rem;
-}
-</style> 
 </nav>
 
 <style>
