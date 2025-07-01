@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string("order_number");
             $table->integer("amount");
+            $table->string('payment_method')->nullable();
+            $table->decimal('labor_fee', 10, 2)->default(0.00);
             $table->timestamps();
         });
     }

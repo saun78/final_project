@@ -59,7 +59,7 @@
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Total Sales Amount</h5>
-                                    <h2 class="card-text">${{ number_format($totalAmount, 2) }}</h2>
+                                    <h2 class="card-text">RM{{ number_format($totalAmount, 2) }}</h2>
                                 </div>
                             </div>
                         </div>
@@ -71,6 +71,7 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Total Sold</th>
+                                    <th>Payment Method</th>
                                     <th>Total Amount</th>
                                 </tr>
                             </thead>
@@ -79,7 +80,8 @@
                                 <tr>
                                     <td>{{ $period === 'monthly' ? Carbon\Carbon::parse($data->date)->format('F Y') : Carbon\Carbon::parse($data->date)->format('Y-m-d') }}</td>
                                     <td>{{ number_format($data->total_sold) }}</td>
-                                    <td>${{ number_format($data->total_amount, 2) }}</td>
+                                    <td>{{ number_format($data->payment_method) }}</td>
+                                    <td>RM{{ number_format($data->total_amount, 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

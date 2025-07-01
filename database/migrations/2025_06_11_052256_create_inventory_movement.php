@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("location_id");
             $table->string("quantity");
             $table->string("notes");
-            $table->timestamp("time");
+            $table->timestamps();
         });
     }
 

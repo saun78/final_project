@@ -87,7 +87,7 @@
                                     <td>{{ $record->product->category->name }}</td>
                                     <td>{{ $record->product->brand->name }}</td>
                                     <td>{{ number_format($record->quantity_sold) }}</td>
-                                    <td>${{ number_format($record->total_amount, 2) }}</td>
+                                    <td>RM{{ number_format($record->total_amount, 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -116,7 +116,7 @@
                                     <td>{{ $total['product']->category->name }}</td>
                                     <td>{{ $total['product']->brand->name }}</td>
                                     <td>{{ number_format($total['total_sold']) }}</td>
-                                    <td>${{ number_format($total['total_amount'], 2) }}</td>
+                                    <td>RM{{ number_format($total['total_amount'], 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -124,7 +124,7 @@
                                 <tr class="font-weight-bold">
                                     <td colspan="4" class="text-right">Grand Total:</td>
                                     <td></td>
-                                    <td>${{ number_format($totalAmount, 2) }}</td>
+                                    <td>RM{{ number_format($totalAmount, 2) }}</td>
                                 </tr>
                             </tfoot>
                         </table>
