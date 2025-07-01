@@ -125,6 +125,7 @@ class ProductController extends Controller
             'selling_price' => 'nullable|numeric|min:0',
             'received_date' => 'nullable|date',
             'supplier_ref' => 'nullable|string|max:255',
+            'receipt_photo' => 'nullable|image|max:2048', // Max 2MB
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -161,6 +162,33 @@ class ProductController extends Controller
     public function batches(Product $product)
     {
         $batches = $this->productService->getProductBatches($product->id);
+        
+        // Load sales movements for each batch to show order links
+        foreach ($batches as $batch) {
+            $batch->salesMovements = \App\Models\InventoryMovement::where('batch_id', $batch->id)
+                ->where('movement_type', 'sale')
+                ->where('reference_type', 'order_item')
+                ->with(['product'])
+                ->get();
+                
+            // Get order details for each movement
+            $batch->orders = collect();
+            foreach ($batch->salesMovements as $movement) {
+                if ($movement->reference_id) {
+                    $orderItem = \App\Models\OrderItem::with('order')->find($movement->reference_id);
+                    if ($orderItem && $orderItem->order) {
+                        $batch->orders->push([
+                            'order' => $orderItem->order,
+                            'quantity_sold' => abs($movement->quantity),
+                            'sale_date' => $movement->movement_date,
+                            'unit_cost' => $movement->unit_cost,
+                            'is_cancelled' => str_contains($movement->notes, '[CANCELLED')
+                        ]);
+                    }
+                }
+            }
+        }
+        
         return view('products.batches', compact('product', 'batches'));
     }
 

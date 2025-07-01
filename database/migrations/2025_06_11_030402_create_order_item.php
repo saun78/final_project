@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('order_item', function (Blueprint $table) {
             $table->id();
-            $table->string("order_id");
-            $table->string("product_id");
+            $table->unsignedBigInteger("order_id");
+            $table->unsignedBigInteger("product_id");
             $table->integer("quantity");
-            $table->integer("price");
+            $table->decimal("price", 10, 2);
+            $table->decimal("cost_price", 10, 2)->nullable();
             $table->timestamps();
+
+            // Add foreign key constraint for order (exists before this migration)
+            $table->foreign('order_id')->references('id')->on('order')->onDelete('cascade');
         });
     }
 

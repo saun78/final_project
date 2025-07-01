@@ -16,12 +16,16 @@ class ProductInventory extends Model
         'received_date',
         'supplier_ref',
         'notes',
+        'receipt_photo',
+        'status',
+        'depleted_date',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'purchase_price' => 'decimal:2',
         'received_date' => 'date',
+        'depleted_date' => 'date',
     ];
 
     /**
@@ -92,6 +96,7 @@ class ProductInventory extends Model
     {
         $query = static::where('product_id', $productId)
             ->where('quantity', '>', 0)
+            ->where('status', 'active')
             ->orderBy('received_date', 'asc')
             ->orderBy('batch_no', 'asc');
             
@@ -115,9 +120,9 @@ class ProductInventory extends Model
     }
 
     /**
-     * 按FIFO原则扣减库存
+     * 按FIFO原则扣减库存，并记录批次使用情况
      */
-    public static function deductFIFO($productId, $quantityToDeduct): array
+    public static function deductFIFO($productId, $quantityToDeduct, $orderItemId = null): array
     {
         $batches = static::getFIFOBatches($productId, $quantityToDeduct);
         $deductions = [];
@@ -127,6 +132,7 @@ class ProductInventory extends Model
             if ($remainingQuantity <= 0) break;
             
             $deductFromThisBatch = min($remainingQuantity, $batch->quantity);
+            $originalQuantity = $batch->quantity;
             
             // 记录扣减信息
             $deductions[] = [
@@ -137,8 +143,27 @@ class ProductInventory extends Model
                 'cost' => $deductFromThisBatch * $batch->purchase_price,
             ];
             
+            // 如果提供了订单项ID，记录销售移动
+            if ($orderItemId) {
+                \App\Models\InventoryMovement::recordSale(
+                    $batch->product_id,
+                    $batch->id,
+                    $batch->batch_no,
+                    $orderItemId,
+                    $deductFromThisBatch,
+                    $batch->purchase_price
+                );
+            }
+            
             // 更新批次库存
             $batch->quantity -= $deductFromThisBatch;
+            
+            // 如果批次用完，标记为已用完
+            if ($batch->quantity == 0) {
+                $batch->status = 'depleted';
+                $batch->depleted_date = now()->toDateString();
+            }
+            
             $batch->save();
             
             $remainingQuantity -= $deductFromThisBatch;
@@ -151,12 +176,15 @@ class ProductInventory extends Model
         return $deductions;
     }
 
+
+
     /**
-     * 获取产品的总库存（所有批次的总和）
+     * 获取产品的总库存（所有活跃批次的总和）
      */
     public static function getTotalStock($productId): int
     {
         return static::where('product_id', $productId)
+            ->where('status', 'active')
             ->sum('quantity');
     }
 
@@ -167,6 +195,7 @@ class ProductInventory extends Model
     {
         $batches = static::where('product_id', $productId)
             ->where('quantity', '>', 0)
+            ->where('status', 'active')
             ->get();
             
         if ($batches->isEmpty()) {
@@ -180,5 +209,21 @@ class ProductInventory extends Model
         $totalQuantity = $batches->sum('quantity');
         
         return $totalQuantity > 0 ? $totalValue / $totalQuantity : 0;
+    }
+
+    /**
+     * 获取照片URL
+     */
+    public function getReceiptPhotoUrlAttribute()
+    {
+        return $this->receipt_photo ? asset('storage/' . $this->receipt_photo) : null;
+    }
+
+    /**
+     * 获取该批次的库存移动记录
+     */
+    public function movements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'batch_id');
     }
 }

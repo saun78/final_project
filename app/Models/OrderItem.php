@@ -15,12 +15,14 @@ class OrderItem extends Model
         'order_id',
         'product_id',
         'quantity',
-        'price'
+        'price',
+        'cost_price'
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'cost_price' => 'decimal:2'
     ];
 
     public function order()
@@ -36,5 +38,28 @@ class OrderItem extends Model
     public function getSubtotalAttribute()
     {
         return $this->quantity * $this->price;
+    }
+
+    public function getProfitAttribute()
+    {
+        return ($this->price - $this->cost_price) * $this->quantity;
+    }
+
+    public function getProfitMarginAttribute()
+    {
+        if ($this->cost_price == 0) {
+            return 0;
+        }
+        return (($this->price - $this->cost_price) / $this->cost_price) * 100;
+    }
+
+    /**
+     * 获取该订单项的库存移动记录
+     */
+    public function movements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'reference_id')
+            ->where('reference_type', 'order_item')
+            ->where('movement_type', 'sale');
     }
 } 

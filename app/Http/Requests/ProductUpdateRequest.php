@@ -32,6 +32,9 @@ class ProductUpdateRequest extends FormRequest
             'supplier_id' => 'required|exists:supplier,id',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'quantity' => 'nullable|integer|min:0',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'selling_price' => 'nullable|numeric|min:0|gte:purchase_price',
             'picture' => 'nullable|image|max:2048', // Max 2MB
         ];
     }
@@ -46,6 +49,7 @@ class ProductUpdateRequest extends FormRequest
         return [
             'name.unique' => 'A product with this name already exists. Please choose a different name.',
             'part_number.unique' => 'A product with this part number already exists. Please choose a different part number.',
+            'selling_price.gte' => 'The selling price cannot be lower than the purchase price.',
         ];
     }
 

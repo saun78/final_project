@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Supplier extends Model
 {
@@ -16,22 +15,10 @@ class Supplier extends Model
         'name',
         'contact_person',
         'contact_number',
-        'address',
-        'slug'
+        'address'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($supplier) {
-            $supplier->slug = Str::slug($supplier->name);
-        });
-        
-        static::updating(function ($supplier) {
-            $supplier->slug = Str::slug($supplier->name);
-        });
-    }
+
 
     public function products()
     {

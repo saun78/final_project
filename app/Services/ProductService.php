@@ -170,24 +170,30 @@ class ProductService
      */
     public function addStock(Product $product, array $data)
     {
+        // Handle receipt photo upload
+        $receiptPhotoPath = null;
+        if (isset($data['receipt_photo']) && $data['receipt_photo']) {
+            $receiptPhotoPath = $data['receipt_photo']->store('receipts', 'public');
+        }
+
         $batch = $product->addStock(
             $data['quantity'],
             $data['purchase_price'],
             $data['received_date'] ?? null,
             $data['supplier_ref'] ?? null,
-            $data['notes'] ?? null
+            $data['notes'] ?? null,
+            $receiptPhotoPath
         );
 
         return $batch;
     }
 
     /**
-     * Get batch inventory for a product
+     * Get batch inventory for a product (including depleted batches)
      */
     public function getProductBatches($productId)
     {
         return ProductInventory::where('product_id', $productId)
-            ->where('quantity', '>', 0)
             ->orderBy('received_date', 'asc')
             ->orderBy('batch_no', 'asc')
             ->get();

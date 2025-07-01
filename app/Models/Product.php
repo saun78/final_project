@@ -159,7 +159,7 @@ class Product extends Model
     /**
      * Add stock in (create new batch)
      */
-    public function addStock($quantity, $purchasePrice, $receivedDate = null, $supplierRef = null, $notes = null)
+    public function addStock($quantity, $purchasePrice, $receivedDate = null, $supplierRef = null, $notes = null, $receiptPhoto = null)
     {
         $batchNo = ProductInventory::generateBatchNo($this->id, $receivedDate);
         
@@ -171,7 +171,18 @@ class Product extends Model
             'received_date' => $receivedDate ?: now()->toDateString(),
             'supplier_ref' => $supplierRef,
             'notes' => $notes,
+            'receipt_photo' => $receiptPhoto,
         ]);
+
+        // 记录库存移动：进货
+        \App\Models\InventoryMovement::recordStockIn(
+            $this->id,
+            $batch->id,
+            $batchNo,
+            $quantity,
+            $purchasePrice,
+            $notes ?: "Stock in for batch {$batchNo}"
+        );
 
         // Product quantity will be automatically synced by ProductInventory model
 

@@ -20,6 +20,9 @@ return new class extends Migration
             $table->date('received_date'); // 收货日期（用于FIFO排序）
             $table->string('supplier_ref')->nullable(); // 供应商参考号
             $table->text('notes')->nullable(); // 备注
+            $table->string('receipt_photo')->nullable(); // 进货单据照片
+            $table->enum('status', ['active', 'depleted'])->default('active'); // 批次状态
+            $table->date('depleted_date')->nullable(); // 用完日期
             $table->timestamps();
 
             // 外键约束

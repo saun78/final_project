@@ -128,34 +128,48 @@ class OrderController extends Controller
         ]);
 
         // Create order items and update stock using FIFO (using transaction)
-        DB::transaction(function () use ($request, $order, $products) {
-            foreach ($request->items as $item) {
-                $product = $products->get($item['product_id']);
-                
-                // Deduct stock using FIFO method
-                try {
-                    $batchDeductions = $product->deductStock($item['quantity']);
+        try {
+            DB::transaction(function () use ($request, $order, $products) {
+                foreach ($request->items as $item) {
+                    $product = $products->get($item['product_id']);
                     
+                    // 在事务内再次检查库存，防止竞态条件
+                    $availableStock = ProductInventory::getTotalStock($item['product_id']);
+                    if ($availableStock < $item['quantity']) {
+                        throw new \Exception("Insufficient stock for {$product->name}. Available: {$availableStock}, Required: {$item['quantity']}");
+                    }
+                    
+                    // Create order item first to get ID for batch tracking
+                    $orderItem = OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'cost_price' => 0, // Will be updated after FIFO calculation
+                    ]);
 
-                    
-                } catch (\Exception $e) {
-                    throw new \Exception("Failed to deduct stock for {$product->name}: " . $e->getMessage());
+                    // Deduct stock using FIFO method with batch tracking
+                    try {
+                        $batchDeductions = ProductInventory::deductFIFO($item['product_id'], $item['quantity'], $orderItem->id);
+                        
+                        // Calculate and update average cost
+                        $totalCost = collect($batchDeductions)->sum('cost');
+                        $averageCost = $totalCost / $item['quantity'];
+                        
+                        $orderItem->update(['cost_price' => $averageCost]);
+                        
+                    } catch (\Exception $e) {
+                        throw new \Exception("Failed to deduct stock for {$product->name}: " . $e->getMessage());
+                    }
                 }
-
-                // Create order item with cost information from FIFO
-                $totalCost = collect($batchDeductions)->sum('cost');
-                $averageCost = $totalCost / $item['quantity'];
-                
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    // Note: You might want to add a cost_price field to order_item table
-                    // 'cost_price' => $averageCost,
-                ]);
-            }
-        });
+            });
+        } catch (\Exception $e) {
+            // 如果事务失败，删除已创建的订单并返回错误
+            $order->delete();
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()])
+                ->withInput();
+        }
 
         return redirect()->route('orders.index')->with('success', 'Receipt created successfully! Product stock updated.');
     }
@@ -195,14 +209,71 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        // WARNING: This only deletes the order record, does NOT restore inventory
-        // Use with extreme caution - this is for correcting mistakes only
+        // DANGEROUS OPERATION: This restores inventory and deletes the order
+        // Use with extreme caution - this should only be used for correcting immediate mistakes
         DB::transaction(function () use ($order) {
+            // Restore inventory to original batches
+            foreach ($order->orderItems as $item) {
+                $product = $item->product;
+                if ($product) {
+                    // Get the sales movements for this order item to know which batches were used
+                    $salesMovements = \App\Models\InventoryMovement::getOrderItemBatches($item->id);
+                    
+                    if ($salesMovements->isEmpty()) {
+                        // Fallback: if no movement records found, create a new batch (old behavior)
+                        $costPrice = $item->cost_price ?: $product->purchase_price;
+                        $batch = $product->addStock(
+                            $item->quantity,
+                            $costPrice,
+                            now()->toDateString(),
+                            'ORDER-CANCEL-' . $order->order_number,
+                            'Inventory restored from cancelled order #' . $order->order_number . ' (no original batch records found)'
+                        );
+                    } else {
+                        // Restore inventory to original batches
+                        foreach ($salesMovements as $movement) {
+                            $originalBatch = \App\Models\ProductInventory::find($movement->batch_id);
+                            
+                            if ($originalBatch) {
+                                // Restore the quantity to the original batch
+                                $quantityToRestore = abs($movement->quantity); // Movement quantity is negative for sales
+                                $originalBatch->quantity += $quantityToRestore;
+                                
+                                // If the batch was marked as depleted, reactivate it
+                                if ($originalBatch->status === 'depleted') {
+                                    $originalBatch->status = 'active';
+                                    $originalBatch->depleted_date = null;
+                                }
+                                
+                                $originalBatch->save();
+                                
+                                // Record the restoration movement
+                                \App\Models\InventoryMovement::recordReturn(
+                                    $product->id,
+                                    $originalBatch->id,
+                                    $originalBatch->batch_no,
+                                    $quantityToRestore,
+                                    $movement->unit_cost,
+                                    $order->order_number
+                                );
+                            }
+                        }
+                        
+                        // Mark the original sales movements as cancelled
+                        foreach ($salesMovements as $movement) {
+                            $movement->update([
+                                'notes' => $movement->notes . ' [CANCELLED - Order #' . $order->order_number . ' deleted]'
+                            ]);
+                        }
+                    }
+                }
+            }
+            
             $order->orderItems()->delete();
             $order->delete();
         });
 
-        return redirect()->route('orders.index')->with('warning', 'Order deleted successfully. Note: Inventory was NOT restored - use this feature only for correcting mistakes.');
+        return redirect()->route('orders.index')->with('warning', 'Order deleted and inventory restored to original batches. Use this feature only for correcting immediate mistakes.');
     }
 
     public function print(Order $order)
