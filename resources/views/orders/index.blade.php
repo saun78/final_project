@@ -204,7 +204,7 @@
                                                     </a>
                                                     <button type="button" class="btn btn-outline-danger btn-sm" 
                                                             onclick="confirmDelete({{ $order->id }}, '{{ $order->order_number }}')"
-                                                            title="Delete order (WARNING: Does not restore inventory)">
+                                                            title="Delete order and restore inventory (Use with caution)">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
@@ -241,7 +241,7 @@
                 </div>
                 <div class="alert alert-danger d-flex align-items-center" role="alert">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    <small><strong>WARNING:</strong> This will only delete the order record. Product inventory will NOT be restored. Use this only to correct mistakes.</small>
+                    <small><strong>WARNING:</strong> This will delete the order and restore product inventory. This action cannot be undone. Use only to correct immediate mistakes.</small>
                 </div>
             </div>
             <div class="modal-footer">

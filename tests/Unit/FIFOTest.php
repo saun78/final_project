@@ -19,12 +19,19 @@ class FIFOTest extends TestCase
         // 创建必要的数据
         $category = Category::create(['name' => 'Test Category']);
         $brand = Brand::create(['name' => 'Test Brand']);
+        $supplier = \App\Models\Supplier::create([
+            'name' => 'Test Supplier',
+            'contact_person' => 'John Doe',
+            'contact_number' => '123456789',
+            'address' => 'Test Address'
+        ]);
         
         $product = Product::create([
             'name' => 'Test Product',
             'part_number' => 'TEST001',
             'category_id' => $category->id,
             'brand_id' => $brand->id,
+            'supplier_id' => $supplier->id,
             'quantity' => 0,
             'purchase_price' => 10.00,
             'selling_price' => 15.00,
@@ -78,12 +85,19 @@ class FIFOTest extends TestCase
         // 创建必要的数据
         $category = Category::create(['name' => 'Test Category']);
         $brand = Brand::create(['name' => 'Test Brand']);
+        $supplier = \App\Models\Supplier::create([
+            'name' => 'Test Supplier 2',
+            'contact_person' => 'Jane Doe',
+            'contact_number' => '987654321',
+            'address' => 'Test Address 2'
+        ]);
         
         $product = Product::create([
             'name' => 'Test Product',
             'part_number' => 'TEST002',
             'category_id' => $category->id,
             'brand_id' => $brand->id,
+            'supplier_id' => $supplier->id,
             'quantity' => 0,
             'purchase_price' => 10.00,
             'selling_price' => 15.00,
@@ -105,12 +119,19 @@ class FIFOTest extends TestCase
         // 创建必要的数据
         $category = Category::create(['name' => 'Test Category']);
         $brand = Brand::create(['name' => 'Test Brand']);
+        $supplier = \App\Models\Supplier::create([
+            'name' => 'Test Supplier 3',
+            'contact_person' => 'Bob Smith',
+            'contact_number' => '555666777',
+            'address' => 'Test Address 3'
+        ]);
         
         $product = Product::create([
             'name' => 'Test Product',
             'part_number' => 'TEST003',
             'category_id' => $category->id,
             'brand_id' => $brand->id,
+            'supplier_id' => $supplier->id,
             'quantity' => 0,
             'purchase_price' => 10.00,
             'selling_price' => 15.00,

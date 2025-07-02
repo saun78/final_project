@@ -36,7 +36,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('products.stock-in', $product) }}" method="POST">
+                    <form action="{{ route('products.stock-in', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row g-3">
@@ -119,6 +119,31 @@
                                 @error('supplier_ref')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <!-- Receipt Photo -->
+                            <div class="col-md-6">
+                                <label for="receipt_photo" class="form-label">Receipt Photo</label>
+                                <input type="file" 
+                                       class="form-control @error('receipt_photo') is-invalid @enderror" 
+                                       id="receipt_photo" 
+                                       name="receipt_photo" 
+                                       accept="image/*"
+                                       onchange="previewPhoto(this)">
+                                @error('receipt_photo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Upload receipt/invoice photo for this batch (JPG, PNG, max 2MB)</small>
+                                
+                                <!-- Photo Preview -->
+                                <div id="photoPreview" class="mt-2" style="display: none;">
+                                    <img id="previewImage" src="" alt="Receipt preview" class="img-thumbnail" style="max-height: 150px;">
+                                    <div class="mt-1">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePhoto()">
+                                            <i class="bi bi-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Profit Margin Display -->
@@ -297,5 +322,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial calculation
     updateCalculations();
 });
+
+// Photo preview functions
+function previewPhoto(input) {
+    const preview = document.getElementById('photoPreview');
+    const previewImage = document.getElementById('previewImage');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removePhoto() {
+    const input = document.getElementById('receipt_photo');
+    const preview = document.getElementById('photoPreview');
+    
+    input.value = '';
+    preview.style.display = 'none';
+}
 </script>
 @endsection 
