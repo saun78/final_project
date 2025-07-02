@@ -13,13 +13,7 @@ return new class extends Migration
     {
         Schema::create('inventory_movement', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD
-            $table->string("product_id");
-            $table->string("location_id");
-            $table->string("quantity");
-            $table->string("notes");
-            $table->timestamps();
-=======
+
             $table->enum('movement_type', ['stock_in', 'sale', 'adjustment', 'transfer']); // 移动类型
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('batch_id')->nullable(); // 批次ID（用于销售记录）
@@ -44,7 +38,7 @@ return new class extends Migration
             $table->index(['movement_type', 'movement_date']);
             $table->index('batch_id');
             $table->index(['reference_type', 'reference_id']);
->>>>>>> cd5cafca600346b2d6f1d834f77d5c6bd80c2e98
+
         });
     }
 
