@@ -61,7 +61,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                        <a href="{{ route('reports.sales-by-period') }}" class="nav-link {{ request()->routeIs('reports.sales-by-period') ? 'active' : '' }}">
+                        <a href="{{ route('reports.summary') }}" class="nav-link {{ request()->routeIs('reports.summary') ? 'active' : '' }}">
                             <i class="bi bi-calendar-check"></i>
                             Summary
                        </a>

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string("part_number")->nullable();
             $table->unsignedBigInteger("category_id");
             $table->unsignedBigInteger("brand_id");
-            $table->unsignedBigInteger("supplier_id");
+            $table->unsignedBigInteger("supplier_id")->nullable();
             $table->string("location")->nullable();
             $table->string("description")->nullable();
             $table->string("name");
@@ -26,9 +26,10 @@ return new class extends Migration
             $table->string("picture")->nullable();
             $table->timestamps();
 
-            
+            // Add foreign key constraints
             $table->foreign('category_id')->references('id')->on('category')->onDelete('cascade');
             $table->foreign('brand_id')->references('id')->on('brand')->onDelete('cascade');
+            $table->foreign('supplier_id')->references('id')->on('supplier')->onDelete('set null');
         });
     }
 

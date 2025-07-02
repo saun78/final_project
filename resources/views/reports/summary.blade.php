@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('reports.sales-by-period') }}" method="GET" class="mb-4">
+                    <form action="{{ route('reports.summary') }}" method="GET" class="mb-4">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
@@ -35,6 +35,17 @@
                                 <div class="form-group">
                                     <label for="end_date">End Date</label>
                                     <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $endDate }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="payment_method">Payment Method (Optional)</label>
+                                    <select name="payment_method" id="payment_method" class="form-control">
+                                        <option value="">All</option>
+                                        <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                                        <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
+                                        <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -80,7 +91,7 @@
                                 <tr>
                                     <td>{{ $period === 'monthly' ? Carbon\Carbon::parse($data->date)->format('F Y') : Carbon\Carbon::parse($data->date)->format('Y-m-d') }}</td>
                                     <td>{{ number_format($data->total_sold) }}</td>
-                                    <td>{{ number_format($data->payment_method) }}</td>
+                                    <!-- <td>{{ number_format($data->payment_method) }}</td> -->
                                     <td>RM{{ number_format($data->total_amount, 2) }}</td>
                                 </tr>
                                 @endforeach

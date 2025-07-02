@@ -68,19 +68,25 @@ class ReportController extends Controller
         $period = $request->get('period', 'daily');
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth());
         $endDate = $request->get('end_date', Carbon::now());
+        $paymentMethod = $request->get('payment_method');
 
         $query = Report::with('product')
             ->select(
                 DB::raw('DATE(sale_date) as date'),
                 DB::raw('SUM(quantity_sold) as total_sold'),
-                DB::raw('SUM(total_amount) as total_amount')
+                DB::raw('SUM(total_amount) as total_amount'),
+                'payment_method'
             )
             ->whereBetween('sale_date', [$startDate, $endDate]);
 
+        if ($paymentMethod) {
+            $query->where('payment_method', $paymentMethod);
+        }
+
         if ($period === 'monthly') {
-            $query->groupBy(DB::raw('YEAR(sale_date)'), DB::raw('MONTH(sale_date)'));
+            $query->groupBy(DB::raw('YEAR(sale_date)'), DB::raw('MONTH(sale_date)'), 'payment_method');
         } else {
-            $query->groupBy(DB::raw('DATE(sale_date)'));
+            $query->groupBy(DB::raw('DATE(sale_date)'), 'payment_method');
         }
 
         $salesData = $query->get();
@@ -88,7 +94,7 @@ class ReportController extends Controller
         $totalSales = $salesData->sum('total_sold');
         $totalAmount = $salesData->sum('total_amount');
 
-        return view('reports.sales-by-period', compact('salesData', 'totalSales', 'totalAmount', 'period', 'startDate', 'endDate'));
+        return view('reports.summary', compact('salesData', 'totalSales', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod'));
     }
 
     public function store(Request $request, Product $product)

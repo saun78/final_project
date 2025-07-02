@@ -60,6 +60,6 @@ Route::middleware(['auth'])->group(function () {
     // Reports Routes
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/top-selling', [ReportController::class, 'topSelling'])->name('reports.top-selling');
-    Route::get('/reports/sales-by-period', [ReportController::class, 'salesByPeriod'])->name('reports.sales-by-period');
+    Route::get('/reports/summary', [ReportController::class, 'salesByPeriod'])->name('reports.summary');
     
 });

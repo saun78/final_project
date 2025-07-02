@@ -26,7 +26,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Sales by Period</h5>
                                     <p class="card-text">Analyze sales data by daily or monthly periods.</p>
-                                    <a href="{{ route('reports.sales-by-period') }}" class="btn btn-primary">
+                                    <a href="{{ route('reports.summary') }}" class="btn btn-primary">
                                         <i class="fas fa-calendar-alt"></i> View Report
                                     </a>
                                 </div>
