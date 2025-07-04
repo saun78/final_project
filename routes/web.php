@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
+Route::get('/ad',function () {
+    return view('auth.ad');
+});
+
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
