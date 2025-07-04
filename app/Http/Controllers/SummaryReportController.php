@@ -2,68 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Report;
-use App\Models\Product;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class ReportController extends Controller
+class SummaryReportController extends Controller
 {
-
-    public function topSelling(Request $request)
-    {
-        // Get all order items joined with products, categories, brands, and orders
-        $query = \App\Models\OrderItem::with(['product.category', 'product.brand', 'order']);
-
-        // Date filter (by order created_at)
-        if ($request->filled('start_date')) {
-            $query->whereHas('order', function($q) use ($request) {
-                $q->whereDate('created_at', '>=', $request->start_date);
-            });
-        }
-        if ($request->filled('end_date')) {
-            $query->whereHas('order', function($q) use ($request) {
-                $q->whereDate('created_at', '<=', $request->end_date);
-            });
-        }
-
-        // Search filter (by product name, part number, category, brand)
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('product', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('part_number', 'like', "%{$search}%")
-                  ->orWhereHas('category', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('brand', function($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        $orderItems = $query->orderByDesc('created_at')->get();
-
-        // Individual sales records (each order item)
-        $salesRecords = $orderItems;
-
-        // Product totals
-        $productTotals = $orderItems->groupBy('product_id')->map(function ($records) {
-            return [
-                'product' => $records->first()->product,
-                'total_sold' => $records->sum('quantity'),
-                'total_amount' => $records->sum(function($item) { return $item->quantity * $item->price; })
-            ];
-        })->sortByDesc('total_sold');
-
-        $totalSales = $productTotals->sum('total_sold');
-        $totalAmount = $productTotals->sum('total_amount');
-
-        return view('reports.top-selling', compact('salesRecords', 'productTotals', 'totalSales', 'totalAmount'));
-    }
-
-    public function salesByPeriod(Request $request)
+    public function summary(Request $request)
     {
         $period = $request->get('period', 'daily'); // Default to daily
         $startDate = $request->get('start_date');
@@ -71,7 +16,7 @@ class ReportController extends Controller
         $paymentMethod = $request->get('payment_method');
 
         // Get all order items joined with orders and products
-        $query = \App\Models\OrderItem::with(['order', 'product']);
+        $query = OrderItem::with(['order', 'product']);
         $query->whereHas('order', function($q) use ($startDate, $endDate, $paymentMethod) {
             if ($startDate && $endDate) {
                 $q->whereDate('created_at', '>=', $startDate)
@@ -118,5 +63,4 @@ class ReportController extends Controller
 
         return view('reports.summary', compact('salesData', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod', 'cashTotal', 'tngTotal'));
     }
-
 } 

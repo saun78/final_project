@@ -6,12 +6,10 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Summary</h3>
-                    <div class="card-tools">
-                    </div>
+                    <h3 class="card-title">Profit Report</h3>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('reports.summary') }}" method="GET" class="mb-4">
+                    <form action="{{ route('reports.profit') }}" method="GET" class="mb-4">
                         <div class="row align-items-end g-2">
                             <div class="col-auto">
                                 <label for="period" class="form-label">Report Period</label>
@@ -86,27 +84,19 @@
                     </script>
 
                     <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card bg-primary text-white">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Sales Amount</h5>
-                                    <h2 class="card-text">RM{{ number_format($totalAmount, 2) }}</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="card bg-success text-white">
                                 <div class="card-body">
-                                    <h5 class="card-title">Cash Total</h5>
-                                    <h3 class="card-text">RM{{ number_format($cashTotal, 2) }}</h3>
+                                    <h5 class="card-title">Total Profit</h5>
+                                    <h2 class="card-text">RM{{ number_format($totalProfit, 2) }}</h2>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card bg-info text-white">
+                        <div class="col-md-6">
+                            <div class="card bg-secondary text-white">
                                 <div class="card-body">
-                                    <h5 class="card-title">TNG Total</h5>
-                                    <h3 class="card-text">RM{{ number_format($tngTotal, 2) }}</h3>
+                                    <h5 class="card-title">Total COGS</h5>
+                                    <h2 class="card-text">RM{{ number_format($totalCogs, 2) }}</h2>
                                 </div>
                             </div>
                         </div>
@@ -116,14 +106,14 @@
                             <thead>
                                 <tr>
                                     <th>{{ $period === 'monthly' ? 'Month' : 'Date' }}</th>
-                                    <th>Cash Amount</th>
-                                    <th>TNG Amount</th>
-                                    <th>Card Amount</th>
-                                    <th>Total Amount</th>
+                                    <th>Sales</th>
+                                    <th>COGS</th>
+                                    <th>Profit</th>
+                                    <th>Details</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($salesData as $data)
+                                @foreach($profitData as $i => $data)
                                 <tr>
                                     <td>
                                         @if($period === 'monthly')
@@ -132,10 +122,40 @@
                                             {{ \Carbon\Carbon::parse($data->date)->format('Y-m-d') }}
                                         @endif
                                     </td>
-                                    <td>RM{{ number_format($data->cash_amount, 2) }}</td>
-                                    <td>RM{{ number_format($data->tng_amount, 2) }}</td>
-                                    <td>RM{{ number_format($data->card_amount, 2) }}</td>
-                                    <td>RM{{ number_format($data->total_amount, 2) }}</td>
+                                    <td>RM{{ number_format($data->sales, 2) }}</td>
+                                    <td>RM{{ number_format($data->cogs, 2) }}</td>
+                                    <td>RM{{ number_format($data->profit, 2) }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="document.getElementById('details-{{ $i }}').classList.toggle('d-none')">
+                                            Show Details
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr id="details-{{ $i }}" class="d-none">
+                                    <td colspan="5">
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Qty</th>
+                                                    <th>Sales</th>
+                                                    <th>COGS</th>
+                                                    <th>Profit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($data->products as $product)
+                                                <tr>
+                                                    <td>{{ $product->product_name }}</td>
+                                                    <td>{{ $product->quantity }}</td>
+                                                    <td>RM{{ number_format($product->sales, 2) }}</td>
+                                                    <td>RM{{ number_format($product->cogs, 2) }}</td>
+                                                    <td>RM{{ number_format($product->profit, 2) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>

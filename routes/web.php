@@ -11,6 +11,9 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TopSellingReportController;
+use App\Http\Controllers\SummaryReportController;
+use App\Http\Controllers\ProfitReportController;
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -58,8 +61,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/export/excel', [OrderController::class, 'exportExcel'])->name('orders.export.excel');
 
     // Reports Routes
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/top-selling', [ReportController::class, 'topSelling'])->name('reports.top-selling');
-    Route::get('/reports/summary', [ReportController::class, 'salesByPeriod'])->name('reports.summary');
+    Route::get('/reports/top-selling', [TopSellingReportController::class, 'topSelling'])->name('reports.top-selling');
+    Route::get('/reports/summary', [SummaryReportController::class, 'summary'])->name('reports.summary');
+    Route::get('/reports/profit', [ProfitReportController::class, 'profit'])->name('reports.profit');
+    Route::get('/reports/top-selling/pdf', [TopSellingReportController::class, 'exportPdf'])->name('reports.top-selling.pdf');
+    Route::get('/reports/summary/pdf', [SummaryReportController::class, 'exportPdf'])->name('reports.summary.pdf');
+    Route::get('/reports/profit/pdf', [ProfitReportController::class, 'exportPdf'])->name('reports.profit.pdf');
     
 });

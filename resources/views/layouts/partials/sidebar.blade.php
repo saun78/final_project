@@ -66,7 +66,14 @@
                             Summary
                        </a>
                     </li>
-                </ul>
+                        <li class="nav-item">
+                            <a href="{{ route('reports.profit') }}" class="nav-link {{ request()->routeIs('reports.profit') ? 'active' : '' }}">
+                                <i class="bi bi-currency-dollar"></i>
+                                Profit Report
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>

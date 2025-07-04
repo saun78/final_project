@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('product')->onDelete('cascade');
             $table->integer('quantity_sold');
             $table->decimal('total_amount', 10, 2);
-            $table->timestamp('sale_date');
+            $table->decimal('payment_method');
+            $table->timestamp('sale_date'); 
             $table->timestamps();
         });
     }

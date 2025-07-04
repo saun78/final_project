@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category', function (Blueprint $table) {
+        Schema::create('supplier', function (Blueprint $table) {
             $table->id();
-            $table->string("name")->unique();
+            $table->string("name");
+            $table->string("contact_person");
+            $table->string("contact_number");
+            $table->string("address");
+            $table->string("slug")->nullable();
             $table->timestamps();
-            
-            // Add index for performance
-            $table->index('name');
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category');
+        Schema::dropIfExists('supplier');
     }
 };

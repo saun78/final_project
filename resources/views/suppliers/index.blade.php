@@ -1,4 +1,4 @@
-<!-- @extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Suppliers Management')
 
@@ -321,4 +321,4 @@ function updateSearchInfo(searchQuery, count) {
     }
 }
 </script>
-@endpush  -->
+@endpush 
