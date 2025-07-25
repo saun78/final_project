@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register</title>
@@ -61,12 +55,7 @@
       opacity: 0;
     }
   </style>
-<<<<<<< HEAD
   <body>
-=======
-</head>
-<body>
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 
   {{-- ✅ 成功弹窗 --}}
   @if (session('success'))
@@ -166,11 +155,7 @@
               <span class="input-group-text" onclick="togglePassword('password_confirmation')">
                 <i class="bi bi-eye" id="eye-password_confirmation"></i>
               </span>
-<<<<<<< HEAD
 </div>
-=======
-            </div>
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             @error('password_confirmation')
               <div class="invalid-feedback d-block">{{ $message }}</div>
             @enderror
@@ -183,16 +168,10 @@
 
         <div class="text-center mt-3">
           <p>Already have an account? <a href="{{ route('login') }}">Login here</a></p>
-<<<<<<< HEAD
 </div>
       </div>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-=======
-        </div>
-      </div>
-    </div>
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -212,9 +191,4 @@
     }
   </script>
 </body>
-<<<<<<< HEAD
 </html> 
-</html>
-=======
-</html>
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('order_item', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD
             $table->unsignedBigInteger("order_id");
             $table->unsignedBigInteger("product_id");
             $table->integer("quantity");
@@ -23,13 +22,6 @@ return new class extends Migration
 
             // Add foreign key constraint for order (exists before this migration)
             $table->foreign('order_id')->references('id')->on('`order`')->onDelete('cascade');
-=======
-            $table->string("order_id");
-            $table->string("product_id");
-            $table->integer("quantity");
-            $table->integer("price");
-            $table->timestamps();
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
         });
     }
 

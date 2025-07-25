@@ -15,12 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string("order_number");
             $table->integer("amount");
-<<<<<<< HEAD
             $table->string('payment_method');
             $table->decimal('labor_fee', 10, 2)->default(0.00);
-=======
-            $table->string("status");
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             $table->timestamps();
         });
     }

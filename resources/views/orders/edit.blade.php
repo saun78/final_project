@@ -87,9 +87,9 @@
                                             <label class="form-label">Payment Method</label>
                                             <select name="payment_method" class="form-select" required>
                                                 <option value="">Select Payment Method</option>
-                                                                                            <option value="cash" {{ $order->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
-                                            <option value="bank" {{ $order->payment_method == 'bank' ? 'selected' : '' }}>Bank</option>
-                                            <option value="tng_wallet" {{ $order->payment_method == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
+                                                <option value="cash" {{ $order->payment_method == 'cash' ? 'selected' : '' }}>Cash</option>
+                                                <option value="bank_transfer" {{ $order->payment_method == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                                                <option value="tng_wallet" {{ $order->payment_method == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
                                             </select>
                                         </div>
                                         

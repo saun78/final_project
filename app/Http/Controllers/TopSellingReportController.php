@@ -42,8 +42,32 @@ class TopSellingReportController extends Controller
 
         $orderItems = $query->orderByDesc('created_at')->get();
 
-        // Individual sales records (each order item)
-        $salesRecords = $orderItems;
+        // Group by time (to minute) and product_id
+        $groupedSales = $orderItems->groupBy(function($item) {
+            return $item->order->created_at->format('Y-m-d H:i') . '-' . $item->product_id;
+        })->map(function($group) {
+            $first = $group->first();
+            return (object) [
+                'datetime' => $first->order->created_at->format('Y-m-d H:i'),
+                'product' => $first->product,
+                'quantity' => $group->sum('quantity'),
+                'amount' => $group->sum(function($item) { return $item->quantity * $item->price; }),
+                'category' => $first->product->category,
+                'brand' => $first->product->brand,
+            ];
+        });
+
+        // Paginate manually
+        $perPage = 10;
+        $currentPage = $request->input('page', 1);
+        $pagedSales = $groupedSales->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $salesRecords = new \Illuminate\Pagination\LengthAwarePaginator(
+            $pagedSales,
+            $groupedSales->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         // Product totals
         $productTotals = $orderItems->groupBy('product_id')->map(function ($records) {

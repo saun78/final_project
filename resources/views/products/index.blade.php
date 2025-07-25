@@ -24,7 +24,7 @@
             
             <!-- Action Buttons -->
             <a href="{{ route('products.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> Add New Part
+                <i class="bi bi-plus-lg"></i> Add New Product
             </a>
             <div class="d-flex gap-2">
                 <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
@@ -572,7 +572,7 @@
                         Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} results
                     </div>
                     <div>
-                {{ $products->links() }}
+                        {{ $products->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             @endif

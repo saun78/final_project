@@ -46,8 +46,8 @@
                                                 @case('cash')
                                                     <span class="badge bg-success">Cash</span>
                                                     @break
-                                                @case('bank')
-                                                    <span class="badge bg-primary">Bank</span>
+                                                @case('bank_transfer')
+                                                    <span class="badge bg-info">Bank Transfer</span>
                                                     @break
                                                 @case('tng_wallet')
                                                     <span class="badge bg-warning">TNG Wallet</span>

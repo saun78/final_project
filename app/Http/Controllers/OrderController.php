@@ -82,7 +82,7 @@ class OrderController extends Controller
             'items.*.product_id' => 'required|exists:product,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,bank,tng_wallet',
+            'payment_method' => 'required|in:cash,bank_transfer,tng_wallet',
             'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
@@ -190,7 +190,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'payment_method' => 'required|in:cash,bank,tng_wallet',
+            'payment_method' => 'required|in:cash,bank_transfer,tng_wallet',
             'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
@@ -377,8 +377,8 @@ class OrderController extends Controller
                         case 'cash':
                             $paymentMethod = 'Cash';
                             break;
-                        case 'bank':
-                            $paymentMethod = 'Bank';
+                        case 'bank_transfer':
+                            $paymentMethod = 'Bank Transfer';
                             break;
                         case 'tng_wallet':
                             $paymentMethod = 'TNG Wallet';

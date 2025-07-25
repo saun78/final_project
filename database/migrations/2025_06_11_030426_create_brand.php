@@ -13,16 +13,8 @@ return new class extends Migration
     {
         Schema::create('brand', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD
-            $table->string("name")->unique();
-            $table->timestamps();
-            
-            // Add index for performance
-            $table->index('name');
-=======
             $table->string("name");
             $table->timestamps();
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
         });
     }
 

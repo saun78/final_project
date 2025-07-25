@@ -63,6 +63,20 @@ class ProfitReportController extends Controller
             ];
         })->sortBy('date');
 
+        $profitData = $profitData->sortByDesc('date');
+
+        // Paginate profitData (10 per page)
+        $perPage = 10;
+        $page = \Illuminate\Pagination\LengthAwarePaginator::resolveCurrentPage();
+        $pagedData = $profitData->slice(($page - 1) * $perPage, $perPage)->values();
+        $profitData = new \Illuminate\Pagination\LengthAwarePaginator(
+            $pagedData,
+            $profitData->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
         $totalSales = $profitData->sum('sales');
         $totalCogs = $profitData->sum('cogs');
         $totalProfit = $profitData->sum('profit');
