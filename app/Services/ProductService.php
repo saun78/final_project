@@ -84,7 +84,7 @@ class ProductService
         if ($isSearching) {
             return $query->with(['category', 'brand', 'supplier'])->latest()->limit(100)->get();
         } else {
-            return $query->with(['category', 'brand', 'supplier'])->latest()->paginate(10);
+            return $query->with(['category', 'brand', 'supplier'])->latest()->paginate(12);
         }
     }
 

@@ -43,7 +43,7 @@ class ReportController extends Controller
             });
         }
 
-        $orderItems = $query->orderByDesc('created_at')->get();
+        $orderItems = $query->orderByDesc('created_at')->paginate(10);
 
         // Individual sales records (each order item)
         $salesRecords = $orderItems;
@@ -102,12 +102,16 @@ class ReportController extends Controller
             $cardAmount = $items->filter(function($item) {
                 return $item->order->payment_method === 'card';
             })->sum(function($item) { return $item->quantity * $item->price; });
+            $bankTransferAmount = $items->filter(function($item) {
+                return $item->order->payment_method === 'bank_transfer';
+            })->sum(function($item) { return $item->quantity * $item->price; });
             $totalAmount = $items->sum(function($item) { return $item->quantity * $item->price; });
             return (object) [
                 'date' => $date,
                 'cash_amount' => $cashAmount,
                 'tng_amount' => $tngAmount,
                 'card_amount' => $cardAmount,
+                'bank_transfer_amount' => $bankTransferAmount,
                 'total_amount' => $totalAmount
             ];
         })->sortBy('date');

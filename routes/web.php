@@ -14,6 +14,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TopSellingReportController;
 use App\Http\Controllers\SummaryReportController;
 use App\Http\Controllers\ProfitReportController;
+use App\Http\Controllers\ScheduleController;
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -67,5 +68,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/top-selling/pdf', [TopSellingReportController::class, 'exportPdf'])->name('reports.top-selling.pdf');
     Route::get('/reports/summary/pdf', [SummaryReportController::class, 'exportPdf'])->name('reports.summary.pdf');
     Route::get('/reports/profit/pdf', [ProfitReportController::class, 'exportPdf'])->name('reports.profit.pdf');
+
+    // Schedule Page Route
+    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+    Route::get('/schedule/create', [ScheduleController::class, 'create'])->name('schedule.create');
+    Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.store');
+    Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy'])->name('schedule.destroy');
     
 });

@@ -41,12 +41,13 @@
                                 <select name="payment_method" id="payment_method" class="form-control">
                                     <option value="">All</option>
                                     <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                                    <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
+                                    <option value="bank_transfer" {{ request('payment_method') == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
                                     <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
                                 </select>
                             </div>
-                            <div class="col-auto">
-                                <button type="submit" class="btn btn-primary w-100">Generate Report</button>
+                            <div class="col-auto d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <a href="{{ route('reports.profit') }}" class="btn btn-secondary">Reset</a>
                             </div>
                         </div>
                     </form>
@@ -84,6 +85,86 @@
                     </script>
 
                     <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <canvas id="profitChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        @php
+                            // Sort $profitData by date ascending for chart
+                            $sortedProfitData = $profitData->sortBy('date')->values();
+                        @endphp
+                        const chartLabels = {!! json_encode($sortedProfitData->pluck('date')->map(function($d) use ($period) {
+                            return $period === 'monthly' ? \Carbon\Carbon::createFromFormat('Y-m', $d)->format('M Y') : \Carbon\Carbon::parse($d)->format('Y-m-d');
+                        })) !!};
+                        const chartSales = {!! json_encode($sortedProfitData->pluck('sales')) !!};
+                        const chartCogs = {!! json_encode($sortedProfitData->pluck('cogs')) !!};
+                        const chartProfit = {!! json_encode($sortedProfitData->pluck('profit')) !!};
+                        const ctx = document.getElementById('profitChart').getContext('2d');
+                        const profitChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: chartLabels,
+                                datasets: [
+                                    {
+                                        label: 'Sales (RM)',
+                                        data: chartSales,
+                                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Cost (RM)',
+                                        data: chartCogs,
+                                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Profit (RM)',
+                                        data: chartProfit,
+                                        type: 'line',
+                                        borderColor: 'rgba(40, 167, 69, 1)',
+                                        backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                        tension: 0.3,
+                                        fill: false,
+                                        yAxisID: 'y',
+                                        pointRadius: 3,
+                                        pointHoverRadius: 5
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { position: 'top' },
+                                    title: { display: false }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Amount (RM)'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Date'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+
+                    <div class="row mb-4">
                         <div class="col-md-6">
                             <div class="card bg-success text-white">
                                 <div class="card-body">
@@ -95,7 +176,7 @@
                         <div class="col-md-6">
                             <div class="card bg-secondary text-white">
                                 <div class="card-body">
-                                    <h5 class="card-title">Total COGS</h5>
+                                    <h5 class="card-title">Total Cost</h5>
                                     <h2 class="card-text">RM{{ number_format($totalCogs, 2) }}</h2>
                                 </div>
                             </div>
@@ -106,9 +187,9 @@
                             <thead>
                                 <tr>
                                     <th>{{ $period === 'monthly' ? 'Month' : 'Date' }}</th>
-                                    <th>Sales</th>
-                                    <th>COGS</th>
-                                    <th>Profit</th>
+                                    <th>Total Sales</th>
+                                    <th>Total Cost</th>
+                                    <th>Total Profit</th>
                                     <th>Details</th>
                                 </tr>
                             </thead>
@@ -138,9 +219,9 @@
                                                 <tr>
                                                     <th>Product</th>
                                                     <th>Qty</th>
-                                                    <th>Sales</th>
-                                                    <th>COGS</th>
-                                                    <th>Profit</th>
+                                                    <th>Total Sales</th>
+                                                    <th>Total Cost</th>
+                                                    <th>Total Profit</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -160,6 +241,11 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        @if($profitData->lastPage() > 1)
+                            {{ $profitData->links('pagination::bootstrap-5') }}
+                        @endif
                     </div>
                 </div>
             </div>

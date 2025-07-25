@@ -9,6 +9,107 @@
                     <h3 class="card-title">Top Selling Products</h3>
                 </div>
                 <div class="card-body">
+                    <!-- Top Selling Charts -->
+                    <div class="row mb-4">
+                        <div class="col-lg-8 col-12 mb-3 mb-lg-0">
+                            <h4 class="mb-3">Top Selling Products </h4>
+                            <div style="width:100%; min-width:300px; height:250px;">
+                                <canvas id="topSellingBarChart" height="250" style="min-height:250px; width:100%;"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-12">
+                            <h4 class="mb-3">Products Category</h4>
+                            <div class="d-flex justify-content-center">
+                                <div id="chartdiv" style="width: 100%; min-width:300px; height: 250px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @php
+                        $categoryTotals = collect($productTotals)
+                            ->groupBy(function($total) {
+                                return $total['product']->category->name;
+                            })
+                            ->map(function($group, $category) {
+                                return [
+                                    'category' => $category,
+                                    'value' => $group->sum('total_sold')
+                                ];
+                            })
+                            ->sortByDesc('value')
+                            ->take(10)
+                            ->values();
+                    @endphp
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+                    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+                    <script>
+                        const topProducts = @json(collect($productTotals)->take(10)->values()->map(function($total) {
+                            return [
+                                'name' => $total['product']->name,
+                                'total_sold' => $total['total_sold']
+                            ];
+                        }));
+                        // Bar Chart
+                        const ctxBar = document.getElementById('topSellingBarChart').getContext('2d');
+                        // Define a color palette
+                        const barColors = [
+                            '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc949', '#af7aa1', '#ff9da7', '#9c755f', '#bab0ab',
+                            '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+                        ];
+                        new Chart(ctxBar, {
+                            type: 'bar',
+                            data: {
+                                labels: topProducts.map(p => p.name),
+                                datasets: [{
+                                    label: 'Quantity Sold',
+                                    data: topProducts.map(p => p.total_sold),
+                                    backgroundColor: topProducts.map((p, i) => barColors[i % barColors.length]),
+                                    borderColor: topProducts.map((p, i) => barColors[i % barColors.length]),
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: false },
+                                    title: { display: false }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { precision: 0 }
+                                    }
+                                }
+                            }
+                        });
+                        // amCharts 5 Pie Chart
+                        am5.ready(function() {
+                            let root = am5.Root.new("chartdiv");
+                            root.setThemes([
+                                am5themes_Animated.new(root)
+                            ]);
+                            let chart = root.container.children.push(
+                                am5percent.PieChart.new(root, {
+                                    endAngle: 270
+                                })
+                            );
+                            let series = chart.series.push(
+                                am5percent.PieSeries.new(root, {
+                                    valueField: "value",
+                                    categoryField: "category",
+                                    endAngle: 270
+                                })
+                            );
+                            // Prepare category data from PHP
+                            const am5Data = @json($categoryTotals);
+                            series.data.setAll(am5Data);
+                            series.states.create("hidden", {
+                                endAngle: -90
+                            });
+                        });
+                    </script>
+
                     <!-- Search Form -->
                     <form action="{{ route('reports.top-selling') }}" method="GET" class="mb-4">
                         <div class="row align-items-end g-2">
@@ -96,23 +197,34 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($salesRecords as $record)
+                                @if($salesRecords->isEmpty())
                                 <tr>
-                                    <td>{{ $record->order->created_at->format('Y-m-d H:i:s') }}</td>
-                                    <td>{{ $record->product->name }}</td>
-                                    <td>{{ $record->product->part_number }}</td>
-                                    <td>{{ $record->product->category->name }}</td>
-                                    <td>{{ $record->product->brand->name }}</td>
-                                    <td>{{ number_format($record->quantity) }}</td>
-                                    <td>RM{{ number_format($record->quantity * $record->price, 2) }}</td>
+                                    <td colspan="7" class="text-center">—</td>
                                 </tr>
-                                @endforeach
+                                @else
+                                    @foreach($salesRecords as $record)
+                                    <tr>
+                                        <td>{{ $record->datetime }}</td>
+                                        <td>{{ $record->product->name ?: '—' }}</td>
+                                        <td>{{ $record->product->part_number ?: '—' }}</td>
+                                        <td>{{ $record->category->name ?? '—' }}</td>
+                                        <td>{{ $record->brand->name ?? '—' }}</td>
+                                        <td>{{ $record->quantity !== null ? number_format($record->quantity) : '—' }}</td>
+                                        <td>{{ ($record->amount !== null) ? 'RM' . number_format($record->amount, 2) : '—' }}</td>
+                                    </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                     </div>
+                    @if($salesRecords->lastPage() > 1)
+                        <div class="d-flex justify-content-center">
+                            {{ $salesRecords->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
 
                     <!-- Product Totals -->
-                    <h4 class="mb-3">Product Totals</h4>
+                    <h4 class="mb-3">Product Totals Sold</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -128,19 +240,19 @@
                             <tbody>
                                 @foreach($productTotals as $total)
                                 <tr>
-                                    <td>{{ $total['product']->name }}</td>
-                                    <td>{{ $total['product']->part_number }}</td>
-                                    <td>{{ $total['product']->category->name }}</td>
-                                    <td>{{ $total['product']->brand->name }}</td>
-                                    <td>{{ number_format($total['total_sold']) }}</td>
-                                    <td>RM{{ number_format($total['total_amount'], 2) }}</td>
+                                    <td>{{ $total['product']->name ?: '—' }}</td>
+                                    <td>{{ $total['product']->part_number ?: '—' }}</td>
+                                    <td>{{ $total['product']->category->name ?? '—' }}</td>
+                                    <td>{{ $total['product']->brand->name ?? '—' }}</td>
+                                    <td>{{ isset($total['total_sold']) ? number_format($total['total_sold']) : '—' }}</td>
+                                    <td>{{ isset($total['total_amount']) ? 'RM' . number_format($total['total_amount'], 2) : '—' }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
                             <tfoot>
                                 <tr class="font-weight-bold">
                                     <td colspan="4" class="text-right">Grand Total:</td>
-                                    <td></td>
+                                    <td></td>   
                                     <td>RM{{ number_format($totalAmount, 2) }}</td>
                                 </tr>
                             </tfoot>

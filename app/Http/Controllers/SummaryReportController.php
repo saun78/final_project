@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SummaryReportController extends Controller
 {
@@ -47,20 +48,64 @@ class SummaryReportController extends Controller
             $cardAmount = $items->filter(function($item) {
                 return $item->order->payment_method === 'card';
             })->sum(function($item) { return $item->quantity * $item->price; });
+            $bankTransferAmount = $items->filter(function($item) {
+                return $item->order->payment_method === 'bank_transfer';
+            })->sum(function($item) { return $item->quantity * $item->price; });
             $totalAmount = $items->sum(function($item) { return $item->quantity * $item->price; });
+
+            // Collect unique receipts for the day
+            $receipts = $items->pluck('order')->unique('id')->map(function($order) {
+                return [
+                    'order_number' => $order->order_number,
+                    'payment_method' => $order->payment_method,
+                    'time' => $order->created_at->format('H:i'),
+                    'total_amount' => $order->calculateTotal(),
+                    'id' => $order->id, // keep id for linking
+                ];
+            })->values();
+
             return (object) [
                 'date' => $date,
                 'cash_amount' => $cashAmount,
                 'tng_amount' => $tngAmount,
                 'card_amount' => $cardAmount,
-                'total_amount' => $totalAmount
+                'bank_transfer_amount' => $bankTransferAmount,
+                'total_amount' => $totalAmount,
+                'receipts' => $receipts,
             ];
         })->sortBy('date');
+
+        $chartData = $salesData; // for chart (original order)
+        $salesData = $salesData->sortByDesc('date'); // for table (descending)
 
         $totalAmount = $salesData->sum('total_amount');
         $cashTotal = $salesData->sum('cash_amount');
         $tngTotal = $salesData->sum('tng_amount');
+        $cardTotal = $salesData->sum('card_amount');
+        $bankTransferTotal = $salesData->sum('bank_transfer_amount');
 
-        return view('reports.summary', compact('salesData', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod', 'cashTotal', 'tngTotal'));
+        $salesData = $salesData->values(); // Ensure it's numerically indexed
+
+        // Prepare data for chart
+        $dates = $salesData->pluck('date')->toArray();
+        $totals = $salesData->pluck('total_amount')->toArray();
+        $cashAmounts = $salesData->pluck('cash_amount')->toArray();
+        $tngAmounts = $salesData->pluck('tng_amount')->toArray();
+        $cardAmounts = $salesData->pluck('card_amount')->toArray();
+        $bankTransferAmounts = $salesData->pluck('bank_transfer_amount')->toArray();
+
+        // Pagination
+        $perPage = 10;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $pagedData = $salesData->slice(($page - 1) * $perPage, $perPage)->values();
+        $salesData = new \Illuminate\Pagination\LengthAwarePaginator(
+            $pagedData,
+            $salesData->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('reports.summary', compact('salesData', 'chartData', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod', 'cashTotal', 'tngTotal', 'dates', 'totals', 'cashAmounts', 'tngAmounts', 'cardAmounts', 'bankTransferAmounts', 'cardTotal', 'bankTransferTotal'));
     }
 } 

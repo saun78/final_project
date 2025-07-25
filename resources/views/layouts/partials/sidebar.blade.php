@@ -47,6 +47,12 @@
                     </li>
                 </ul>
                 <li class="nav-item">
+                <a href="{{ route('schedule.index') }}" class="nav-link {{ request()->routeIs('schedule.*') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i>
+                    Schedule
+                </a>
+                </li>
+                <li class="nav-item">
                     <a href="#reportsSubmenu" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" data-bs-toggle="collapse">
                     <i class="bi bi-graph-up"></i>
                     Reports
