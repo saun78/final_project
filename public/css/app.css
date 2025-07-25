@@ -91,12 +91,15 @@ body {
     transform: translateY(-5px);
 }
 
+<<<<<<< HEAD
 /* Dashboard Stat Card 美化 */
 .dashboard-cards-row {
     display: flex;
     gap: 2rem;
     width: 100%;
 }
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 .stat-card {
     border-radius: 1rem;
     padding: 1.5rem;
@@ -106,6 +109,7 @@ body {
     font-size: 2rem;
     opacity: 0.8;
 }
+<<<<<<< HEAD
 .stat-card .stat-title {
     font-size: 1.2rem;
     font-weight: 600;
@@ -146,6 +150,8 @@ body {
 .stat-card.bg-green { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #fff; }
 .stat-card.bg-yellow { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); color: #fff; }
 .stat-card.bg-red { background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); color: #fff; }
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 
 /* Table Styles */
 .table {
@@ -158,6 +164,7 @@ body {
     border-bottom: none;
 }
 
+<<<<<<< HEAD
 /* Dashboard Modern Card Styles - Screenshot Level */
 /* Pixel-perfect Dashboard Card Styles */
 .dashboard-card {
@@ -229,6 +236,8 @@ body {
     }
 }
 
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 /* Responsive Styles */
 @media (max-width: 768px) {
     .sidebar {
@@ -240,6 +249,7 @@ body {
     .main-content {
         margin-left: 0;
     }
+<<<<<<< HEAD
 } 
 
 .dashboard-date-label {
@@ -286,4 +296,6 @@ body {
     background: #fff;
     border: 1px solid #8bb3ad;
     cursor: not-allowed;
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 } 

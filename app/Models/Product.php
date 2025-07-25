@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 
 class Product extends Model
 {
@@ -18,8 +21,11 @@ class Product extends Model
         'name',
         'category_id',
         'brand_id',
+<<<<<<< HEAD
         'supplier_id', // Required
         'location',
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
         'description',
         'quantity',
         'purchase_price',
@@ -33,6 +39,7 @@ class Product extends Model
         'selling_price' => 'decimal:2',
     ];
 
+<<<<<<< HEAD
     /**
      * Get the category that owns the product.
      */
@@ -71,11 +78,26 @@ class Product extends Model
     public function getCategoryNameAttribute()
     {
         return $this->category ? $this->category->name : 'Unknown';
+=======
+    // Get the category name
+    public function getCategoryNameAttribute()
+    {
+        $categories = [
+            'engine' => 'Engine Parts',
+            'electrical' => 'Electrical',
+            'body' => 'Body Parts',
+            'accessories' => 'Accessories',
+            'maintenance' => 'Maintenance',
+        ];
+
+        return $categories[$this->category_id] ?? $this->category_id;
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
     }
 
     // Get the brand name
     public function getBrandNameAttribute()
     {
+<<<<<<< HEAD
         return $this->brand ? $this->brand->name : 'Unknown';
     }
 
@@ -83,6 +105,16 @@ class Product extends Model
     public function getSupplierNameAttribute()
     {
         return $this->supplier ? $this->supplier->name : 'Unknown';
+=======
+        $brands = [
+            'honda' => 'Honda',
+            'yamaha' => 'Yamaha',
+            'suzuki' => 'Suzuki',
+            'kawasaki' => 'Kawasaki',
+        ];
+
+        return $brands[$this->brand_id] ?? $this->brand_id;
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
     }
 
     // Get stock status
@@ -126,6 +158,7 @@ class Product extends Model
         return (($this->selling_price - $this->purchase_price) / $this->purchase_price) * 100;
     }
 
+<<<<<<< HEAD
     // Get total value using batch-based calculation
     public function getTotalValueAttribute()
     {
@@ -211,5 +244,11 @@ class Product extends Model
         $this->update(['selling_price' => $newSellingPrice]);
         
         return $this;
+=======
+    // Get total value
+    public function getTotalValueAttribute()
+    {
+        return $this->quantity * $this->purchase_price;
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
     }
 } 

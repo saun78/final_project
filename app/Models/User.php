@@ -40,6 +40,10 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+<<<<<<< HEAD
+=======
+            'email_verified_at' => 'datetime',
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             'password' => 'hashed',
         ];
     }

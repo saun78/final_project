@@ -59,6 +59,7 @@
 </head>
 <body>
 
+<<<<<<< HEAD
   {{-- ❌ 登录失败弹窗 --}}
   @if ($errors->any())
   <div id="error-alert"
@@ -83,6 +84,51 @@
     </div>
     <button type="button" class="btn-close ms-2" style="filter: invert(0);" onclick="dismissAlert('error-alert')"></button>
   </div>
+=======
+  {{-- ✅ 登录成功弹窗 --}}
+  @if (session('success'))
+  <div id="success-alert"
+       class="alert alert-success border-0 shadow-sm position-fixed top-0 start-50 translate-middle-x mt-3 px-4 py-3 text-center fade-out"
+       style="z-index: 1050; min-width: 300px; max-width: 90%; border-radius: 8px; background-color: #73aa75; color: #fff;">
+    {{ session('success') }}
+    <div class="countdown-text small mt-2 text-light">
+      Redirecting in <span id="countdown">3</span> seconds...
+      <button class="btn btn-sm btn-outline-light ms-2 py-0 px-2" onclick="window.location.href='{{ route('dashboard') }}'">Go Now</button>
+    </div>
+    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2" onclick="dismissAlert('success-alert')"></button>
+  </div>
+
+  <script>
+    let seconds = 3;
+    const countdownEl = document.getElementById('countdown');
+    const successAlert = document.getElementById('success-alert');
+    const interval = setInterval(() => {
+      seconds--;
+      countdownEl.innerText = seconds;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        successAlert.classList.add('hide');
+        setTimeout(() => window.location.href = "{{ route('dashboard') }}", 1000);
+      }
+    }, 1000);
+  </script>
+  @endif
+
+  {{-- ❌ 登录失败弹窗 --}}
+  @if ($errors->any())
+  <div id="error-alert"
+       class="alert alert-danger border-0 shadow-sm position-fixed top-0 start-50 translate-middle-x mt-3 px-4 py-3 text-center fade-out"
+       style="z-index: 1050; min-width: 300px; max-width: 90%; border-radius: 8px; background-color: #c75555; color: #fff;">
+    <strong>Login failed:</strong>
+    <ul class="mt-2 text-start small mb-0">
+      @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+      @endforeach
+    </ul>
+    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2" onclick="dismissAlert('error-alert')"></button>
+  </div>
+
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
   <script>
     const errorAlert = document.getElementById('error-alert');
     setTimeout(() => {
@@ -102,6 +148,10 @@
     {{ session('logout_success') }}
     <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-2" onclick="dismissAlert('logout-alert')"></button>
   </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
   <script>
     const logoutAlert = document.getElementById('logout-alert');
     setTimeout(() => {
@@ -181,6 +231,10 @@
       }
     }
   </script>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

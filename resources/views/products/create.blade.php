@@ -18,7 +18,11 @@
                             <div class="col-md-6">
                                 <label for="part_number" class="form-label">Part Number</label>
                                 <input type="text" class="form-control @error('part_number') is-invalid @enderror" 
+<<<<<<< HEAD
                                     id="part_number" name="part_number" value="{{ old('part_number') }}">
+=======
+                                    id="part_number" name="part_number" value="{{ old('part_number') }}" required>
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 @error('part_number')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -34,6 +38,7 @@
                         </div>
 
                         <div class="row mb-3">
+<<<<<<< HEAD
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="category_id" class="form-label mb-0">Category</label>
@@ -49,11 +54,24 @@
                                             {{ $category->name }}
                                         </option>
                                     @endforeach
+=======
+                            <div class="col-md-6">
+                                <label for="category_id" class="form-label">Category</label>
+                                <select class="form-select @error('category_id') is-invalid @enderror" 
+                                    id="category_id" name="category_id" required>
+                                    <option value="">Select Category</option>
+                                    <option value="engine" {{ old('category_id') == 'engine' ? 'selected' : '' }}>Engine Parts</option>
+                                    <option value="electrical" {{ old('category_id') == 'electrical' ? 'selected' : '' }}>Electrical</option>
+                                    <option value="body" {{ old('category_id') == 'body' ? 'selected' : '' }}>Body Parts</option>
+                                    <option value="accessories" {{ old('category_id') == 'accessories' ? 'selected' : '' }}>Accessories</option>
+                                    <option value="maintenance" {{ old('category_id') == 'maintenance' ? 'selected' : '' }}>Maintenance</option>
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 </select>
                                 @error('category_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+<<<<<<< HEAD
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="brand_id" class="form-label mb-0">Brand</label>
@@ -69,11 +87,23 @@
                                             {{ $brand->name }}
                                         </option>
                                     @endforeach
+=======
+                            <div class="col-md-6">
+                                <label for="brand_id" class="form-label">Brand</label>
+                                <select class="form-select @error('brand_id') is-invalid @enderror" 
+                                    id="brand_id" name="brand_id" required>
+                                    <option value="">Select Brand</option>
+                                    <option value="honda" {{ old('brand_id') == 'honda' ? 'selected' : '' }}>Honda</option>
+                                    <option value="yamaha" {{ old('brand_id') == 'yamaha' ? 'selected' : '' }}>Yamaha</option>
+                                    <option value="suzuki" {{ old('brand_id') == 'suzuki' ? 'selected' : '' }}>Suzuki</option>
+                                    <option value="kawasaki" {{ old('brand_id') == 'kawasaki' ? 'selected' : '' }}>Kawasaki</option>
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 </select>
                                 @error('brand_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+<<<<<<< HEAD
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <label for="supplier_id" class="form-label mb-0">Supplier</label>
@@ -104,6 +134,8 @@
                             @error('location')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                         </div>
 
                         <div class="mb-3">
@@ -115,6 +147,7 @@
                             @enderror
                         </div>
 
+<<<<<<< HEAD
                         <!-- Initial Stock and Pricing -->
                         <div class="alert alert-info">
                             <h6><i class="bi bi-info-circle"></i> Initial Stock & Batch Creation</h6>
@@ -130,6 +163,13 @@
                                 <input type="number" class="form-control @error('quantity') is-invalid @enderror" 
                                     id="quantity" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
                                 <small class="text-muted">Will create initial batch if > 0</small>
+=======
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="quantity" class="form-label">Quantity</label>
+                                <input type="number" class="form-control @error('quantity') is-invalid @enderror" 
+                                    id="quantity" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 @error('quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -142,7 +182,10 @@
                                         id="purchase_price" name="purchase_price" value="{{ old('purchase_price') }}" 
                                         step="0.01" min="0" required>
                                 </div>
+<<<<<<< HEAD
                                 <small class="text-muted">Cost price for initial batch</small>
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 @error('purchase_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -155,7 +198,10 @@
                                         id="selling_price" name="selling_price" value="{{ old('selling_price') }}" 
                                         step="0.01" min="0" required>
                                 </div>
+<<<<<<< HEAD
                                 <small class="text-muted">Sales price for all transactions</small>
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
                                 @error('selling_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

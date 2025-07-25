@@ -22,6 +22,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
+<<<<<<< HEAD
         $user = User::create([
             'username' => $request->username,
             'password' => Hash::make($request->password),
@@ -32,3 +33,18 @@ class RegisterController extends Controller
         return redirect()->route('dashboard')->with('popup_message', 'Register Successful!');
     }
 } 
+=======
+        try {
+            $user = User::create([
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+            ]);
+
+            Auth::login($user);
+            return redirect()->route('register')->with('success', 'Register successful!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Registration failed. Please try again.');
+        }
+    }
+}
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42

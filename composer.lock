@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "bf8aac1d1346544c93232a0bf6c66ed4",
     "packages": [
         {
@@ -84,6 +85,11 @@
             "time": "2025-02-13T15:07:54+00:00"
         },
         {
+=======
+    "content-hash": "88970a0117c062eed55fa8728fc43833",
+    "packages": [
+        {
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "brick/math",
             "version": "0.13.1",
             "source": {
@@ -213,6 +219,7 @@
             "time": "2024-02-09T16:56:22+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "composer/pcre",
             "version": "3.3.2",
             "source": {
@@ -292,6 +299,8 @@
             "time": "2024-11-12T16:29:46+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "dflydev/dot-access-data",
             "version": "v3.0.3",
             "source": {
@@ -367,6 +376,7 @@
             "time": "2024-07-08T12:26:09+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "doctrine/dbal",
             "version": "4.2.3",
             "source": {
@@ -521,6 +531,8 @@
             "time": "2025-04-07T20:06:18+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "doctrine/inflector",
             "version": "2.0.10",
             "source": {
@@ -689,6 +701,7 @@
             "time": "2024-02-05T11:56:58+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "dompdf/dompdf",
             "version": "v3.1.0",
             "source": {
@@ -844,6 +857,8 @@
             "time": "2024-04-29T13:26:35+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "dragonmantank/cron-expression",
             "version": "v3.4.0",
             "source": {
@@ -976,6 +991,7 @@
             "time": "2025-03-06T22:45:56+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "elastic/transport",
             "version": "v9.0.1",
             "source": {
@@ -1092,6 +1108,8 @@
             "time": "2025-04-18T08:01:21+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "fruitcake/php-cors",
             "version": "v1.3.0",
             "source": {
@@ -1910,6 +1928,7 @@
             "time": "2025-02-11T13:34:40+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "laravel/scout",
             "version": "v10.15.0",
             "source": {
@@ -1991,6 +2010,8 @@
             "time": "2025-05-13T13:34:05+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "laravel/serializable-closure",
             "version": "v2.0.4",
             "source": {
@@ -2669,6 +2690,7 @@
             "time": "2024-12-08T08:18:47+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "maennchen/zipstream-php",
             "version": "3.1.2",
             "source": {
@@ -2921,6 +2943,8 @@
             "time": "2024-03-31T07:05:07+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "monolog/monolog",
             "version": "3.9.0",
             "source": {
@@ -3423,6 +3447,7 @@
             "time": "2025-05-08T08:14:37+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "nyholm/psr7",
             "version": "1.8.2",
             "source": {
@@ -3924,6 +3949,8 @@
             "time": "2025-05-26T18:51:08+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "phpoption/phpoption",
             "version": "1.9.3",
             "source": {
@@ -3999,6 +4026,7 @@
             "time": "2024-07-20T21:41:07+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "psr/cache",
             "version": "3.0.0",
             "source": {
@@ -4048,6 +4076,8 @@
             "time": "2021-02-03T23:26:27+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "psr/clock",
             "version": "1.0.0",
             "source": {
@@ -4738,6 +4768,7 @@
             "time": "2025-06-01T06:28:46+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "sabberworm/php-css-parser",
             "version": "v8.8.0",
             "source": {
@@ -4803,6 +4834,8 @@
             "time": "2025-03-23T17:59:05+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "symfony/clock",
             "version": "v7.3.0",
             "source": {
@@ -6239,6 +6272,7 @@
             "time": "2025-01-02T08:10:11+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "symfony/polyfill-php82",
             "version": "v1.32.0",
             "source": {
@@ -6315,6 +6349,8 @@
             "time": "2024-09-09T11:45:10+00:00"
         },
         {
+=======
+>>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
             "name": "symfony/polyfill-php83",
             "version": "v1.32.0",
             "source": {
