@@ -14,7 +14,6 @@
                 </a>
             </li>
             <li class="nav-item">
-<<<<<<< HEAD
                 <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                     <i class="bi bi-receipt"></i>
                     Receipts
@@ -114,31 +113,3 @@ function toggleSubmenu(event) {
     }
 }
 </script> 
-=======
-                <a href="#" class="nav-link">
-                    <i class="bi bi-arrow-left-right"></i>
-                    Inventory
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-truck"></i>
-                    Suppliers
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-people"></i>
-                    Customers
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-graph-up"></i>
-                    Reports
-                </a>
-            </li>
-        </ul>
-    </div>
-</nav> 
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42

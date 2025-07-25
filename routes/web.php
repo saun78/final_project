@@ -1,15 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Auth;
-=======
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
-<<<<<<< HEAD
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\SupplierController;
@@ -23,17 +19,6 @@ use App\Http\Controllers\ProfitReportController;
 Route::get('/ad', function (){
     return view('auth.ad');
 });
-=======
-
-Route::get('/', function () {
-    return view('dashboard');
-});
-
-Route::get('/ad',function () {
-    return view('auth.ad');
-});
-
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
@@ -42,7 +27,6 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-<<<<<<< HEAD
 // Public root route - redirect based on authentication status
 Route::get('/', function () {
     if (Auth::check()) {
@@ -91,15 +75,3 @@ Route::middleware(['auth'])->group(function () {
     // 库存异动详情页
     Route::get('/inventory-movements/{movement}', [App\Http\Controllers\InventoryMovementController::class, 'show'])->name('inventory-movements.show');
 });
-=======
-// Protected Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/', function () {
-        return redirect()->route('dashboard');
-    });
-
-    // Product Routes
-    Route::resource('products', ProductController::class);
-});
->>>>>>> 19642a44c7f4ce1bcfbd31954f4a18b7e34fea42
