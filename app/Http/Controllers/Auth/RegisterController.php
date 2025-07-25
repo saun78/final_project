@@ -29,6 +29,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('popup_message', 'Register Successful!');
     }
 } 

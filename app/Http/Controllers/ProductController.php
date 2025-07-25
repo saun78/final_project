@@ -35,6 +35,11 @@ class ProductController extends Controller
             'max_price'
         ]);
 
+        // Handle special filter parameter
+        if ($request->has('filter') && $request->filter === 'low_stock') {
+            $filters['stock_status'] = ['low_stock', 'out_of_stock'];
+        }
+
         // Remove empty values
         $filters = array_filter($filters, function($value) {
             return $value !== null && $value !== '';
@@ -55,7 +60,8 @@ class ProductController extends Controller
                 'location', 
                 'stock_status', 
                 'min_price', 
-                'max_price'
+                'max_price',
+                'filter'
             ]));
         }
 

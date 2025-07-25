@@ -79,10 +79,8 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Supplier Name</th>
                             <th>Contact Person</th>
                             <th>Contact Number</th>
-                            <th>Address</th>
                             <th>Products</th>
                             <th>Actions</th>
                         </tr>
@@ -90,15 +88,13 @@
                     <tbody id="suppliersTableBody">
                         @forelse($suppliers as $supplier)
                         <tr>
-                            <td><strong>{{ $supplier->name }}</strong></td>
                             <td>{{ $supplier->contact_person }}</td>
                             <td>{{ $supplier->contact_number }}</td>
-                            <td>{{ Str::limit($supplier->address, 50) }}</td>
                             <td><span class="badge bg-info">{{ $supplier->products_count }}</span></td>
                             <td>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary btn-sm" 
-                                        onclick="editSupplier({{ $supplier->id }}, '{{ addslashes($supplier->name) }}', '{{ addslashes($supplier->contact_person) }}', '{{ addslashes($supplier->contact_number) }}', '{{ addslashes($supplier->address) }}')"
+                                        onclick="editSupplier({{ $supplier->id }}, '{{ addslashes($supplier->contact_person) }}', '{{ addslashes($supplier->contact_number) }}')"
                                         title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </button>
@@ -115,7 +111,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="4" class="text-center">
                                 @if(request('search'))
                                     No suppliers found matching your search.
                                 @else
@@ -143,12 +139,6 @@
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="supplier_name" class="form-label">Supplier Name</label>
-                        <input type="text" class="form-control" id="supplier_name" name="name" required 
-                            placeholder="e.g. ABC Auto Parts">
-                        <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
-                    </div>
-                    <div class="mb-3">
                         <label for="contact_person" class="form-label">Contact Person</label>
                         <input type="text" class="form-control" id="contact_person" name="contact_person" required 
                             placeholder="e.g. John Smith">
@@ -158,11 +148,6 @@
                         <label for="contact_number" class="form-label">Contact Number</label>
                         <input type="text" class="form-control" id="contact_number" name="contact_number" required 
                             placeholder="e.g. +1-234-567-8900">
-                    </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <textarea class="form-control" id="address" name="address" rows="3" required 
-                            placeholder="Complete supplier address"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -187,11 +172,6 @@
                 @method('PUT')
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="edit_supplier_name" class="form-label">Supplier Name</label>
-                        <input type="text" class="form-control" id="edit_supplier_name" name="name" required>
-                        <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
-                    </div>
-                    <div class="mb-3">
                         <label for="edit_contact_person" class="form-label">Contact Person</label>
                         <input type="text" class="form-control" id="edit_contact_person" name="contact_person" required>
                         <div class="form-text">Only letters and spaces are allowed.</div>
@@ -199,10 +179,6 @@
                     <div class="mb-3">
                         <label for="edit_contact_number" class="form-label">Contact Number</label>
                         <input type="text" class="form-control" id="edit_contact_number" name="contact_number" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_address" class="form-label">Address</label>
-                        <textarea class="form-control" id="edit_address" name="address" rows="3" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -217,11 +193,11 @@
 
 @push('scripts')
 <script>
-function editSupplier(id, name, contactPerson, contactNumber, address) {
-    document.getElementById('edit_supplier_name').value = name;
+function editSupplier(id, contactPerson, contactNumber) {
+    document.getElementById('edit_supplier_name').value = ''; // Clear supplier name
     document.getElementById('edit_contact_person').value = contactPerson;
     document.getElementById('edit_contact_number').value = contactNumber;
-    document.getElementById('edit_address').value = address;
+    document.getElementById('edit_address').value = ''; // Clear address
     document.getElementById('editSupplierForm').action = `/suppliers/${id}`;
     new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
 }
@@ -274,24 +250,19 @@ function updateTable(suppliers) {
     let html = '';
     
     if (suppliers.length === 0) {
-        html = `<tr><td colspan="6" class="text-center">
+        html = `<tr><td colspan="4" class="text-center">
             ${searchInput.value ? 'No suppliers found matching your search.' : 'No suppliers found.'}
         </td></tr>`;
     } else {
         suppliers.forEach(supplier => {
-            const address = supplier.address.length > 50 ? 
-                supplier.address.substring(0, 50) + '...' : supplier.address;
-            
             html += `<tr>
-                <td><strong>${supplier.name}</strong></td>
                 <td>${supplier.contact_person}</td>
                 <td>${supplier.contact_number}</td>
-                <td>${address}</td>
                 <td><span class="badge bg-info">${supplier.products_count}</span></td>
                 <td>
                     <div class="btn-group">
                         <button type="button" class="btn btn-outline-primary btn-sm" 
-                            onclick="editSupplier(${supplier.id}, '${supplier.name.replace(/'/g, "\\'")}', '${supplier.contact_person.replace(/'/g, "\\'")}', '${supplier.contact_number.replace(/'/g, "\\'")}', '${supplier.address.replace(/'/g, "\\'")}')"
+                            onclick="editSupplier(${supplier.id}, '${supplier.contact_person.replace(/'/g, "\\'")}', '${supplier.contact_number.replace(/'/g, "\\'")}')"
                             title="Edit">
                             <i class="bi bi-pencil"></i>
                         </button>

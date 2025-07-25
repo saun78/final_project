@@ -46,8 +46,8 @@
                                                 @case('cash')
                                                     <span class="badge bg-success">Cash</span>
                                                     @break
-                                                @case('card')
-                                                    <span class="badge bg-primary">Card</span>
+                                                @case('bank')
+                                                    <span class="badge bg-primary">Bank</span>
                                                     @break
                                                 @case('tng_wallet')
                                                     <span class="badge bg-warning">TNG Wallet</span>
@@ -125,7 +125,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge bg-info">{{ $item->product->supplier->name ?? 'N/A' }}</span>
+                                            <span class="badge bg-info">{{ $item->product->supplier->contact_person ?? 'N/A' }}</span>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>${{ number_format($item->price, 2) }}</td>

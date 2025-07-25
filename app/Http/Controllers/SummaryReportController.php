@@ -45,7 +45,7 @@ class SummaryReportController extends Controller
                 return $item->order->payment_method === 'tng_wallet';
             })->sum(function($item) { return $item->quantity * $item->price; });
             $cardAmount = $items->filter(function($item) {
-                return $item->order->payment_method === 'card';
+                return $item->order->payment_method === 'bank';
             })->sum(function($item) { return $item->quantity * $item->price; });
             $totalAmount = $items->sum(function($item) { return $item->quantity * $item->price; });
             return (object) [

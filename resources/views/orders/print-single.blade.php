@@ -113,8 +113,8 @@
                 @case('cash')
                     Cash
                     @break
-                @case('card')
-                    Card
+                @case('bank')
+                    Bank
                     @break
                 @case('tng_wallet')
                     TNG Wallet

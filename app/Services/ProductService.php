@@ -48,20 +48,20 @@ class ProductService
 
         // Filter by stock status
         if (!empty($filters['stock_status'])) {
-            switch ($filters['stock_status']) {
-                case 'in_stock':
-                    $query->where('quantity', '>', 0);
-                    break;
-                case 'low_stock':
-                    $query->whereBetween('quantity', [1, 10]);
-                    break;
-                case 'good_stock':
-                    $query->where('quantity', '>', 10);
-                    break;
-                case 'out_of_stock':
-                    $query->where('quantity', 0);
-                    break;
-            }
+            $statuses = (array)$filters['stock_status'];
+            $query->where(function($q) use ($statuses) {
+                foreach ($statuses as $status) {
+                    if ($status === 'in_stock') {
+                        $q->orWhere('quantity', '>', 0);
+                    } elseif ($status === 'low_stock') {
+                        $q->orWhereBetween('quantity', [1, 10]);
+                    } elseif ($status === 'good_stock') {
+                        $q->orWhere('quantity', '>', 10);
+                    } elseif ($status === 'out_of_stock') {
+                        $q->orWhere('quantity', 0);
+                    }
+                }
+            });
         }
 
         // Filter by price range

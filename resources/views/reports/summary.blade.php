@@ -42,9 +42,9 @@
                                 <label for="payment_method" class="form-label">Payment Method</label>
                                 <select name="payment_method" id="payment_method" class="form-control">
                                     <option value="">All</option>
-                                    <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                                    <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
-                                    <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
+                                                                    <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                                <option value="bank" {{ request('payment_method') == 'bank' ? 'selected' : '' }}>Bank</option>
+                                <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
                                 </select>
                             </div>
                             <div class="col-auto">

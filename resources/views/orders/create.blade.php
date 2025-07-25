@@ -69,12 +69,12 @@
                                                         data-part-number="{{ $product->part_number ?? '' }}"
                                                         data-category="{{ $product->category->name ?? 'N/A' }}"
                                                         data-brand="{{ $product->brand->name ?? 'N/A' }}"
-                                                        data-supplier="{{ $product->supplier->name ?? 'N/A' }}"
+                                                        data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
                                                         data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
                                                     @if($product->part_number)
-                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                                                     @else
-                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                                                     @endif
                                                 </option>
                                             @endforeach
@@ -125,7 +125,7 @@
                                             <select name="payment_method" class="form-select" required>
                                                 <option value="">Select Payment Method</option>
                                                 <option value="cash">Cash</option>
-                                                <option value="card">Card</option>
+                                                <option value="bank">Bank</option>
                                                 <option value="tng_wallet">TNG Wallet</option>
                                             </select>
                                         </div>
@@ -189,12 +189,12 @@
                             data-part-number="{{ $product->part_number ?? '' }}"
                             data-category="{{ $product->category->name ?? 'N/A' }}"
                             data-brand="{{ $product->brand->name ?? 'N/A' }}"
-                            data-supplier="{{ $product->supplier->name ?? 'N/A' }}"
+                            data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
                             data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
                         @if($product->part_number)
-                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                         @else
-                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->name ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
                         @endif
                     </option>
                 @endforeach

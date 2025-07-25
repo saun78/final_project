@@ -15,6 +15,10 @@ use App\Http\Controllers\TopSellingReportController;
 use App\Http\Controllers\SummaryReportController;
 use App\Http\Controllers\ProfitReportController;
 
+
+Route::get('/ad', function (){
+    return view('auth.ad');
+});
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
@@ -68,4 +72,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/summary/pdf', [SummaryReportController::class, 'exportPdf'])->name('reports.summary.pdf');
     Route::get('/reports/profit/pdf', [ProfitReportController::class, 'exportPdf'])->name('reports.profit.pdf');
     
+    // 库存异动详情页
+    Route::get('/inventory-movements/{movement}', [App\Http\Controllers\InventoryMovementController::class, 'show'])->name('inventory-movements.show');
 });

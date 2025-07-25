@@ -44,7 +44,7 @@
         <div class="card-body">
             <form action="{{ route('products.index') }}" method="GET" id="searchForm">
                 <!-- Hidden inputs to preserve other filter values -->
-                <input type="hidden" name="category" value="{{ request('category') }}">
+                    <input type="hidden" name="category" value="{{ request('category') }}">
                 <input type="hidden" name="brand" value="{{ request('brand') }}">
                 <input type="hidden" name="supplier" value="{{ request('supplier') }}">
                 <input type="hidden" name="location" value="{{ request('location') }}">
@@ -116,7 +116,7 @@
                             <select name="supplier" class="form-select" id="supplierSelect">
                                 <option value="">All Suppliers</option>
                                 @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
+                                    <option value="{{ $supplier->id }}" {{ request('supplier') == $supplier->id ? 'selected' : '' }}>{{ $supplier->contact_person }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -205,7 +205,7 @@
                                         part_number: '{{ $product->part_number }}',
                                         category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                         brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
+                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->contact_person) : 'Unknown' }}',
                                         location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                         quantity: {{ $product->quantity }},
                                         purchase_price: {{ $product->purchase_price }},
@@ -223,7 +223,7 @@
                                         part_number: '{{ $product->part_number }}',
                                         category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                         brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
+                                        supplier: '{{ $product->supplier ? addslashes($product->supplier->contact_person) : 'Unknown' }}',
                                         location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                         quantity: {{ $product->quantity }},
                                         purchase_price: {{ $product->purchase_price }},
@@ -258,7 +258,7 @@
                             <div class="mb-2">
                                 <span class="badge bg-info me-1">{{ $product->category ? $product->category->name : 'Unknown' }}</span>
                                 <span class="badge bg-secondary me-1">{{ $product->brand ? $product->brand->name : 'Unknown' }}</span>
-                                <span class="badge bg-success">{{ $product->supplier ? $product->supplier->name : 'Unknown' }}</span>
+                                <span class="badge bg-success">{{ $product->supplier ? $product->supplier->contact_person : 'Unknown' }}</span>
                             </div>
                             
                             <!-- Location -->
@@ -314,7 +314,7 @@
                                             part_number: '{{ $product->part_number }}',
                                             category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                             brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                                            supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
+                                            supplier: '{{ $product->supplier ? addslashes($product->supplier->contact_person) : 'Unknown' }}',
                                             location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                             quantity: {{ $product->quantity }},
                                             purchase_price: {{ $product->purchase_price }},
@@ -397,7 +397,7 @@
                             part_number: '{{ $product->part_number }}',
                             category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                             brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                            supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
+                            supplier: '{{ $product->supplier ? addslashes($product->supplier->contact_person) : 'Unknown' }}',
                             location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                             quantity: {{ $product->quantity }},
                             purchase_price: {{ $product->purchase_price }},
@@ -431,7 +431,15 @@
                             
                             <!-- Supplier -->
                             <td class="align-middle">
-                                <span class="text-nowrap">{{ $product->supplier ? $product->supplier->name : '-' }}</span>
+                                <span class="text-nowrap">
+                                    @if($product->supplier)
+                                        {{ $product->supplier->contact_person }}
+                                    @elseif($product->supplier_id)
+                                        Supplier ID: {{ $product->supplier_id }} (Not Found)
+                                    @else
+                                        No Supplier
+                                    @endif
+                                </span>
                             </td>
                             
                             <!-- Location -->
@@ -486,7 +494,7 @@
                                                     part_number: '{{ $product->part_number }}',
                                                     category: '{{ $product->category ? addslashes($product->category->name) : 'Unknown' }}',
                                                     brand: '{{ $product->brand ? addslashes($product->brand->name) : 'Unknown' }}',
-                                                    supplier: '{{ $product->supplier ? addslashes($product->supplier->name) : 'Unknown' }}',
+                                                    supplier: '{{ $product->supplier ? addslashes($product->supplier->contact_person) : 'Unknown' }}',
                                                     location: '{{ $product->location ? addslashes($product->location) : 'Unknown' }}',
                                                     quantity: {{ $product->quantity }},
                                                     purchase_price: {{ $product->purchase_price }},

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Add index for performance
-            $table->index('name');
+            // $table->index('name');
         });
     }
 
