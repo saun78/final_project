@@ -227,7 +227,7 @@
                                     @endif
                                 </td>
                                 <td style="text-align: center; font-size: 9px;">
-                                    {{ $item->product->supplier->name ?? 'N/A' }}
+                                    {{ $item->product->supplier->contact_person ?? 'N/A' }}
                                 </td>
                                 <td class="qty">{{ $item->quantity }}</td>
                                 <td class="price">${{ number_format($item->price, 2) }}</td>

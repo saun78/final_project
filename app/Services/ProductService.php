@@ -145,7 +145,7 @@ class ProductService
         return [
             'categories' => Category::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
-            'suppliers' => Supplier::orderBy('name')->get(),
+            'suppliers' => Supplier::orderBy('contact_person')->get(),
         ];
     }
 

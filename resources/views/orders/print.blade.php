@@ -143,7 +143,7 @@
                             @endif
                         </td>
                         <td>
-                            <small>{{ $item->product->supplier->name ?? 'N/A' }}</small>
+                            <small>{{ $item->product->supplier->contact_person ?? 'N/A' }}</small>
                         </td>
                         <td>{{ $item->quantity }}</td>
                         <td>${{ number_format($item->price, 2) }}</td>

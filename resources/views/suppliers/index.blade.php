@@ -194,10 +194,8 @@
 @push('scripts')
 <script>
 function editSupplier(id, contactPerson, contactNumber) {
-    document.getElementById('edit_supplier_name').value = ''; // Clear supplier name
     document.getElementById('edit_contact_person').value = contactPerson;
     document.getElementById('edit_contact_number').value = contactNumber;
-    document.getElementById('edit_address').value = ''; // Clear address
     document.getElementById('editSupplierForm').action = `/suppliers/${id}`;
     new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
 }
