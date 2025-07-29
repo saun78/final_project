@@ -46,24 +46,40 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-arrow-left-right"></i>
-                    Inventory
+                <li class="nav-item">
+                <a href="{{ route('schedule.index') }}" class="nav-link {{ request()->routeIs('schedule.*') ? 'active' : '' }}">
+                    <i class="bi bi-receipt"></i>
+                    Schedule
                 </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="bi bi-people"></i>
-                    Customers
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
+                </li>
+                <li class="nav-item">
+                    <a href="#reportsSubmenu" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" data-bs-toggle="collapse">
                     <i class="bi bi-graph-up"></i>
                     Reports
+                    <i class="bi bi-chevron-down ms-auto"></i>
                 </a>
+                <div class="collapse {{ request()->routeIs('reports.*') ? 'show' : '' }}" id="reportsSubmenu">
+                    <ul class="nav flex-column ms-3">
+                        <li class="nav-item">
+                            <a href="{{ route('reports.top-selling') }}" class="nav-link {{ request()->routeIs('reports.top-selling') ? 'active' : '' }}">
+                                <i class="bi bi-bar-chart"></i>
+                                Top Selling
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                        <a href="{{ route('reports.summary') }}" class="nav-link {{ request()->routeIs('reports.summary') ? 'active' : '' }}">
+                            <i class="bi bi-calendar-check"></i>
+                            Summary
+                       </a>
+                    </li>
+                        <li class="nav-item">
+                            <a href="{{ route('reports.profit') }}" class="nav-link {{ request()->routeIs('reports.profit') ? 'active' : '' }}">
+                                <i class="bi bi-currency-dollar"></i>
+                                Profit Report
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>

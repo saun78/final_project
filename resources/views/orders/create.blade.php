@@ -125,7 +125,7 @@
                                             <select name="payment_method" class="form-select" required>
                                                 <option value="">Select Payment Method</option>
                                                 <option value="cash">Cash</option>
-                                                <option value="card">Card</option>
+                                                <option value="bank_transfer">Bank Transfer</option>
                                                 <option value="tng_wallet">TNG Wallet</option>
                                             </select>
                                         </div>

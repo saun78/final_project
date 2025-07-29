@@ -25,13 +25,14 @@ return new class extends Migration
             $table->date('depleted_date')->nullable(); // 用完日期
             $table->timestamps();
 
+
             // 外键约束
             $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');
             
             // 索引
-            $table->index(['product_id', 'received_date']); // 用于FIFO查询
+            $table->index(['product_id', 'received_date']); 
             $table->index('batch_no');
-            $table->unique(['product_id', 'batch_no']); // 确保同一产品的批次号唯一
+            $table->unique(['product_id', 'batch_no']); 
         });
     }
 

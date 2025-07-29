@@ -57,7 +57,7 @@ class CategoryController extends Controller
                 'string',
                 'max:255',
                 'unique:category,name',
-                'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
+                'regex:/^[a-zA-Z0-9\s]+$/',
             ],
         ], [
             'name.regex' => 'Category name can only contain letters, numbers, and spaces.',
@@ -85,7 +85,7 @@ class CategoryController extends Controller
                 'string',
                 'max:255',
                 Rule::unique('category', 'name')->ignore($category->id),
-                'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
+                'regex:/^[a-zA-Z0-9\s]+$/',
             ],
         ], [
             'name.regex' => 'Category name can only contain letters, numbers, and spaces.',

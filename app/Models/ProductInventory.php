@@ -211,6 +211,7 @@ class ProductInventory extends Model
         return $totalQuantity > 0 ? $totalValue / $totalQuantity : 0;
     }
 
+
     /**
      * 获取照片URL
      */
@@ -227,3 +228,4 @@ class ProductInventory extends Model
         return $this->hasMany(InventoryMovement::class, 'batch_id');
     }
 }
+

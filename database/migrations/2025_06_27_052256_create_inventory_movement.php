@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('inventory_movement', function (Blueprint $table) {
             $table->id();
-            $table->enum('movement_type', ['stock_in', 'sale', 'adjustment', 'transfer']); // 移动类型
+
+            $table->enum('movement_type', ['stock_in', 'sale', 'adjustment', 'transfer']); 
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('batch_id')->nullable(); // 批次ID（用于销售记录）
-            $table->string('batch_no')->nullable(); // 批次号（冗余存储，便于查询）
-            $table->string('reference_type')->nullable(); // 关联类型 (order_item, receipt等)
-            $table->unsignedBigInteger('reference_id')->nullable(); // 关联ID
-            $table->integer('quantity'); // 数量（正数=入库，负数=出库）
-            $table->decimal('unit_cost', 10, 2)->nullable(); // 单位成本
-            $table->decimal('total_cost', 10, 2)->nullable(); // 总成本
-            $table->unsignedBigInteger('location_id')->nullable(); // 位置ID（如果需要）
+            $table->unsignedBigInteger('batch_id')->nullable();
+            $table->string('batch_no')->nullable(); 
+            $table->string('reference_type')->nullable(); 
+            $table->unsignedBigInteger('reference_id')->nullable(); 
+            $table->integer('quantity'); 
+            $table->decimal('unit_cost', 10, 2)->nullable(); 
+            $table->decimal('total_cost', 10, 2)->nullable(); 
+            $table->unsignedBigInteger('location_id')->nullable(); // 位置ID（如果需要
             $table->text('notes')->nullable(); // 备注
             $table->timestamp('movement_date'); // 移动时间
             $table->timestamps();
@@ -37,6 +38,7 @@ return new class extends Migration
             $table->index(['movement_type', 'movement_date']);
             $table->index('batch_id');
             $table->index(['reference_type', 'reference_id']);
+
         });
     }
 

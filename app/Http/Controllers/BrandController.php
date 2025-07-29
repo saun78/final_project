@@ -56,7 +56,7 @@ class BrandController extends Controller
                 'string',
                 'max:255',
                 'unique:brand,name',
-                'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
+                'regex:/^[a-zA-Z0-9\s]+$/',
             ],
         ], [
             'name.regex' => 'Brand name can only contain letters, numbers, and spaces.',
