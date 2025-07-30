@@ -37,11 +37,6 @@ return new class extends Migration
             $table->index(['category_id', 'brand_id']);
             $table->index('quantity');
         });
-
-        // Add foreign key constraint for order_item table after product table is created
-        Schema::table('order_item', function (Blueprint $table) {
-            $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');
-        });
     }
 
     /**
@@ -49,11 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop foreign key constraint from order_item table first
-        Schema::table('order_item', function (Blueprint $table) {
-            $table->dropForeign(['product_id']);
-        });
-        
         Schema::dropIfExists('product');
     }
 };
