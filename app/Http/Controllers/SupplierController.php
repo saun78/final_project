@@ -115,4 +115,20 @@ class SupplierController extends Controller
         return redirect()->route('suppliers.index')
             ->with('success', 'Supplier deleted successfully.');
     }
+
+    /**
+     * Get products for a specific supplier
+     */
+    public function getProducts(Supplier $supplier)
+    {
+        $products = $supplier->products()
+            ->with(['category', 'brand'])
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'supplier' => $supplier->contact_person,
+            'products' => $products
+        ]);
+    }
 } 

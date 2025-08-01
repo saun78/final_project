@@ -4,6 +4,148 @@
 
 @push('styles')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<style>
+.product-item {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+
+.product-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transform: translateY(-1px);
+}
+
+.product-item.out-of-stock {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+}
+
+.product-item .product-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.product-item .product-details {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.product-item .stock-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.products-loading {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.products-empty {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.products-empty i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Sidebar Design */
+.products-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Fully hidden off-screen */
+    width: 400px;
+    height: 100vh;
+    background-color: #ffffff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+    padding: 0;
+    transition: right 0.4s ease-in-out;
+    z-index: 1050;
+    overflow-y: auto;
+}
+
+.products-sidebar.active {
+    right: 0; /* Slides in from the right */
+}
+
+.products-sidebar .sidebar-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.products-sidebar .sidebar-header h5 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.products-sidebar .sidebar-body {
+    padding: 20px;
+}
+
+.products-sidebar .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.products-sidebar .close-btn:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+/* Overlay for sidebar */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .products-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+}
+</style>
 @endpush
 
 @section('content')
@@ -93,6 +235,11 @@
                             <td><span class="badge bg-info">{{ $supplier->products_count }}</span></td>
                             <td>
                                 <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-info btn-sm" 
+                                        onclick="showSupplierProducts({{ $supplier->id }}, '{{ addslashes($supplier->contact_person) }}')"
+                                        title="View Products">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
                                     <button type="button" class="btn btn-outline-primary btn-sm" 
                                         onclick="editSupplier({{ $supplier->id }}, '{{ addslashes($supplier->contact_person) }}', '{{ addslashes($supplier->contact_number) }}')"
                                         title="Edit">
@@ -123,6 +270,22 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Products Sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="hideProductsSidebar()"></div>
+<div class="products-sidebar" id="productsSidebar">
+    <div class="sidebar-header">
+        <h5 id="sidebarTitle">Supplier Products</h5>
+        <button type="button" class="close-btn" onclick="hideProductsSidebar()">
+            <i class="bi bi-x"></i>
+        </button>
+    </div>
+    <div class="sidebar-body">
+        <div id="productsList">
+            <!-- Products will be loaded here -->
         </div>
     </div>
 </div>
@@ -200,6 +363,91 @@ function editSupplier(id, contactPerson, contactNumber) {
     new bootstrap.Modal(document.getElementById('editSupplierModal')).show();
 }
 
+function showSupplierProducts(supplierId, supplierName) {
+    // Show the products sidebar
+    const productsSidebar = document.getElementById('productsSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarTitle = document.getElementById('sidebarTitle');
+    const productsList = document.getElementById('productsList');
+    
+    // Update title
+    sidebarTitle.textContent = `${supplierName} Products`;
+    
+    // Show loading state
+    productsList.innerHTML = `
+        <div class="products-loading">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            Loading products...
+        </div>
+    `;
+    
+    // Show the sidebar and overlay
+    productsSidebar.classList.add('active');
+    sidebarOverlay.classList.add('active');
+    
+    // Prevent body scroll when sidebar is open
+    document.body.style.overflow = 'hidden';
+    
+    // Fetch products via AJAX
+    fetch(`/suppliers/${supplierId}/products`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.products && data.products.length > 0) {
+                let productsHtml = '';
+                data.products.forEach(product => {
+                    const stockClass = product.quantity <= 0 ? 'out-of-stock' : '';
+                    const stockBadgeClass = product.quantity > 10 ? 'bg-success' : 
+                                           product.quantity > 0 ? 'bg-warning' : 'bg-danger';
+                    const stockText = product.quantity <= 0 ? 'Out of Stock' : `${product.quantity} in stock`;
+                    
+                    productsHtml += `
+                        <div class="product-item ${stockClass}">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-details">
+                                <div>Part Number: ${product.part_number || 'N/A'}</div>
+                                <div>Category: ${product.category ? product.category.name : 'N/A'}</div>
+                                <div>Brand: ${product.brand ? product.brand.name : 'N/A'}</div>
+                                <div>Price: $${product.selling_price}</div>
+                                <div class="mt-2">
+                                    <span class="badge ${stockBadgeClass} stock-badge">${stockText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                productsList.innerHTML = productsHtml;
+            } else {
+                productsList.innerHTML = `
+                    <div class="products-empty">
+                        <i class="bi bi-box"></i>
+                        <div>No products found for this supplier</div>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
+            productsList.innerHTML = `
+                <div class="products-empty">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>Error loading products</div>
+                </div>
+            `;
+        });
+}
+
+function hideProductsSidebar() {
+    const productsSidebar = document.getElementById('productsSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    // Hide the sidebar and overlay
+    productsSidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
 // Auto search functionality with AJAX
 let searchTimeout;
 const searchInput = document.getElementById('supplierSearch');
@@ -213,6 +461,13 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.focus();
         searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
     }
+    
+    // Add keyboard event listener for ESC key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            hideProductsSidebar();
+        }
+    });
 });
 
 if (searchInput) {

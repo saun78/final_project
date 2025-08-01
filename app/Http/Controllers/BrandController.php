@@ -118,4 +118,20 @@ class BrandController extends Controller
         return redirect()->route('brands.index')
             ->with('success', 'Brand deleted successfully.');
     }
+
+    /**
+     * Get products for a specific brand
+     */
+    public function getProducts(Brand $brand)
+    {
+        $products = $brand->products()
+            ->with(['category', 'supplier'])
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'brand' => $brand->name,
+            'products' => $products
+        ]);
+    }
 } 

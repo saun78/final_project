@@ -9,7 +9,7 @@
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <img src="https://ui-avatars.com/api/?name=Admin&background=3498db&color=fff" alt="" width="32" height="32" class="rounded-circle me-2">
-                <span class="d-none d-md-inline">Admin</span>
+                <span class="d-none d-md-inline">Logout</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown"> 
                 <li>

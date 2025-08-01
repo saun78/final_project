@@ -119,4 +119,20 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')
             ->with('success', 'Category deleted successfully.');
     }
+
+    /**
+     * Get products for a specific category
+     */
+    public function getProducts(Category $category)
+    {
+        $products = $category->products()
+            ->with(['brand', 'supplier'])
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'category' => $category->name,
+            'products' => $products
+        ]);
+    }
 } 

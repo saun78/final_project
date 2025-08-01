@@ -51,12 +51,15 @@ Route::middleware(['auth'])->group(function () {
      
     // Category Routes
     Route::resource('categories', CategoryController::class);
+    Route::get('/categories/{category}/products', [CategoryController::class, 'getProducts'])->name('categories.products');
     
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    Route::get('/brands/{brand}/products', [BrandController::class, 'getProducts'])->name('brands.products');
     
     // Supplier Routes
     Route::resource('suppliers', SupplierController::class);
+    Route::get('/suppliers/{supplier}/products', [SupplierController::class, 'getProducts'])->name('suppliers.products');
     
     // Order/Receipt Routes
     Route::resource('orders', OrderController::class);
