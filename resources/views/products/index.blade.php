@@ -27,11 +27,15 @@
                 <i class="bi bi-plus-lg"></i> Add New Product
             </a>
             <div class="d-flex gap-2">
-                <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-grid"></i> Manage Categories
+                <a href="{{ route('products.index', ['stock_status' => 'in_stock']) }}" 
+                   class="btn {{ request('stock_status') == 'in_stock' ? 'btn-success' : 'btn-outline-success' }}">
+                    <i class="bi bi-check-circle"></i> In Stock 
+                    <span class="badge {{ request('stock_status') == 'in_stock' ? 'bg-white text-success' : 'bg-success' }} ms-1">{{ $stockCounts['in_stock'] }}</span>
                 </a>
-                <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-tags"></i> Manage Brands
+                <a href="{{ route('products.index', ['stock_status' => 'out_of_stock']) }}" 
+                   class="btn {{ request('stock_status') == 'out_of_stock' ? 'btn-danger' : 'btn-outline-danger' }}">
+                    <i class="bi bi-x-circle"></i> Out of Stock 
+                    <span class="badge {{ request('stock_status') == 'out_of_stock' ? 'bg-white text-danger' : 'bg-danger' }} ms-1">{{ $stockCounts['out_of_stock'] }}</span>
                 </a>
             </div>
         </div>
@@ -191,7 +195,7 @@
             <div class="row g-4" id="gridView">
                 @forelse($products as $product)
                 <div class="col-xl-4 col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div class="card h-100 product-card">
+                    <div class="card h-100 product-card {{ $product->quantity <= 0 ? 'out-of-stock' : '' }}">
                         <!-- Product Image -->
                         <div class="card-img-container" style="height: 200px; overflow: hidden; position: relative;">
                             @if($product->picture)
@@ -242,6 +246,16 @@
                                     {{ $product->quantity }} in stock
                                 </span>
                             </div>
+                            
+                            <!-- Out of Stock Overlay -->
+                            @if($product->quantity <= 0)
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(0,0,0,0.3);">
+                                <div class="text-center text-white">
+                                    <i class="bi bi-exclamation-triangle-fill fs-1 mb-2"></i>
+                                    <div class="fw-bold">OUT OF STOCK</div>
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
                         <!-- Card Body -->
@@ -391,7 +405,7 @@
                     </thead>
                     <tbody>
                         @forelse($products as $product)
-                        <tr style="cursor: pointer;" onclick="showProductModal({
+                        <tr class="{{ $product->quantity <= 0 ? 'out-of-stock-row' : '' }}" style="cursor: pointer;" onclick="showProductModal({
                             id: {{ $product->id }},
                             name: '{{ addslashes($product->name) }}',
                             part_number: '{{ $product->part_number }}',
@@ -452,6 +466,9 @@
                                 <span class="fw-semibold @if($product->quantity <= 0) text-danger @elseif($product->quantity <= 10) text-warning @else text-success @endif">
                                     {{ $product->quantity }}
                                 </span>
+                                @if($product->quantity <= 0)
+                                    <div class="small text-danger fw-bold">OUT OF STOCK</div>
+                                @endif
                             </td>
                             
                             <!-- Average Cost -->
@@ -765,6 +782,85 @@
     color: white;
 }
 
+/* Stock status buttons */
+.btn-outline-success:hover .badge {
+    background-color: #fff !important;
+    color: #198754 !important;
+}
+
+.btn-outline-danger:hover .badge {
+    background-color: #fff !important;
+    color: #dc3545 !important;
+}
+
+.btn-success .badge {
+    background-color: #fff !important;
+    color: #198754 !important;
+}
+
+.btn-danger .badge {
+    background-color: #fff !important;
+    color: #dc3545 !important;
+}
+
+.btn .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Out of stock styling */
+.out-of-stock {
+    opacity: 0.7;
+    filter: grayscale(80%);
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    position: relative;
+}
+
+.out-of-stock .card-img-top {
+    filter: grayscale(80%);
+}
+
+.out-of-stock .card-title {
+    color: #6c757d !important;
+}
+
+.out-of-stock .badge {
+    opacity: 0.8;
+}
+
+.out-of-stock .btn {
+    opacity: 0.8;
+}
+
+.out-of-stock-row {
+    opacity: 0.7;
+    background-color: #f8f9fa !important;
+}
+
+.out-of-stock-row:hover {
+    background-color: #e9ecef !important;
+}
+
+.out-of-stock-row td {
+    color: #6c757d;
+}
+
+.out-of-stock-row .fw-semibold {
+    color: #6c757d !important;
+}
+
+/* Out of stock overlay animation */
+.out-of-stock .position-absolute {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.3; }
+}
+
 
 </style>
 @endpush
@@ -793,8 +889,8 @@ document.addEventListener('DOMContentLoaded', function() {
             filterText.textContent = 'Show Filters';
         });
         
-        // Auto-open filters if any filter is active (excluding search)
-        @if(request('category') || request('brand') || request('supplier') || request('location') || request('stock_status') || request('min_price') || request('max_price'))
+        // Auto-open filters if any filter is active (excluding search and stock_status)
+        @if(request('category') || request('brand') || request('supplier') || request('location') || request('min_price') || request('max_price'))
             new bootstrap.Collapse(filterCollapse, {show: true});
         @endif
     }

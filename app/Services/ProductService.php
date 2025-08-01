@@ -79,12 +79,15 @@ class ProductService
                        !empty($filters['location']) || !empty($filters['stock_status']) || 
                        !empty($filters['min_price']) || !empty($filters['max_price']);
 
+        // Order by stock status (in stock first, out of stock last) then by latest
+        $query->orderBy('quantity', 'desc')->latest();
+        
         // If searching, limit to 100 results without pagination
         // If not searching, use normal pagination
         if ($isSearching) {
-            return $query->with(['category', 'brand', 'supplier'])->latest()->limit(100)->get();
+            return $query->with(['category', 'brand', 'supplier'])->limit(100)->get();
         } else {
-            return $query->with(['category', 'brand', 'supplier'])->latest()->paginate(12);
+            return $query->with(['category', 'brand', 'supplier'])->paginate(12);
         }
     }
 
@@ -146,6 +149,15 @@ class ProductService
             'categories' => Category::orderBy('name')->get(),
             'brands' => Brand::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('contact_person')->get(),
+        ];
+    }
+
+    public function getStockCounts()
+    {
+        return [
+            'in_stock' => Product::where('quantity', '>', 0)->count(),
+            'out_of_stock' => Product::where('quantity', '<=', 0)->count(),
+            'total' => Product::count(),
         ];
     }
 

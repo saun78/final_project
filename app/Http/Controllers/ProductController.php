@@ -67,12 +67,16 @@ class ProductController extends Controller
 
         $formData = $this->productService->getFormData();
         
+        // Get stock counts for all products (not just current page)
+        $stockCounts = $this->productService->getStockCounts();
+        
         return view('products.index', [
             'products' => $products,
             'categories' => $formData['categories'],
             'brands' => $formData['brands'],
             'suppliers' => $formData['suppliers'],
             'isSearching' => $isSearching,
+            'stockCounts' => $stockCounts,
         ]);
     }
 

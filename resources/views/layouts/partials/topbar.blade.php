@@ -3,7 +3,7 @@
         <button class="btn btn-link text-dark me-3" id="sidebarToggle">
             <i class="bi bi-list fs-4"></i>
         </button>
-        <span class="topbar-brand">IMS</span>
+        <span class="topbar-brand">CSlow</span>
     </div>
     <div class="d-flex align-items-center">
         <div class="dropdown">

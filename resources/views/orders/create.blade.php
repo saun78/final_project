@@ -26,6 +26,18 @@
     color: #6c757d;
     font-style: italic;
 }
+
+/* Out of stock product styling in select2 */
+.select2-results__option[aria-disabled="true"] {
+    opacity: 0.6;
+    color: #6c757d;
+    background-color: #f8f9fa;
+}
+
+.select2-results__option[aria-disabled="true"]:hover {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
 </style>
 @endpush
 
@@ -51,6 +63,11 @@
                         </div>
                     @endif
 
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> Products with zero stock (out of stock) are disabled and cannot be selected for orders.
+                    </div>
+
                     <form action="{{ route('orders.store') }}" method="POST" id="orderForm">
                         @csrf
                         
@@ -70,11 +87,12 @@
                                                         data-category="{{ $product->category->name ?? 'N/A' }}"
                                                         data-brand="{{ $product->brand->name ?? 'N/A' }}"
                                                         data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
-                                                        data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
+                                                        data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}"
+                                                        {{ $product->quantity <= 0 ? 'disabled' : '' }}>
                                                     @if($product->part_number)
-                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                                                     @else
-                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                                                     @endif
                                                 </option>
                                             @endforeach
@@ -190,11 +208,12 @@
                             data-category="{{ $product->category->name ?? 'N/A' }}"
                             data-brand="{{ $product->brand->name ?? 'N/A' }}"
                             data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
-                            data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}">
+                            data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}"
+                            {{ $product->quantity <= 0 ? 'disabled' : '' }}>
                         @if($product->part_number)
-                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                         @else
-                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }})
+                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                         @endif
                     </option>
                 @endforeach
@@ -281,20 +300,22 @@ $(document).ready(function() {
         var brand = $product.data('brand');
         var supplier = $product.data('supplier');
         var hasValidImage = imageUrl && imageUrl.trim() !== '' && imageUrl.includes('storage');
+        var isOutOfStock = stock <= 0;
         
         var imageElement = hasValidImage ? 
-            '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' : '';
+            '<img src="' + imageUrl + '" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px; border-radius: 4px;' + (isOutOfStock ? 'filter: grayscale(100%); opacity: 0.6;' : '') + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';" />' : '';
         
-        var placeholderElement = '<div style="width: 40px; height: 40px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-right: 10px; display: ' + (hasValidImage ? 'none' : 'flex') + '; align-items: center; justify-content: center; font-size: 12px; color: #6c757d;"><i class="bi bi-image"></i></div>';
+        var placeholderElement = '<div style="width: 40px; height: 40px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; margin-right: 10px; display: ' + (hasValidImage ? 'none' : 'flex') + '; align-items: center; justify-content: center; font-size: 12px; color: #6c757d;' + (isOutOfStock ? 'opacity: 0.6;' : '') + '"><i class="bi bi-image"></i></div>';
         
         var productName = product.text.split(' - ')[0];
         var categoryBrandSupplier = category + '/' + brand + '/' + supplier;
+        var stockText = isOutOfStock ? '<span style="color: #dc3545; font-weight: bold;">OUT OF STOCK</span>' : 'Stock: ' + stock;
         
-        return $('<div class="d-flex align-items-center">' +
+        return $('<div class="d-flex align-items-center" style="' + (isOutOfStock ? 'opacity: 0.6; color: #6c757d;' : '') + '">' +
                     imageElement + placeholderElement +
                     '<div>' +
-                        '<div style="font-weight: 500;">' + productName + '</div>' +
-                        '<small class="text-muted">$' + price + ' - ' + categoryBrandSupplier + ' - Stock: ' + stock + '</small>' +
+                        '<div style="font-weight: 500;' + (isOutOfStock ? 'text-decoration: line-through;' : '') + '">' + productName + '</div>' +
+                        '<small class="text-muted">$' + price + ' - ' + categoryBrandSupplier + ' - ' + stockText + '</small>' +
                     '</div>' +
                 '</div>');
     }
@@ -343,6 +364,18 @@ $(document).ready(function() {
         $select.on('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             if (selectedOption.dataset.price) {
+                const stock = parseInt(selectedOption.dataset.stock) || 0;
+                
+                // Check if product is out of stock
+                if (stock <= 0) {
+                    alert('This product is out of stock and cannot be selected.');
+                    $(this).val(''); // Reset selection
+                    $price.val('');
+                    $supplier.val('');
+                    $quantity.removeAttr('max').removeAttr('title');
+                    return;
+                }
+                
                 $price.val(selectedOption.dataset.price);
                 $supplier.val(selectedOption.dataset.supplier || 'N/A');
                 if (selectedOption.dataset.stock) {
