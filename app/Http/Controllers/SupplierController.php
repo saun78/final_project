@@ -122,6 +122,7 @@ class SupplierController extends Controller
     public function getProducts(Supplier $supplier)
     {
         $products = $supplier->products()
+            ->whereNull('deleted_at')
             ->with(['category', 'brand'])
             ->orderBy('name')
             ->get();

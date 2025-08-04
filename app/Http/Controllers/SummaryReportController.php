@@ -18,6 +18,7 @@ class SummaryReportController extends Controller
 
         // Get all order items joined with orders and products
         $query = OrderItem::with(['order', 'product']);
+        
         $query->whereHas('order', function($q) use ($startDate, $endDate, $paymentMethod) {
             if ($startDate && $endDate) {
                 $q->whereDate('created_at', '>=', $startDate)

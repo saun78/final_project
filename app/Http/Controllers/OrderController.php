@@ -146,6 +146,10 @@ class OrderController extends Controller
                         'quantity' => $item['quantity'],
                         'price' => $item['price'],
                         'cost_price' => 0, // Will be updated after FIFO calculation
+                        'product_name' => $product->name,
+                        'product_part_number' => $product->part_number,
+                        'supplier_name' => $product->supplier?->name,
+                        'supplier_contact_person' => $product->supplier?->contact_person,
                     ]);
 
                     // Deduct stock using FIFO method with batch tracking
@@ -190,7 +194,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'payment_method' => 'required|in:cash,bank_transfer,tng_wallet',
+            'payment_method' => 'required|in:cash,card,tng_wallet',
             'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
@@ -377,8 +381,8 @@ class OrderController extends Controller
                         case 'cash':
                             $paymentMethod = 'Cash';
                             break;
-                        case 'bank_transfer':
-                            $paymentMethod = 'Bank Transfer';
+                        case 'card':
+                            $paymentMethod = 'Card';
                             break;
                         case 'tng_wallet':
                             $paymentMethod = 'TNG Wallet';

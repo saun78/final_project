@@ -221,13 +221,13 @@
                                     @endif
                                 </td>
                                 <td class="product-name">
-                                    {{ $item->product->name ?? 'N/A' }}
-                                    @if(isset($item->product->part_number))
-                                        <br><small style="color: #666;">Part #: {{ $item->product->part_number }}</small>
+                                    {{ $item->product_name }}
+                                    @if($item->product_part_number)
+                                        <br><small style="color: #666;">Part #: {{ $item->product_part_number }}</small>
                                     @endif
                                 </td>
                                 <td style="text-align: center; font-size: 9px;">
-                                    {{ $item->product->supplier->contact_person ?? 'N/A' }}
+                                    {{ $item->supplier_contact_person }}
                                 </td>
                                 <td class="qty">{{ $item->quantity }}</td>
                                 <td class="price">${{ number_format($item->price, 2) }}</td>

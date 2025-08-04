@@ -55,9 +55,9 @@
                                         @foreach($order->orderItems as $item)
                                             <tr>
                                                 <td>
-                                                    {{ $item->product->name ?? 'N/A' }}
-                                                    @if($item->product && $item->product->part_number)
-                                                        <br><small class="text-muted">Part #: {{ $item->product->part_number }}</small>
+                                                    {{ $item->product_name }}
+                                                    @if($item->product_part_number)
+                                                        <br><small class="text-muted">Part #: {{ $item->product_part_number }}</small>
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->quantity }}</td>

@@ -125,6 +125,7 @@ class BrandController extends Controller
     public function getProducts(Brand $brand)
     {
         $products = $brand->products()
+            ->whereNull('deleted_at')
             ->with(['category', 'supplier'])
             ->orderBy('name')
             ->get();

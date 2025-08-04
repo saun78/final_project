@@ -21,7 +21,10 @@ return new class extends Migration
             $table->timestamps();
 
             // Add foreign key constraint for order (exists before this migration)
-            $table->foreign('order_id')->references('id')->on('order')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('`order`')->onDelete('cascade');
+            
+            // Add foreign key constraint for product_id with cascade delete
+            $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');
         });
     }
 

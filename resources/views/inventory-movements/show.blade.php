@@ -175,9 +175,9 @@
                                 <h6><i class="bi bi-box me-2"></i>Product Info</h6>
                                 <div class="info-row">
                                     <span class="info-label">Product</span>
-                                    <span class="info-value">{{ $movement->product->name ?? 'N/A' }}</span>
+                                    <span class="info-value">{{ $movement->product?->name ?? 'N/A' }}</span>
                                 </div>
-                                @if($movement->product->part_number)
+                                @if($movement->product?->part_number)
                                 <div class="info-row">
                                     <span class="info-label">Part #</span>
                                     <span class="info-value">{{ $movement->product->part_number }}</span>
@@ -185,11 +185,11 @@
                                 @endif
                                 <div class="info-row">
                                     <span class="info-label">Supplier</span>
-                                    <span class="info-value">{{ $movement->product->supplier->contact_person ?? 'N/A' }}</span>
+                                    <span class="info-value">{{ $movement->product?->supplier?->contact_person ?? 'N/A' }}</span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Current Stock</span>
-                                    <span class="info-value">{{ $movement->product->quantity ?? 0 }}</span>
+                                    <span class="info-value">{{ $movement->product?->quantity ?? 0 }}</span>
                                 </div>
                                 @if($movement->movement_type == 'stock_in')
                                 <div class="info-row">

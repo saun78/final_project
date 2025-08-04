@@ -143,13 +143,13 @@
             @foreach($order->orderItems as $item)
                 <tr>
                     <td class="product-name">
-                        <strong>{{ $item->product->name ?? 'N/A' }}</strong>
-                        @if(isset($item->product->part_number))
-                            <br><small>Part #: {{ $item->product->part_number }}</small>
+                        <strong>{{ $item->product_name }}</strong>
+                        @if($item->product_part_number)
+                            <br><small>Part #: {{ $item->product_part_number }}</small>
                         @endif
                     </td>
                     <td style="text-align: center;">
-                        <small>{{ $item->product->supplier->contact_person ?? 'N/A' }}</small>
+                        <small>{{ $item->supplier_contact_person }}</small>
                     </td>
                     <td>{{ $item->quantity }}</td>
                     <td>${{ number_format($item->price, 2) }}</td>

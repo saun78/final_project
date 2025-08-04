@@ -140,6 +140,14 @@ class ProductService
             Storage::disk('public')->delete($product->picture);
         }
 
+        // Delete related records explicitly to ensure proper cleanup
+        // This is especially important for SQLite which might not handle cascade deletes properly
+        $product->inventoryBatches()->delete();
+        
+        // The foreign key constraints should handle the rest, but we'll be explicit
+        // InventoryMovement records will be deleted via cascade
+        // OrderItem records will be deleted via cascade (after we add the constraint)
+
         return $product->delete();
     }
 

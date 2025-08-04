@@ -16,6 +16,12 @@ class ProfitReportController extends Controller
         $paymentMethod = $request->get('payment_method');
 
         $query = OrderItem::with(['order', 'product']);
+        
+        // Exclude soft-deleted products
+        $query->whereHas('product', function($q) {
+            $q->whereNull('deleted_at');
+        });
+        
         $query->whereHas('order', function($q) use ($startDate, $endDate, $paymentMethod) {
             if ($startDate && $endDate) {
                 $q->whereDate('created_at', '>=', $startDate)

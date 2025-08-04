@@ -84,15 +84,15 @@
                                                         data-price="{{ $product->selling_price }}" 
                                                         data-stock="{{ $product->quantity }}"
                                                         data-part-number="{{ $product->part_number ?? '' }}"
-                                                        data-category="{{ $product->category->name ?? 'N/A' }}"
-                                                        data-brand="{{ $product->brand->name ?? 'N/A' }}"
-                                                        data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
+                                                        data-category="{{ $product->category?->name ?? 'N/A' }}"
+                                                        data-brand="{{ $product->brand?->name ?? 'N/A' }}"
+                                                        data-supplier="{{ $product->supplier?->contact_person ?? 'N/A' }}"
                                                         data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}"
                                                         {{ $product->quantity <= 0 ? 'disabled' : '' }}>
                                                     @if($product->part_number)
-                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
+                                                        [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category?->name ?? 'N/A' }}/{{ $product->brand?->name ?? 'N/A' }}/{{ $product->supplier?->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                                                     @else
-                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
+                                                        {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category?->name ?? 'N/A' }}/{{ $product->brand?->name ?? 'N/A' }}/{{ $product->supplier?->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                                                     @endif
                                                 </option>
                                             @endforeach
@@ -205,15 +205,15 @@
                             data-price="{{ $product->selling_price }}" 
                             data-stock="{{ $product->quantity }}"
                             data-part-number="{{ $product->part_number ?? '' }}"
-                            data-category="{{ $product->category->name ?? 'N/A' }}"
-                            data-brand="{{ $product->brand->name ?? 'N/A' }}"
-                            data-supplier="{{ $product->supplier->contact_person ?? 'N/A' }}"
+                            data-category="{{ $product->category?->name ?? 'N/A' }}"
+                            data-brand="{{ $product->brand?->name ?? 'N/A' }}"
+                            data-supplier="{{ $product->supplier?->contact_person ?? 'N/A' }}"
                             data-image="{{ $product->picture ? asset('storage/' . $product->picture) : '' }}"
                             {{ $product->quantity <= 0 ? 'disabled' : '' }}>
                         @if($product->part_number)
-                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
+                            [{{ $product->part_number }}] {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category?->name ?? 'N/A' }}/{{ $product->brand?->name ?? 'N/A' }}/{{ $product->supplier?->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                         @else
-                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category->name ?? 'N/A' }}/{{ $product->brand->name ?? 'N/A' }}/{{ $product->supplier->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
+                            {{ $product->name }} - ${{ $product->selling_price }} ({{ $product->category?->name ?? 'N/A' }}/{{ $product->brand?->name ?? 'N/A' }}/{{ $product->supplier?->contact_person ?? 'N/A' }}) (Stock: {{ $product->quantity }}){{ $product->quantity <= 0 ? ' - OUT OF STOCK' : '' }}
                         @endif
                     </option>
                 @endforeach

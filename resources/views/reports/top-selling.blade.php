@@ -27,7 +27,7 @@
                     @php
                         $categoryTotals = collect($productTotals)
                             ->groupBy(function($total) {
-                                return $total['product']->category->name;
+                                return $total['product']?->category?->name ?? 'Unknown Category';
                             })
                             ->map(function($group, $category) {
                                 return [
@@ -46,7 +46,7 @@
                     <script>
                         const topProducts = @json(collect($productTotals)->take(10)->values()->map(function($total) {
                             return [
-                                'name' => $total['product']->name,
+                                'name' => $total['product']?->name ?? 'Unknown Product',
                                 'total_sold' => $total['total_sold']
                             ];
                         }));
@@ -205,10 +205,10 @@
                                     @foreach($salesRecords as $record)
                                     <tr>
                                         <td>{{ $record->datetime }}</td>
-                                        <td>{{ $record->product->name ?: '—' }}</td>
-                                        <td>{{ $record->product->part_number ?: '—' }}</td>
-                                        <td>{{ $record->category->name ?? '—' }}</td>
-                                        <td>{{ $record->brand->name ?? '—' }}</td>
+                                        <td>{{ $record->product?->name ?: '—' }}</td>
+                                        <td>{{ $record->product?->part_number ?: '—' }}</td>
+                                        <td>{{ $record->category?->name ?? '—' }}</td>
+                                        <td>{{ $record->brand?->name ?? '—' }}</td>
                                         <td>{{ $record->quantity !== null ? number_format($record->quantity) : '—' }}</td>
                                         <td>{{ ($record->amount !== null) ? 'RM' . number_format($record->amount, 2) : '—' }}</td>
                                     </tr>
@@ -240,10 +240,10 @@
                             <tbody>
                                 @foreach($productTotals as $total)
                                 <tr>
-                                    <td>{{ $total['product']->name ?: '—' }}</td>
-                                    <td>{{ $total['product']->part_number ?: '—' }}</td>
-                                    <td>{{ $total['product']->category->name ?? '—' }}</td>
-                                    <td>{{ $total['product']->brand->name ?? '—' }}</td>
+                                    <td>{{ $total['product']?->name ?: '—' }}</td>
+                                    <td>{{ $total['product']?->part_number ?: '—' }}</td>
+                                    <td>{{ $total['product']?->category?->name ?? '—' }}</td>
+                                    <td>{{ $total['product']?->brand?->name ?? '—' }}</td>
                                     <td>{{ isset($total['total_sold']) ? number_format($total['total_sold']) : '—' }}</td>
                                     <td>{{ isset($total['total_amount']) ? 'RM' . number_format($total['total_amount'], 2) : '—' }}</td>
                                 </tr>

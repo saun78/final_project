@@ -60,8 +60,11 @@ class DashboardController extends Controller
         // 最近10笔当天的库存异动（只显示in和out）
         $today = now()->toDateString();
         $recentMovements = \App\Models\InventoryMovement::with(['product.supplier'])
+            ->whereHas('product', function($q) {
+                $q->whereNull('deleted_at');
+            })
             ->whereDate('movement_date', $today)
-            ->whereIn('movement_type', ['stock_in', 'sale', 'stock_out'])
+            ->whereIn('movement_type', ['stock_in', 'sale', 'stock_out', 'adjustment'])
             ->orderBy('movement_date', 'desc')
             ->paginate(10);
 
@@ -70,6 +73,9 @@ class DashboardController extends Controller
         $endOfMonth = Carbon::now()->endOfMonth();
 
         $productTotals = OrderItem::with('product', 'order')
+            ->whereHas('product', function($q) {
+                $q->whereNull('deleted_at');
+            })
             ->whereHas('order', function($q) use ($startOfMonth, $endOfMonth) {
                 $q->whereDate('created_at', '>=', $startOfMonth)
                   ->whereDate('created_at', '<=', $endOfMonth);
@@ -77,8 +83,9 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('product_id')
             ->map(function ($records) {
+                $firstRecord = $records->first();
                 return [
-                    'name' => $records->first()->product->name ?? 'Unknown',
+                    'name' => $firstRecord->product?->name ?? 'Unknown Product',
                     'total_sold' => $records->sum('quantity'),
                     'total_amount' => $records->sum(function($item) { return $item->quantity * $item->price; }),
                 ];
@@ -129,6 +136,9 @@ class DashboardController extends Controller
         
         // Get daily top selling products
         $dailyTopSelling = OrderItem::with(['product', 'order'])
+            ->whereHas('product', function($q) {
+                $q->whereNull('deleted_at');
+            })
             ->whereHas('order', function($query) use ($startDate, $endDate) {
                 $query->whereDate('created_at', '>=', $startDate)
                       ->whereDate('created_at', '<=', $endDate);
@@ -140,8 +150,9 @@ class DashboardController extends Controller
             ->map(function($dayItems) {
                 return $dayItems->groupBy('product_id')
                     ->map(function($productItems) {
+                        $firstItem = $productItems->first();
                         return [
-                            'product_name' => $productItems->first()->product->name,
+                            'product_name' => $firstItem->product?->name ?? 'Unknown Product',
                             'total_sold' => $productItems->sum('quantity'),
                             'total_amount' => $productItems->sum(function($item) {
                                 return $item->quantity * $item->price;
@@ -235,6 +246,9 @@ class DashboardController extends Controller
         
         // Get daily profit data
         $dailyProfit = OrderItem::with(['order'])
+            ->whereHas('product', function($q) {
+                $q->whereNull('deleted_at');
+            })
             ->whereHas('order', function($query) use ($startDate, $endDate) {
                 $query->whereDate('created_at', '>=', $startDate)
                       ->whereDate('created_at', '<=', $endDate);

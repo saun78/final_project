@@ -13,6 +13,11 @@ class TopSellingReportController extends Controller
         // Get all order items joined with products, categories, brands, and orders
         $query = OrderItem::with(['product.category', 'product.brand', 'order']);
 
+        // Exclude soft-deleted products
+        $query->whereHas('product', function($q) {
+            $q->whereNull('deleted_at');
+        });
+
         // Date filter (by order created_at)
         if ($request->filled('start_date')) {
             $query->whereHas('order', function($q) use ($request) {
@@ -52,8 +57,8 @@ class TopSellingReportController extends Controller
                 'product' => $first->product,
                 'quantity' => $group->sum('quantity'),
                 'amount' => $group->sum(function($item) { return $item->quantity * $item->price; }),
-                'category' => $first->product->category,
-                'brand' => $first->product->brand,
+                'category' => $first->product?->category,
+                'brand' => $first->product?->brand,
             ];
         });
 
@@ -87,6 +92,11 @@ class TopSellingReportController extends Controller
     public function exportPdf(Request $request)
     {
         $query = \App\Models\OrderItem::with(['product.category', 'product.brand', 'order']);
+
+        // Exclude soft-deleted products
+        $query->whereHas('product', function($q) {
+            $q->whereNull('deleted_at');
+        });
 
         if ($request->filled('start_date')) {
             $query->whereHas('order', function($q) use ($request) {

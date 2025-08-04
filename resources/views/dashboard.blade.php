@@ -191,7 +191,7 @@
                         @forelse($recentMovements as $movement)
                             <tr>
                                 <td>{{ $movement->movement_date->format('Y-m-d H:i') }}</td>
-                                <td>{{ $movement->product->name ?? 'Unknown Product' }}</td>
+                                <td>{{ $movement->product?->name ?? 'Unknown Product' }}</td>
                                 <td>
                                     @if($movement->movement_type == 'stock_in')
                                         <span class="badge bg-success">In</span>
@@ -199,12 +199,18 @@
                                         <span class="badge bg-danger">Out</span>
                                     @elseif($movement->movement_type == 'stock_out')
                                         <span class="badge bg-warning">Out</span>
+                                    @elseif($movement->movement_type == 'adjustment')
+                                        @if($movement->quantity > 0)
+                                            <span class="badge bg-info">Restored</span>
+                                        @else
+                                            <span class="badge bg-secondary">Adjusted</span>
+                                        @endif
                                     @else
                                         <span class="badge bg-secondary">{{ ucfirst($movement->movement_type) }}</span>
                                     @endif
                                 </td>
                                 <td>{{ abs($movement->quantity) }}</td>
-                                <td>{{ $movement->product->supplier->contact_person ?? 'N/A' }}</td>
+                                <td>{{ $movement->product?->supplier?->contact_person ?? 'N/A' }}</td>
                                 <td>
                                     <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
                                         class="btn btn-sm btn-outline-primary" title="View Details">

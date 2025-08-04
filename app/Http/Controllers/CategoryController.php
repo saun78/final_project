@@ -126,6 +126,7 @@ class CategoryController extends Controller
     public function getProducts(Category $category)
     {
         $products = $category->products()
+            ->whereNull('deleted_at')
             ->with(['brand', 'supplier'])
             ->orderBy('name')
             ->get();

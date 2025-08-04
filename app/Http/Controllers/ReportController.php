@@ -16,6 +16,11 @@ class ReportController extends Controller
         // Get all order items joined with products, categories, brands, and orders
         $query = \App\Models\OrderItem::with(['product.category', 'product.brand', 'order']);
 
+        // Exclude soft-deleted products
+        $query->whereHas('product', function($q) {
+            $q->whereNull('deleted_at');
+        });
+
         // Date filter (by order created_at)
         if ($request->filled('start_date')) {
             $query->whereHas('order', function($q) use ($request) {
@@ -72,6 +77,12 @@ class ReportController extends Controller
 
         // Get all order items joined with orders and products
         $query = \App\Models\OrderItem::with(['order', 'product']);
+        
+        // Exclude soft-deleted products
+        $query->whereHas('product', function($q) {
+            $q->whereNull('deleted_at');
+        });
+        
         $query->whereHas('order', function($q) use ($startDate, $endDate, $paymentMethod) {
             if ($startDate && $endDate) {
                 $q->whereDate('created_at', '>=', $startDate)
