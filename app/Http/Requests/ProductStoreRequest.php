@@ -23,8 +23,8 @@ class ProductStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'part_number' => 'nullable|string|max:50|unique:product,part_number',
-            'name' => 'required|string|max:255|unique:product,name',
+            'part_number' => 'nullable|string|max:50|unique:product,part_number,NULL,id,deleted_at,NULL',
+            'name' => 'required|string|max:255|unique:product,name,NULL,id,deleted_at,NULL',
             'category_id' => 'required|exists:category,id',
             'brand_id' => 'required|exists:brand,id',
             'supplier_id' => 'required|exists:supplier,id',

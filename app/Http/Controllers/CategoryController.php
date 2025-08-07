@@ -56,7 +56,6 @@ class CategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'unique:category,name',
                 'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
             ],
         ], [
@@ -65,6 +64,12 @@ class CategoryController extends Controller
 
         // Remove extra spaces and convert to proper case
         $validated['name'] = ucwords(strtolower(trim($validated['name'])));
+        
+        // Check for case-insensitive duplicate
+        $existingCategory = Category::whereRaw('LOWER(name) = ?', [strtolower($validated['name'])])->first();
+        if ($existingCategory) {
+            return back()->withErrors(['name' => 'A category with this name already exists. Please choose a different name.'])->withInput();
+        }
 
         Category::create($validated);
 
@@ -84,7 +89,6 @@ class CategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('category', 'name')->ignore($category->id),
                 'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
             ],
         ], [
@@ -93,6 +97,14 @@ class CategoryController extends Controller
 
         // Remove extra spaces and convert to proper case
         $validated['name'] = ucwords(strtolower(trim($validated['name'])));
+        
+        // Check for case-insensitive duplicate (excluding current category)
+        $existingCategory = Category::whereRaw('LOWER(name) = ?', [strtolower($validated['name'])])
+            ->where('id', '!=', $category->id)
+            ->first();
+        if ($existingCategory) {
+            return back()->withErrors(['name' => 'A category with this name already exists. Please choose a different name.'])->withInput();
+        }
 
         $category->update($validated);
 

@@ -36,6 +36,7 @@ return new class extends Migration
             $table->index('name');
             $table->index(['category_id', 'brand_id']);
             $table->index('quantity');
+            $table->softDeletes();
         });
     }
 

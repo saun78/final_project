@@ -62,7 +62,14 @@ class SupplierController extends Controller
             'contact_number.regex' => 'Contact number can only contain numbers, dashes, plus signs, parentheses, and spaces.',
         ]);
 
+        // Normalize the contact person name
         $validated['contact_person'] = ucwords(strtolower(trim($validated['contact_person'])));
+        
+        // Check for case-insensitive duplicate
+        $existingSupplier = Supplier::whereRaw('LOWER(contact_person) = ?', [strtolower($validated['contact_person'])])->first();
+        if ($existingSupplier) {
+            return back()->withErrors(['contact_person' => 'A supplier with this contact person name already exists. Please choose a different name.'])->withInput();
+        }
 
         Supplier::create($validated);
 
@@ -91,7 +98,16 @@ class SupplierController extends Controller
             'contact_number.regex' => 'Contact number can only contain numbers, dashes, plus signs, parentheses, and spaces.',
         ]);
 
+        // Normalize the contact person name
         $validated['contact_person'] = ucwords(strtolower(trim($validated['contact_person'])));
+        
+        // Check for case-insensitive duplicate (excluding current supplier)
+        $existingSupplier = Supplier::whereRaw('LOWER(contact_person) = ?', [strtolower($validated['contact_person'])])
+            ->where('id', '!=', $supplier->id)
+            ->first();
+        if ($existingSupplier) {
+            return back()->withErrors(['contact_person' => 'A supplier with this contact person name already exists. Please choose a different name.'])->withInput();
+        }
 
         $supplier->update($validated);
 

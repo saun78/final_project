@@ -43,7 +43,7 @@
                             <h5>Order Items (Cannot be changed)</h5>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered">
-                                    <thead class="table-dark">
+                                <thead style="background-color: #f8f9fa; color: black;">
                                         <tr>
                                             <th>Product/Part</th>
                                             <th>Quantity</th>

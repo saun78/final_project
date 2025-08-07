@@ -303,14 +303,26 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="contact_person" class="form-label">Contact Person</label>
-                        <input type="text" class="form-control" id="contact_person" name="contact_person" required 
-                            placeholder="e.g. John Smith">
+                        <input type="text" class="form-control @error('contact_person') is-invalid @enderror" 
+                               id="contact_person" name="contact_person" required 
+                               placeholder="e.g. John Smith" value="{{ old('contact_person') }}">
+                        @error('contact_person')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters and spaces are allowed.</div>
                     </div>
                     <div class="mb-3">
                         <label for="contact_number" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control" id="contact_number" name="contact_number" required 
-                            placeholder="e.g. +1-234-567-8900">
+                        <input type="text" class="form-control @error('contact_number') is-invalid @enderror" 
+                               id="contact_number" name="contact_number" required 
+                               placeholder="e.g. +1-234-567-8900" value="{{ old('contact_number') }}">
+                        @error('contact_number')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -336,12 +348,24 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit_contact_person" class="form-label">Contact Person</label>
-                        <input type="text" class="form-control" id="edit_contact_person" name="contact_person" required>
+                        <input type="text" class="form-control @error('contact_person') is-invalid @enderror" 
+                               id="edit_contact_person" name="contact_person" required value="{{ old('contact_person') }}">
+                        @error('contact_person')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters and spaces are allowed.</div>
                     </div>
                     <div class="mb-3">
                         <label for="edit_contact_number" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control" id="edit_contact_number" name="contact_number" required>
+                        <input type="text" class="form-control @error('contact_number') is-invalid @enderror" 
+                               id="edit_contact_number" name="contact_number" required value="{{ old('contact_number') }}">
+                        @error('contact_number')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -468,6 +492,13 @@ document.addEventListener('DOMContentLoaded', function() {
             hideProductsSidebar();
         }
     });
+    
+    // Show modal if there are validation errors
+    @if($errors->any())
+        if (document.querySelector('.is-invalid')) {
+            new bootstrap.Modal(document.getElementById('addSupplierModal')).show();
+        }
+    @endif
 });
 
 if (searchInput) {

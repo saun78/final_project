@@ -299,8 +299,14 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="category_name" class="form-label">Category Name</label>
-                        <input type="text" class="form-control" id="category_name" name="name" required 
-                            placeholder="e.g. Engine Parts">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               id="category_name" name="name" required 
+                               placeholder="e.g. Engine Parts" value="{{ old('name') }}">
+                        @error('name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
                     </div>
                 </div>
@@ -327,7 +333,13 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit_category_name" class="form-label">Category Name</label>
-                        <input type="text" class="form-control" id="edit_category_name" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               id="edit_category_name" name="name" required value="{{ old('name') }}">
+                        @error('name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
                     </div>
                 </div>
@@ -453,6 +465,13 @@ document.addEventListener('DOMContentLoaded', function() {
             hideProductsSidebar();
         }
     });
+    
+    // Show modal if there are validation errors
+    @if($errors->any())
+        if (document.querySelector('.is-invalid')) {
+            new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+        }
+    @endif
 });
 
 searchInput.addEventListener('input', function(e) {

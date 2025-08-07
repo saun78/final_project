@@ -55,7 +55,6 @@ class BrandController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'unique:brand,name',
                 'regex:/^[a-zA-Z0-9\s]+$/',
             ],
         ], [
@@ -64,6 +63,12 @@ class BrandController extends Controller
 
         // Remove extra spaces and convert to proper case
         $validated['name'] = ucwords(strtolower(trim($validated['name'])));
+        
+        // Check for case-insensitive duplicate
+        $existingBrand = Brand::whereRaw('LOWER(name) = ?', [strtolower($validated['name'])])->first();
+        if ($existingBrand) {
+            return back()->withErrors(['name' => 'A brand with this name already exists. Please choose a different name.'])->withInput();
+        }
 
         Brand::create($validated);
 
@@ -83,7 +88,6 @@ class BrandController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('brand', 'name')->ignore($brand->id),
                 'regex:/^[a-zA-Z0-9\s]+$/', // Only letters, numbers, and spaces
             ],
         ], [
@@ -92,6 +96,14 @@ class BrandController extends Controller
 
         // Remove extra spaces and convert to proper case
         $validated['name'] = ucwords(strtolower(trim($validated['name'])));
+        
+        // Check for case-insensitive duplicate (excluding current brand)
+        $existingBrand = Brand::whereRaw('LOWER(name) = ?', [strtolower($validated['name'])])
+            ->where('id', '!=', $brand->id)
+            ->first();
+        if ($existingBrand) {
+            return back()->withErrors(['name' => 'A brand with this name already exists. Please choose a different name.'])->withInput();
+        }
 
         $brand->update($validated);
 

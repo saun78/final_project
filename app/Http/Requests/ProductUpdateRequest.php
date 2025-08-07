@@ -25,8 +25,8 @@ class ProductUpdateRequest extends FormRequest
         $productId = $this->route('product')->id;
 
         return [
-            'part_number' => ['nullable', 'string', 'max:50', Rule::unique('product', 'part_number')->ignore($productId)],
-            'name' => ['required', 'string', 'max:255', Rule::unique('product', 'name')->ignore($productId)],
+            'part_number' => ['nullable', 'string', 'max:50', Rule::unique('product', 'part_number')->ignore($productId)->whereNull('deleted_at')],
+            'name' => ['required', 'string', 'max:255', Rule::unique('product', 'name')->ignore($productId)->whereNull('deleted_at')],
             'category_id' => 'required|exists:category,id',
             'brand_id' => 'required|exists:brand,id',
             'supplier_id' => 'required|exists:supplier,id',

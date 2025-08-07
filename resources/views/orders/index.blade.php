@@ -227,7 +227,7 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Confirm Deletion
+                    <i class="bi bi-exclamation-triangle me-2"></i>Confirm to Delete
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

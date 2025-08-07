@@ -298,8 +298,14 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="brand_name" class="form-label">Brand Name</label>
-                        <input type="text" class="form-control" id="brand_name" name="name" required 
-                            placeholder="e.g. Honda">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               id="brand_name" name="name" required 
+                               placeholder="e.g. Honda" value="{{ old('name') }}">
+                        @error('name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
                     </div>
                 </div>
@@ -326,7 +332,13 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit_brand_name" class="form-label">Brand Name</label>
-                        <input type="text" class="form-control" id="edit_brand_name" name="name" required>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               id="edit_brand_name" name="name" required value="{{ old('name') }}">
+                        @error('name')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                         <div class="form-text">Only letters, numbers, and spaces are allowed.</div>
                     </div>
                 </div>
@@ -452,6 +464,13 @@ document.addEventListener('DOMContentLoaded', function() {
             hideProductsSidebar();
         }
     });
+    
+    // Show modal if there are validation errors
+    @if($errors->any())
+        if (document.querySelector('.is-invalid')) {
+            new bootstrap.Modal(document.getElementById('addBrandModal')).show();
+        }
+    @endif
 });
 
 searchInput.addEventListener('input', function(e) {

@@ -87,12 +87,10 @@
                                         <span>Items Subtotal:</span>
                                         <span>${{ number_format($itemsSubtotal, 2) }}</span>
                                     </div>
-                                    @if($order->labor_fee > 0)
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span>Labor Fee:</span>
-                                            <span>${{ number_format($order->labor_fee, 2) }}</span>
-                                        </div>
-                                    @endif
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Labor Fee:</span>
+                                        <span>${{ number_format($order->labor_fee, 2) }}</span>
+                                    </div>
                                     <hr>
                                     <div class="d-flex justify-content-between">
                                         <strong>Total Amount:</strong>
@@ -143,12 +141,10 @@
                                     <th colspan="4" class="text-end">Items Subtotal:</th>
                                     <th>${{ number_format($itemsTotal, 2) }}</th>
                                 </tr>
-                                @if($order->labor_fee > 0)
-                                    <tr>
-                                        <th colspan="4" class="text-end">Labor Fee:</th>
-                                        <th>${{ number_format($order->labor_fee, 2) }}</th>
-                                    </tr>
-                                @endif
+                                <tr>
+                                    <th colspan="4" class="text-end">Labor Fee:</th>
+                                    <th>${{ number_format($order->labor_fee, 2) }}</th>
+                                </tr>
                                 <tr class="table-active">
                                     <th colspan="4" class="text-end">Total:</th>
                                     <th>${{ number_format($order->amount, 2) }}</th>

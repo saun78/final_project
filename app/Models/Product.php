@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -32,6 +33,7 @@ class Product extends Model
         'quantity' => 'integer',
         'purchase_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
+        'deleted_at' => 'datetime'
     ];
 
     /**

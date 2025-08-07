@@ -158,9 +158,18 @@
                 <div class="col-8"></div>
                 <div class="col-4">
                     <table class="table table-borderless">
+                        @php
+                            $itemsSubtotal = $order->orderItems->sum(function($item) {
+                                return $item->quantity * $item->price;
+                            });
+                        @endphp
                         <tr>
-                            <td><strong>Subtotal:</strong></td>
-                            <td class="text-end">${{ number_format($order->amount, 2) }}</td>
+                            <td><strong>Items Subtotal:</strong></td>
+                            <td class="text-end">${{ number_format($itemsSubtotal, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Labor Fee:</strong></td>
+                            <td class="text-end">${{ number_format($order->labor_fee, 2) }}</td>
                         </tr>
                         <tr class="total-row">
                             <td><strong>TOTAL:</strong></td>

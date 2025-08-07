@@ -170,12 +170,10 @@
                 <td><strong>Items Subtotal:</strong></td>
                 <td style="text-align: right;">${{ number_format($itemsSubtotal, 2) }}</td>
             </tr>
-            @if($order->labor_fee > 0)
-                <tr>
-                    <td><strong>Labor Fee:</strong></td>
-                    <td style="text-align: right;">${{ number_format($order->labor_fee, 2) }}</td>
-                </tr>
-            @endif
+            <tr>
+                <td><strong>Labor Fee:</strong></td>
+                <td style="text-align: right;">${{ number_format($order->labor_fee, 2) }}</td>
+            </tr>
             <tr class="total-row">
                 <td><strong>TOTAL:</strong></td>
                 <td style="text-align: right;"><strong>${{ number_format($order->amount, 2) }}</strong></td>

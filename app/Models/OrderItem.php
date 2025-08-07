@@ -39,52 +39,6 @@ class OrderItem extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    /**
-     * Get the product name (from stored data or relationship)
-     */
-    public function getProductNameAttribute()
-    {
-        return $this->attributes['product_name'] ?? $this->product?->name ?? 'Unknown Product';
-    }
-
-    /**
-     * Get the product part number (from stored data or relationship)
-     */
-    public function getProductPartNumberAttribute()
-    {
-        return $this->attributes['product_part_number'] ?? $this->product?->part_number;
-    }
-
-    /**
-     * Get the supplier contact person (from stored data or relationship)
-     */
-    public function getSupplierContactPersonAttribute()
-    {
-        return $this->attributes['supplier_contact_person'] ?? $this->product?->supplier?->contact_person ?? 'N/A';
-    }
-
-    /**
-     * Get the supplier name (from stored data or relationship)
-     */
-    public function getSupplierNameAttribute()
-    {
-        return $this->attributes['supplier_name'] ?? $this->product?->supplier?->name ?? 'N/A';
-    }
-
-    /**
-     * Populate product information fields when product is set
-     */
-    public function populateProductInfo()
-    {
-        if ($this->product) {
-            $this->product_name = $this->product->name;
-            $this->product_part_number = $this->product->part_number;
-            $this->supplier_name = $this->product->supplier?->name;
-            $this->supplier_contact_person = $this->product->supplier?->contact_person;
-            $this->save();
-        }
-    }
-
     public function getSubtotalAttribute()
     {
         return $this->quantity * $this->price;

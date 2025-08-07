@@ -148,7 +148,6 @@ class OrderController extends Controller
                         'cost_price' => 0, // Will be updated after FIFO calculation
                         'product_name' => $product->name,
                         'product_part_number' => $product->part_number,
-                        'supplier_name' => $product->supplier?->name,
                         'supplier_contact_person' => $product->supplier?->contact_person,
                     ]);
 
