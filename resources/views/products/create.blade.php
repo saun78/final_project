@@ -137,7 +137,7 @@
                             <div class="col-md-4">
                                 <label for="purchase_price" class="form-label">Purchase Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control @error('purchase_price') is-invalid @enderror" 
                                         id="purchase_price" name="purchase_price" value="{{ old('purchase_price') }}" 
                                         step="0.01" min="0" required>
@@ -150,7 +150,7 @@
                             <div class="col-md-4">
                                 <label for="selling_price" class="form-label">Selling Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control @error('selling_price') is-invalid @enderror" 
                                         id="selling_price" name="selling_price" value="{{ old('selling_price') }}" 
                                         step="0.01" min="0" required>

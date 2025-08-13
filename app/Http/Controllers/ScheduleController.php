@@ -52,6 +52,7 @@ class ScheduleController extends Controller
             'appointment_date' => 'required|date',
             'appointment_time' => 'required',
             'description' => 'nullable|string',
+            'location' => 'nullable|string',
         ]);
 
         // Prevent past date/time

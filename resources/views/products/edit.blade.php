@@ -135,7 +135,7 @@
                             <div class="col-md-4">
                                 <label for="purchase_price" class="form-label">Average Purchase Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control bg-light" 
                                         id="purchase_price" name="purchase_price" 
                                         value="{{ $product->inventoryBatches()->where('quantity', '>', 0)->exists() 
@@ -148,7 +148,7 @@
                             <div class="col-md-4">
                                 <label for="selling_price" class="form-label">Current Selling Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control bg-light" 
                                         id="selling_price" name="selling_price" value="{{ number_format($product->selling_price, 2) }}" 
                                         readonly>

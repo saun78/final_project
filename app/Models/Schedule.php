@@ -17,5 +17,6 @@ class Schedule extends Model
         'appointment_date',
         'appointment_time',
         'description',
+        'location',
     ];
 } 

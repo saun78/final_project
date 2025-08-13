@@ -147,11 +147,11 @@
                     <!-- Price Range -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label for="minPrice" class="form-label">Min Price ($)</label>
+                            <label for="minPrice" class="form-label">Min Price (RM)</label>
                             <input type="number" name="min_price" class="form-control" id="minPrice" placeholder="0.00" step="0.01" value="{{ request('min_price') }}">
                         </div>
                         <div class="col-md-6">
-                            <label for="maxPrice" class="form-label">Max Price ($)</label>
+                            <label for="maxPrice" class="form-label">Max Price (RM)</label>
                             <input type="number" name="max_price" class="form-control" id="maxPrice" placeholder="999.99" step="0.01" value="{{ request('max_price') }}">
                         </div>
                     </div>
@@ -294,11 +294,11 @@
                                                 ? $product->inventoryBatches()->where('quantity', '>', 0)->get()->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $product->inventoryBatches()->where('quantity', '>', 0)->sum('quantity')
                                                 : $product->purchase_price;
                                         @endphp
-                                        <span class="fw-semibold">${{ number_format($avgCost, 2) }}</span>
+                                        <span class="fw-semibold">RM{{ number_format($avgCost, 2) }}</span>
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted d-block">Selling</small>
-                                        <span class="fw-semibold text-success">${{ number_format($product->selling_price, 2) }}</span>
+                                        <span class="fw-semibold text-success">RM{{ number_format($product->selling_price, 2) }}</span>
                                     </div>
                                 </div>
                                 
@@ -478,12 +478,12 @@
                                         ? $product->inventoryBatches()->where('quantity', '>', 0)->get()->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $product->inventoryBatches()->where('quantity', '>', 0)->sum('quantity')
                                         : $product->purchase_price;
                                 @endphp
-                                <span class="text-nowrap">${{ number_format($avgCost, 2) }}</span>
+                                <span class="text-nowrap">RM{{ number_format($avgCost, 2) }}</span>
                             </td>
                             
                             <!-- Selling Price -->
                             <td class="align-middle text-end">
-                                <span class="text-nowrap fw-semibold">${{ number_format($product->selling_price, 2) }}</span>
+                                <span class="text-nowrap fw-semibold">RM{{ number_format($product->selling_price, 2) }}</span>
                             </td>
                             
                             <!-- Batch Info -->
@@ -621,8 +621,8 @@
                         <p><strong>Supplier:</strong> <span id="modalSupplier"></span></p>
                         <p><strong>Location:</strong> <span id="modalLocation"></span></p>
                         <p><strong>Quantity:</strong> <span id="modalQuantity"></span></p>
-                        <p><strong>Purchase Price:</strong> $<span id="modalPurchasePrice"></span></p>
-                        <p><strong>Selling Price:</strong> $<span id="modalSellingPrice"></span></p>
+                        <p><strong>Purchase Price:</strong> RM<span id="modalPurchasePrice"></span></p>
+                        <p><strong>Selling Price:</strong> RM<span id="modalSellingPrice"></span></p>
                         <p><strong>Description:</strong></p>
                         <p id="modalDescription"></p>
                     </div>

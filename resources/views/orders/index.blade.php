@@ -152,7 +152,7 @@
                             </div>
                             <div class="d-flex align-items-center gap-3">
                                 <span class="badge bg-primary fs-6">{{ $currentOrders->count() }} receipts</span>
-                                <span class="text-muted">Total: <strong class="text-success">${{ number_format($currentOrders->sum('amount'), 2) }}</strong></span>
+                                <span class="text-muted">Total: <strong class="text-success">RM{{ number_format($currentOrders->sum('amount'), 2) }}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -184,7 +184,7 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="fw-bold text-success fs-6">${{ number_format($order->amount, 2) }}</span>
+                                                <span class="fw-bold text-success fs-6">RM{{ number_format($order->amount, 2) }}</span>
                                             </td>
                                             <td>
                                                 <small class="text-muted">{{ $order->created_at->format('M j, Y') }}</small>

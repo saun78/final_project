@@ -29,7 +29,7 @@
                 <h6 class="mb-0">
                     <i class="bi bi-currency-dollar"></i> Selling Price Management
                 </h6>
-                <span class="text-muted">Current: ${{ number_format($product->selling_price, 2) }}</span>
+                <span class="text-muted">Current: RM{{ number_format($product->selling_price, 2) }}</span>
             </div>
         </div>
         <div class="card-body">
@@ -40,7 +40,7 @@
                 <div class="col-md-8">
                     <label for="selling_price" class="form-label">New Selling Price</label>
                     <div class="input-group">
-                        <span class="input-group-text">$</span>
+                        <span class="input-group-text">RM</span>
                         <input type="number" 
                                class="form-control" 
                                id="selling_price" 
@@ -108,14 +108,14 @@
                                         {{ $batch->quantity }}
                                     </span>
                                 </td>
-                                <td class="fw-bold text-primary">${{ number_format($batch->purchase_price, 2) }}</td>
-                                <td class="fw-bold text-success">${{ number_format($product->selling_price, 2) }}</td>
+                                <td class="fw-bold text-primary">RM{{ number_format($batch->purchase_price, 2) }}</td>
+                                <td class="fw-bold text-success">RM{{ number_format($product->selling_price, 2) }}</td>
                                 <td>
                                     @php
                                         $profit = $product->selling_price - $batch->purchase_price;
                                     @endphp
                                     <span class="fw-bold text-{{ $profit >= 0 ? 'success' : 'danger' }}">
-                                        ${{ number_format($profit, 2) }}
+                                        RM{{ number_format($profit, 2) }}
                                         @if($batch->purchase_price > 0)
                                             <small class="text-muted">({{ number_format(($profit / $batch->purchase_price) * 100, 1) }}%)</small>
                                         @endif
@@ -164,14 +164,14 @@
                                     <td>
                                         <span class="badge bg-dark">0</span>
                                     </td>
-                                    <td class="text-muted">${{ number_format($batch->purchase_price, 2) }}</td>
-                                    <td class="text-muted">${{ number_format($product->selling_price, 2) }}</td>
+                                    <td class="text-muted">{RM{ number_format($batch->purchase_price, 2) }}</td>
+                                    <td class="text-muted">RM{{ number_format($product->selling_price, 2) }}</td>
                                     <td>
                                         @php
                                             $profit = $product->selling_price - $batch->purchase_price;
                                         @endphp
                                         <span class="text-muted">
-                                            ${{ number_format($profit, 2) }}
+                                            Rm{{ number_format($profit, 2) }}
                                             @if($batch->purchase_price > 0)
                                                 <small>({{ number_format(($profit / $batch->purchase_price) * 100, 1) }}%)</small>
                                             @endif
@@ -213,15 +213,15 @@
                                         $activeBatches = $batches->where('quantity', '>', 0);
                                         $avgPurchasePrice = $activeQuantity > 0 ? $activeBatches->sum(function($batch) { return $batch->quantity * $batch->purchase_price; }) / $activeQuantity : 0;
                                     @endphp
-                                    <span class="text-primary">Avg: ${{ number_format($avgPurchasePrice, 2) }}</span>
+                                    <span class="text-primary">Avg: RM{{ number_format($avgPurchasePrice, 2) }}</span>
                                 </th>
-                                <th class="text-success">${{ number_format($product->selling_price, 2) }}</th>
+                                <th class="text-success">RM{{ number_format($product->selling_price, 2) }}</th>
                                 <th>
                                     @php
                                         $avgProfit = $product->selling_price - $avgPurchasePrice;
                                     @endphp
                                     <span class="text-{{ $avgProfit >= 0 ? 'success' : 'danger' }}">
-                                        ${{ number_format($avgProfit, 2) }}
+                                        RM{{ number_format($avgProfit, 2) }}
                                     </span>
                                 </th>
                                 <th></th>
@@ -260,7 +260,7 @@
                             <p class="mb-0">
                                 <strong>Next out:</strong> {{ $nextBatch->batch_no ?? 'No active batches' }} 
                                 @if($nextBatch)
-                                    - {{ $nextBatch->quantity }} units at ${{ number_format($nextBatch->purchase_price, 2) }}
+                                    - {{ $nextBatch->quantity }} units at RM{{ number_format($nextBatch->purchase_price, 2) }}
                                 @endif
                             </p>
                         </div>
@@ -357,7 +357,7 @@
                                             <small><strong>Received:</strong> {{ $batch->received_date->format('M d, Y') }}</small>
                                         </div>
                                         <div class="col-md-6">
-                                            <small><strong>Purchase Price:</strong> ${{ number_format($batch->purchase_price, 2) }}</small>
+                                            <small><strong>Purchase Price:</strong> RM{{ number_format($batch->purchase_price, 2) }}</small>
                                         </div>
                                     </div>
                                 </div>
@@ -390,9 +390,9 @@
                                                             {{ $orderData['quantity_sold'] }}
                                                         </span>
                                                     </td>
-                                                    <td>${{ number_format($orderData['unit_cost'], 2) }}</td>
+                                                    <td>RM{{ number_format($orderData['unit_cost'], 2) }}</td>
                                                     <td>
-                                                        <strong>${{ number_format($orderData['quantity_sold'] * $orderData['unit_cost'], 2) }}</strong>
+                                                        <strong>RM{{ number_format($orderData['quantity_sold'] * $orderData['unit_cost'], 2) }}</strong>
                                                     </td>
                                                     <td>
                                                         @if($orderData['is_cancelled'])
@@ -426,7 +426,7 @@
                                                 </th>
                                                 <th colspan="2">
                                                     <strong>
-                                                        ${{ number_format($batch->orders->where('is_cancelled', false)->sum(function($order) { 
+                                                        RM{{ number_format($batch->orders->where('is_cancelled', false)->sum(function($order) { 
                                                             return $order['quantity_sold'] * $order['unit_cost']; 
                                                         }), 2) }}
                                                     </strong>
