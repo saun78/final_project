@@ -63,10 +63,10 @@
                         </div>
                     @endif
 
-                    <div class="alert alert-info">
+                    <!-- <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>
                         <strong>Note:</strong> Products with zero stock (out of stock) are disabled and cannot be selected for orders.
-                    </div>
+                    </div> -->
 
                     <form action="{{ route('orders.store') }}" method="POST" id="orderForm">
                         @csrf
@@ -76,7 +76,7 @@
                             <div id="orderItems">
                                 <div class="order-item row mb-3">
                                     <div class="col-md-3">
-                                        <label class="form-label">Product/Part</label>
+                                        <label class="form-label">Product/Part <span class="text-danger">*</span></label>
                                         <select name="items[0][product_id]" class="form-select product-select" required>
                                             <option value="">Select Product</option>
                                             @foreach($products as $product)
@@ -139,7 +139,7 @@
                                         <h5>Payment Details</h5>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label">Payment Method</label>
+                                            <label class="form-label">Payment Method <span class="text-danger">*</span></label>
                                             <select name="payment_method" class="form-select" required>
                                                 <option value="">Select Payment Method</option>
                                                 <option value="cash">Cash</option>

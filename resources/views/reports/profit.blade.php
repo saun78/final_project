@@ -9,6 +9,16 @@
                     <h3 class="card-title">Profit Report</h3>
                 </div>
                 <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <canvas id="profitChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <form action="{{ route('reports.profit') }}" method="GET" class="mb-4">
                         <div class="row align-items-end g-2">
                             <div class="col-auto">
@@ -83,16 +93,6 @@
                             document.getElementById('end_date').value = format(end);
                         });
                     </script>
-
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card">
-                                <div class="card-body">
-                                    <canvas id="profitChart" height="100"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script>
                         @php

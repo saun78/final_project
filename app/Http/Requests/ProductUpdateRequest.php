@@ -32,9 +32,6 @@ class ProductUpdateRequest extends FormRequest
             'supplier_id' => 'required|exists:supplier,id',
             'location' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'quantity' => 'nullable|integer|min:0',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'selling_price' => 'nullable|numeric|min:0|gte:purchase_price',
             'picture' => 'nullable|image|max:2048', // Max 2MB
         ];
     }

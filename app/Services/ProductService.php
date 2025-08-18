@@ -120,15 +120,30 @@ class ProductService
         // Store original data for activity logging
         $originalData = $product->getOriginal();
         
-        if (isset($data['picture']) && $data['picture']) {
+        // Only allow updating specific fields in edit form
+        $allowedFields = [
+            'part_number',
+            'name', 
+            'category_id',
+            'brand_id',
+            'supplier_id',
+            'location',
+            'description',
+            'picture'
+        ];
+        
+        // Filter data to only include allowed fields
+        $updateData = array_intersect_key($data, array_flip($allowedFields));
+        
+        if (isset($updateData['picture']) && $updateData['picture']) {
             // Delete old picture if exists
             if ($product->picture) {
                 Storage::disk('public')->delete($product->picture);
             }
-            $data['picture'] = $data['picture']->store('products', 'public');
+            $updateData['picture'] = $updateData['picture']->store('products', 'public');
         }
 
-        $product->update($data);
+        $product->update($updateData);
         
         return $product;
     }

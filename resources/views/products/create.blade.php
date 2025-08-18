@@ -11,6 +11,11 @@
                     <h5 class="card-title mb-0">Add New Part</h5>
                 </div>
                 <div class="card-body">
+                    <!-- Required Fields Notice -->
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle"></i> Fields marked with <span class="text-danger">*</span> are required.
+                    </div>
+                    
                     <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
@@ -24,7 +29,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="name" class="form-label">Part Name</label>
+                                <label for="name" class="form-label">Part Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                     id="name" name="name" value="{{ old('name') }}" required>
                                 @error('name')
@@ -36,7 +41,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label for="category_id" class="form-label mb-0">Category</label>
+                                    <label for="category_id" class="form-label mb-0">Category <span class="text-danger">*</span></label>
                                     <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
@@ -56,7 +61,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label for="brand_id" class="form-label mb-0">Brand</label>
+                                    <label for="brand_id" class="form-label mb-0">Brand <span class="text-danger">*</span></label>
                                     <a href="{{ route('brands.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
@@ -76,7 +81,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label for="supplier_id" class="form-label mb-0">Supplier</label>
+                                    <label for="supplier_id" class="form-label mb-0">Supplier <span class="text-danger">*</span></label>
                                     <a href="{{ route('suppliers.index') }}" class="btn btn-outline-secondary btn-sm" target="_blank">
                                         <i class="bi bi-plus-lg"></i> Add New
                                     </a>
@@ -126,7 +131,7 @@
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label for="quantity" class="form-label">Initial Quantity</label>
+                                <label for="quantity" class="form-label">Initial Quantity <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control @error('quantity') is-invalid @enderror" 
                                     id="quantity" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
                                 <small class="text-muted">Will create initial batch if > 0</small>
@@ -135,7 +140,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label for="purchase_price" class="form-label">Purchase Price</label>
+                                <label for="purchase_price" class="form-label">Purchase Price <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control @error('purchase_price') is-invalid @enderror" 
@@ -148,7 +153,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label for="selling_price" class="form-label">Selling Price</label>
+                                <label for="selling_price" class="form-label">Selling Price <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">RM</span>
                                     <input type="number" class="form-control @error('selling_price') is-invalid @enderror" 
@@ -186,4 +191,31 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@push('styles')
+<style>
+/* Required field indicator styling */
+.text-danger {
+    font-weight: bold;
+}
+
+/* Make required field labels more prominent */
+.form-label:has(.text-danger) {
+    font-weight: 600;
+}
+
+/* Optional: Add subtle background to required fields */
+.form-control:required,
+.form-select:required {
+    border-left: 3px solid #dc3545;
+}
+
+/* Optional: Add focus effect for required fields */
+.form-control:required:focus,
+.form-select:required:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+</style>
+@endpush 

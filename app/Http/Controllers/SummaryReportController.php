@@ -46,9 +46,6 @@ class SummaryReportController extends Controller
             $tngAmount = $items->filter(function($item) {
                 return $item->order->payment_method === 'tng_wallet';
             })->sum(function($item) { return $item->quantity * $item->price; });
-            $cardAmount = $items->filter(function($item) {
-                return $item->order->payment_method === 'bank';
-            })->sum(function($item) { return $item->quantity * $item->price; });
             $bankTransferAmount = $items->filter(function($item) {
                 return $item->order->payment_method === 'bank_transfer';
             })->sum(function($item) { return $item->quantity * $item->price; });
@@ -69,7 +66,6 @@ class SummaryReportController extends Controller
                 'date' => $date,
                 'cash_amount' => $cashAmount,
                 'tng_amount' => $tngAmount,
-                'card_amount' => $cardAmount,
                 'bank_transfer_amount' => $bankTransferAmount,
                 'total_amount' => $totalAmount,
                 'receipts' => $receipts,
@@ -82,7 +78,6 @@ class SummaryReportController extends Controller
         $totalAmount = $salesData->sum('total_amount');
         $cashTotal = $salesData->sum('cash_amount');
         $tngTotal = $salesData->sum('tng_amount');
-        $cardTotal = $salesData->sum('card_amount');
         $bankTransferTotal = $salesData->sum('bank_transfer_amount');
 
         $salesData = $salesData->values(); // Ensure it's numerically indexed
@@ -92,7 +87,6 @@ class SummaryReportController extends Controller
         $totals = $salesData->pluck('total_amount')->toArray();
         $cashAmounts = $salesData->pluck('cash_amount')->toArray();
         $tngAmounts = $salesData->pluck('tng_amount')->toArray();
-        $cardAmounts = $salesData->pluck('card_amount')->toArray();
         $bankTransferAmounts = $salesData->pluck('bank_transfer_amount')->toArray();
 
         // Pagination
@@ -107,6 +101,6 @@ class SummaryReportController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('reports.summary', compact('salesData', 'chartData', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod', 'cashTotal', 'tngTotal', 'dates', 'totals', 'cashAmounts', 'tngAmounts', 'cardAmounts', 'bankTransferAmounts', 'cardTotal', 'bankTransferTotal'));
+        return view('reports.summary', compact('salesData', 'chartData', 'totalAmount', 'period', 'startDate', 'endDate', 'paymentMethod', 'cashTotal', 'tngTotal', 'bankTransferTotal'));
     }
 } 

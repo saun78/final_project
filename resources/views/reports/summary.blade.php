@@ -116,7 +116,7 @@
                     // Third chart: sales by payment method
                     const cashAmounts = @json($chartData->pluck('cash_amount')->values() ?? []);
                     const tngAmounts = @json($chartData->pluck('tng_amount')->values() ?? []);
-                    const cardAmounts = @json($chartData->pluck('card_amount')->values() ?? []);
+                    const bankTransferAmounts = @json($chartData->pluck('bank_transfer_amount')->values() ?? []);
                     const ctx3 = document.getElementById('paymentMethodLineChart').getContext('2d');
                     const paymentMethodLineChart = new Chart(ctx3, {
                         type: 'line',
@@ -140,8 +140,8 @@
                                     tension: 0.1
                                 },
                                 {
-                                    label: 'Card',
-                                    data: cardAmounts,
+                                    label: 'Bank Transfer',
+                                    data: bankTransferAmounts,
                                     borderColor: 'rgba(153, 102, 255, 1)',
                                     backgroundColor: 'rgba(153, 102, 255, 0.1)',
                                     fill: false,
@@ -192,7 +192,7 @@
                                 <select name="payment_method" id="payment_method" class="form-control">
                                     <option value="">All</option>
                                     <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                                    <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Bank Transfer</option>
+                                    <option value="bank_transfer" {{ request('payment_method') == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
                                     <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
                                 </select>
                             </div>
@@ -276,10 +276,10 @@
                             <div class="card bg-warning text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Bank Transfer Total</h5>
-                                    <h3 class="card-text">RM{{ number_format($cardTotal, 2) }}</h3>
+                                    <h3 class="card-text">RM{{ number_format($bankTransferTotal, 2) }}</h3>
                                     <div class="mt-2">
                                         <span class="fw-bold">Total Receipts:</span>
-                                        {{ $salesData->sum(fn($d) => $d->receipts->where('payment_method', 'Bank Transfer')->count()) }}
+                                        {{ $salesData->sum(fn($d) => $d->receipts->where('payment_method', 'bank_transfer')->count()) }}
                                     </div>
                                 </div>
                             </div>

@@ -201,8 +201,8 @@
                             @if($product->picture)
                                 <img src="{{ asset('storage/' . $product->picture) }}" 
                                      alt="{{ $product->name }}" 
-                                     class="card-img-top" 
-                                     style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+                                     class="card-img-top product-image" 
+                                     style="width: 100%; height: 100%; cursor: pointer;"
                                      onclick="showProductModal({
                                         id: {{ $product->id }},
                                         name: '{{ addslashes($product->name) }}',
@@ -678,11 +678,118 @@
     .col-xl-4, .col-lg-4, .col-md-4, .col-sm-6 {
         margin-bottom: 1rem;
     }
+    
+    /* Mobile image optimization */
+    .product-image {
+        padding: 5px;
+    }
+    
+    .card-img-container {
+        height: 180px !important;
+    }
+}
+
+/* Tablet optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .card-img-container {
+        height: 190px !important;
+    }
 }
 
 /* Loading animation for images */
 .card-img-top {
     transition: transform 0.3s ease;
+}
+
+/* Product image handling for different aspect ratios */
+.product-image {
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+/* Alternative: Use cover but with better centering for portrait images */
+.product-image-cover {
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Responsive image container */
+.card-img-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+/* Better image display for different orientations */
+.product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 0.375rem 0.375rem 0 0;
+}
+
+/* Hover effect for product images */
+.product-image:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Ensure consistent image display across different aspect ratios */
+.card-img-container img {
+    transition: all 0.3s ease;
+}
+
+/* Image loading states */
+.product-image {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-image.loaded {
+    opacity: 1;
+}
+
+.product-image.loading {
+    opacity: 0.3;
+}
+
+/* Error state for failed images */
+.product-image.error {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+/* Loading spinner for images */
+.card-img-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card-img-container:has(.product-image.loading)::before {
+    opacity: 1;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* Ensure consistent card heights */
@@ -975,7 +1082,52 @@ function switchView(viewType) {
 document.addEventListener('DOMContentLoaded', function() {
     const savedView = localStorage.getItem('productsViewPreference') || 'grid';
     switchView(savedView);
+    
+    // Optimize product images for different orientations
+    optimizeProductImages();
 });
+
+// Function to optimize product images based on their aspect ratio
+function optimizeProductImages() {
+    const productImages = document.querySelectorAll('.product-image');
+    
+    productImages.forEach(img => {
+        // Add loading state
+        img.classList.add('loading');
+        
+        img.addEventListener('load', function() {
+            const aspectRatio = this.naturalWidth / this.naturalHeight;
+            
+            // If image is portrait (height > width), use contain
+            // If image is landscape (width > height), use cover with center positioning
+            if (aspectRatio < 1) {
+                // Portrait image
+                this.style.objectFit = 'contain';
+                this.style.objectPosition = 'center';
+            } else {
+                // Landscape image
+                this.style.objectFit = 'cover';
+                this.style.objectPosition = 'center';
+            }
+            
+            // Add loaded class
+            this.classList.remove('loading');
+            this.classList.add('loaded');
+        });
+        
+        img.addEventListener('error', function() {
+            // Handle image loading errors
+            this.classList.remove('loading');
+            this.classList.add('error');
+            this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjhmOWZhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZjNzU3ZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+        });
+        
+        // Handle images that are already loaded
+        if (img.complete) {
+            img.dispatchEvent(new Event('load'));
+        }
+    });
+}
 
 // Global variable to store current product data for modal actions
 let currentModalProduct = null;
@@ -990,7 +1142,7 @@ function showProductModal(product) {
     // Update product image
     const imageContainer = document.getElementById('productImage');
     if (product.picture) {
-        imageContainer.innerHTML = `<img src="/storage/${product.picture}" alt="${product.name}" class="img-fluid rounded">`;
+        imageContainer.innerHTML = `<img src="/storage/${product.picture}" alt="${product.name}" class="img-fluid rounded" style="max-height: 300px; object-fit: contain; background-color: #f8f9fa; padding: 10px;">`;
     } else {
         imageContainer.innerHTML = `
             <div class="bg-light text-center p-5 rounded">

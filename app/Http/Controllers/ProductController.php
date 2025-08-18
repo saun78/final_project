@@ -145,7 +145,7 @@ class ProductController extends Controller
             
             // Update selling price if provided
             if ($request->filled('selling_price') && $request->selling_price != $product->selling_price) {
-                $product->update(['selling_price' => $request->selling_price]);
+                $product->updateWithPrices(['selling_price' => $request->selling_price]);
             }
             
             // Add the stock batch
@@ -211,7 +211,7 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
         ]);
 
-        $product->updateSellingPriceForAllBatches($request->selling_price);
+        $product->updateWithPrices(['selling_price' => $request->selling_price]);
 
         return redirect()->back()
             ->with('success', 'Selling price updated for all future transactions.');

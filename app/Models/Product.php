@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -23,9 +22,6 @@ class Product extends Model
         'supplier_id', // Required
         'location',
         'description',
-        'quantity',
-        'purchase_price',
-        'selling_price',
         'picture',
     ];
 
@@ -33,7 +29,6 @@ class Product extends Model
         'quantity' => 'integer',
         'purchase_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
-        'deleted_at' => 'datetime'
     ];
 
     /**
@@ -214,5 +209,30 @@ class Product extends Model
         $this->update(['selling_price' => $newSellingPrice]);
         
         return $this;
+    }
+
+    /**
+     * Update product with price fields (used for stock-in operations)
+     */
+    public function updateWithPrices(array $data)
+    {
+        // Temporarily allow price fields for this operation
+        $this->fillable = array_merge($this->fillable, ['quantity', 'purchase_price', 'selling_price']);
+        
+        $result = $this->update($data);
+        
+        // Reset fillable to original state
+        $this->fillable = [
+            'part_number',
+            'name',
+            'category_id',
+            'brand_id',
+            'supplier_id',
+            'location',
+            'description',
+            'picture',
+        ];
+        
+        return $result;
     }
 } 
