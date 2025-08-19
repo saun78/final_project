@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('batch_no')->nullable(); // 批次号（冗余存储，便于查询）
             $table->string('reference_type')->nullable(); // 关联类型 (order_item, receipt等)
             $table->unsignedBigInteger('reference_id')->nullable(); // 关联ID
-            $table->integer('quantity'); // 数量（正数=入库，负数=出库）
+            $table->integer('quantity'); // 数量（正数=入库，负数 =出库）
             $table->decimal('unit_cost', 10, 2)->nullable(); // 单位成本
             $table->decimal('total_cost', 10, 2)->nullable(); // 总成本
             $table->unsignedBigInteger('location_id')->nullable(); // 位置ID（如果需要）
@@ -30,7 +30,7 @@ return new class extends Migration
             // 外键约束
             $table->foreign('product_id')->references('id')->on('product')->onDelete('cascade');
             $table->foreign('batch_id')->references('id')->on('product_inventories')->onDelete('set null');
-            $table->foreign('location_id')->references('id')->on('inventory_location')->onDelete('set null');
+            $table->foreign('location_id')->references('id ')->on('inventory_location')->onDelete('set null');
             
             // 索引
             $table->index(['product_id', 'movement_date']);

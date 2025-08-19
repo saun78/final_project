@@ -626,6 +626,7 @@
 
 @push('styles')
 <style>
+    
 .product-card {
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     border: 1px solid #e3e6f0;
