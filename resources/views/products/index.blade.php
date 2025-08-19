@@ -499,7 +499,7 @@
                             <td class="align-middle text-center" onclick="event.stopPropagation();">
                                 <div class="dropdown">
                                     <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
-                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            data-bs-toggle="dropdown" aria-expanded="false" id="dB">
                                         <i class="bi bi-three-dots"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -1138,6 +1138,12 @@ function showProductModal(product) {
     
     // Update modal title
     document.getElementById('productModalLabel').textContent = product.name;
+
+    const myDropdownEl = document.getElementById('dB');
+  const dropdown = bootstrap.Dropdown.getOrCreateInstance(myDropdownEl);
+
+  // 调用 hide() 关闭
+  dropdown.hide();
     
     // Update product image
     const imageContainer = document.getElementById('productImage');
