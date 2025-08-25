@@ -193,7 +193,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'payment_method' => 'required|in:cash,card,tng_wallet',
+            'payment_method' => 'required|in:cash,bank_transfer,tng_wallet',
             'labor_fee' => 'nullable|numeric|min:0'
         ]);
 
@@ -206,7 +206,7 @@ class OrderController extends Controller
                 return $item->quantity * $item->price;
             }) + ($request->labor_fee ?? 0)
         ]);
-
+    
         return redirect()->route('orders.show', $order)->with('success', 'Order payment details updated successfully.');
     }
 

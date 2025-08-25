@@ -36,41 +36,65 @@ class SummaryReportController extends Controller
         $orderItems = $query->get();
 
         // Group by period (day or month) and aggregate payment method columns
-        $salesData = $orderItems->groupBy(function($item) use ($period) {
-            $date = $item->order->created_at;
-            return $period === 'monthly' ? $date->format('Y-m') : $date->format('Y-m-d');
-        })->map(function($items, $date) {
-            $cashAmount = $items->filter(function($item) {
-                return $item->order->payment_method === 'cash';
-            })->sum(function($item) { return $item->quantity * $item->price; });
-            $tngAmount = $items->filter(function($item) {
-                return $item->order->payment_method === 'tng_wallet';
-            })->sum(function($item) { return $item->quantity * $item->price; });
-            $bankTransferAmount = $items->filter(function($item) {
-                return $item->order->payment_method === 'bank_transfer';
-            })->sum(function($item) { return $item->quantity * $item->price; });
-            $totalAmount = $items->sum(function($item) { return $item->quantity * $item->price; });
+ // Group by period (day or month) and aggregate payment method columns
+$salesData = $orderItems->groupBy(function($item) use ($period) {
+    $date = $item->order->created_at;
+    return $period === 'monthly' ? $date->format('Y-m') : $date->format('Y-m-d');
+})->map(function($items, $date) {
+    // Sum up product amounts by payment method
+    $cashAmount = $items->filter(function($item) {
+        return $item->order->payment_method === 'cash';
+    })->sum(function($item) { return $item->quantity * $item->price; });
 
-            // Collect unique receipts for the day
-            $receipts = $items->pluck('order')->unique('id')->map(function($order) {
-                return [
-                    'order_number' => $order->order_number,
-                    'payment_method' => $order->payment_method,
-                    'time' => $order->created_at->format('H:i'),
-                    'total_amount' => $order->calculateTotal(),
-                    'id' => $order->id, // keep id for linking
-                ];
-            })->values();
+    $tngAmount = $items->filter(function($item) {
+        return $item->order->payment_method === 'tng_wallet';
+    })->sum(function($item) { return $item->quantity * $item->price; });
 
-            return (object) [
-                'date' => $date,
-                'cash_amount' => $cashAmount,
-                'tng_amount' => $tngAmount,
-                'bank_transfer_amount' => $bankTransferAmount,
-                'total_amount' => $totalAmount,
-                'receipts' => $receipts,
-            ];
-        })->sortBy('date');
+    $bankTransferAmount = $items->filter(function($item) {
+        return $item->order->payment_method === 'bank_transfer';
+    })->sum(function($item) { return $item->quantity * $item->price; });
+
+    // Add labor fees for this group
+    $laborFeeTotal = $items->pluck('order')
+        ->unique('id')
+        ->sum('labor_fee'); // assumes your orders table has "labor_fee" column
+
+    // Add labor fee into totals
+    $cashAmount += $items->pluck('order')->unique('id')
+        ->filter(fn($order) => $order->payment_method === 'cash')
+        ->sum('labor_fee');
+
+    $tngAmount += $items->pluck('order')->unique('id')
+        ->filter(fn($order) => $order->payment_method === 'tng_wallet')
+        ->sum('labor_fee');
+
+    $bankTransferAmount += $items->pluck('order')->unique('id')
+        ->filter(fn($order) => $order->payment_method === 'bank_transfer')
+        ->sum('labor_fee');
+
+    $totalAmount = $cashAmount + $tngAmount + $bankTransferAmount;
+
+    // Collect unique receipts for the day
+    $receipts = $items->pluck('order')->unique('id')->map(function($order) {
+        return [
+            'order_number' => $order->order_number,
+            'payment_method' => $order->payment_method,
+            'time' => $order->created_at->format('H:i'),
+            'total_amount' => $order->calculateTotal() + $order->labor_fee, // include labor fee
+            'id' => $order->id,
+        ];
+    })->values();
+
+    return (object) [
+        'date' => $date,
+        'cash_amount' => $cashAmount,
+        'tng_amount' => $tngAmount,
+        'bank_transfer_amount' => $bankTransferAmount,
+        'labor_fee_total' => $laborFeeTotal,
+        'total_amount' => $totalAmount,
+        'receipts' => $receipts,
+    ];
+})->sortBy('date');
 
         $chartData = $salesData; // for chart (original order)
         $salesData = $salesData->sortByDesc('date'); // for table (descending)
