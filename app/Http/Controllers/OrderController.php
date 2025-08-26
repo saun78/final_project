@@ -438,8 +438,11 @@ class OrderController extends Controller
         }
 
         // Format price columns as currency
-        $sheet->getStyle('E5:I' . ($row - 1))->getNumberFormat()
-              ->setFormatCode('$#,##0.00');
+        $sheet->getStyle('E5:E' . ($row - 1))->getNumberFormat()
+            ->setFormatCode('#,##0'); // Quantity 格式：整数，无小数点
+
+        $sheet->getStyle('F5:I5' . ($row - 1))->getNumberFormat()
+            ->setFormatCode('"RM"#,##0.00'); // 金额格式，加上引号的 "RM"
 
         // Auto-size columns
         foreach (range('A', 'I') as $column) {
@@ -475,7 +478,7 @@ class OrderController extends Controller
         $sheet->setCellValue('B' . $summaryStartRow, $totalItems);
         $summaryStartRow++;
         $sheet->setCellValue('A' . $summaryStartRow, 'Total Amount:');
-        $sheet->setCellValue('B' . $summaryStartRow, '$' . number_format($totalAmount, 2));
+        $sheet->setCellValue('B' . $summaryStartRow, 'RM' . number_format($totalAmount, 2));
 
         // Style summary section
         $summaryStyle = [

@@ -10,14 +10,14 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Receipt Details - {{ $order->order_number }}</h4>
                     <div>
-                        <div class="btn-group" role="group">
+                        <!-- <div class="btn-group" role="group">
                             <a href="{{ route('orders.print', $order) }}" class="btn btn-success btn-sm" target="_blank">
                                 <i class="bi bi-printer"></i> Print Preview
                             </a>
                             <a href="{{ route('orders.print.pdf', $order) }}" class="btn btn-danger btn-sm">
                                 <i class="bi bi-file-earmark-pdf"></i> Download PDF
                             </a>
-                        </div>
+                        </div> -->
                         <div class="btn-group ms-2" role="group">
                             <a href="{{ route('orders.edit', $order) }}" class="btn btn-outline-warning btn-sm"
                                title="Edit payment method and labor fee">
