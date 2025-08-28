@@ -151,9 +151,9 @@
           </div>
         </form>
 
-        <div class="text-center mt-3">
+        <!-- <div class="text-center mt-3">
           <p>Don't have an account? <a href="{{ route('register') }}">Register here</a></p>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
