@@ -17,7 +17,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Summary</h3>
+                    <h2 class="card-title fw-bold text-primary" style="font-family: 'Poppins', sans-serif; letter-spacing: 1px;">
+                        Summary
+                    </h2>
                     <div class="card-tools">
                     </div>
                 </div>
