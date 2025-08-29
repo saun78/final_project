@@ -5,19 +5,24 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Top Selling Products</h3>
-                </div>
+            <div class="card-header">
+    <h2 class="card-title fw-bold text-primary" style="font-family: 'Poppins', sans-serif; letter-spacing: 1px;">
+        Top Selling
+    </h2>
+</div>
+
                 <div class="card-body">
                     <!-- Top Selling Charts -->
                     <div class="row mb-4">
-                        <div class="col-lg-8 col-12 mb-3 mb-lg-0">
-                            <h4 class="mb-3">Top Selling Products </h4>
-                            <div style="width:100%; min-width:300px; height:250px;">
-                                <canvas id="topSellingBarChart" height="250" style="min-height:250px; width:100%;"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-12">
+    <div class="col-12">
+        <h4 class="mb-3">Top 10 Selling Products</h4>
+        <div style="width:100%; min-width:300px; height:350px;">
+            <canvas id="topSellingBarChart" height="350" style="min-height:350px; width:100%;"></canvas>
+        </div>
+    </div>
+</div>
+
+                        <!-- <div class="col-lg-4 col-12">
                             <h4 class="mb-3">Products Category</h4>
                             <div class="d-flex justify-content-center">
                                 <div id="chartdiv" style="width: 100%; min-width:300px; height: 250px;"></div>
@@ -38,7 +43,7 @@
                             ->sortByDesc('value')
                             ->take(10)
                             ->values();
-                    @endphp
+                    @endphp -->
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
                     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
