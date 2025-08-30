@@ -61,15 +61,15 @@
                                                     @endif
                                                 </td>
                                                 <td>{{ $item->quantity }}</td>
-                                                <td>${{ number_format($item->price, 2) }}</td>
-                                                <td>${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                                <td>RM{{ number_format($item->price, 2) }}</td>
+                                                <td>RM{{ number_format($item->quantity * $item->price, 2) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot class="table-light">
                                         <tr>
                                             <th colspan="3" class="text-end">Items Subtotal:</th>
-                                            <th id="itemsSubtotal">${{ number_format($order->orderItems->sum(function($item) { return $item->quantity * $item->price; }), 2) }}</th>
+                                            <th id="itemsSubtotal">RM{{ number_format($order->orderItems->sum(function($item) { return $item->quantity * $item->price; }), 2) }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -107,16 +107,16 @@
                                         <h5>Updated Order Summary</h5>
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Items Subtotal:</span>
-                                            <span id="displaySubtotal">${{ number_format($order->orderItems->sum(function($item) { return $item->quantity * $item->price; }), 2) }}</span>
+                                            <span id="displaySubtotal">RM{{ number_format($order->orderItems->sum(function($item) { return $item->quantity * $item->price; }), 2) }}</span>
                                         </div>
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Labor Fee:</span>
-                                            <span id="displayLaborFee">${{ number_format($order->labor_fee ?? 0, 2) }}</span>
+                                            <span id="displayLaborFee">RM{{ number_format($order->labor_fee ?? 0, 2) }}</span>
                                         </div>
                                         <hr>
                                         <div class="d-flex justify-content-between">
                                             <strong>Total Amount:</strong>
-                                            <strong id="displayTotal">${{ number_format($order->amount, 2) }}</strong>
+                                            <strong id="displayTotal">RM{{ number_format($order->amount, 2) }}</strong>
                                         </div>
                                     </div>
                                 </div>
