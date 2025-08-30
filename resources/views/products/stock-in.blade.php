@@ -57,9 +57,9 @@
 
                             <!-- Purchase Price -->
                             <div class="col-md-6">
-                                <label for="purchase_price" class="form-label">Purchase Price ($) <span class="text-danger">*</span></label>
+                                <label for="purchase_price" class="form-label">Purchase Price (RM) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" 
                                            class="form-control @error('purchase_price') is-invalid @enderror" 
                                            id="purchase_price" 
@@ -77,9 +77,9 @@
 
                             <!-- Selling Price -->
                             <div class="col-md-6">
-                                <label for="selling_price" class="form-label">Selling Price ($)</label>
+                                <label for="selling_price" class="form-label">Selling Price (RM)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">RM</span>
                                     <input type="number" 
                                            class="form-control @error('selling_price') is-invalid @enderror" 
                                            id="selling_price" 
@@ -152,11 +152,11 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <strong>Estimated Total Value:</strong>
-                                            <span id="totalValue">$0.00</span>
+                                            <span id="totalValue">RM0.00</span>
                                         </div>
                                         <div class="col-md-4">
                                             <strong>Profit per Unit:</strong>
-                                            <span id="profitPerUnit">$0.00</span>
+                                            <span id="profitPerUnit">RM0.00</span>
                                         </div>
                                         <div class="col-md-4">
                                             <strong>Profit Margin:</strong>
@@ -235,11 +235,11 @@
                         </tr>
                         <tr>
                             <th>Current Price:</th>
-                            <td>${{ number_format($product->purchase_price, 2) }}</td>
+                            <td>RM{{ number_format($product->purchase_price, 2) }}</td>
                         </tr>
                         <tr>
                             <th>Selling Price:</th>
-                            <td>${{ number_format($product->selling_price, 2) }}</td>
+                            <td>RM{{ number_format($product->selling_price, 2) }}</td>
                         </tr>
                         @if($product->location)
                         <tr>
