@@ -85,16 +85,16 @@
                                     @endphp
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>Items Subtotal:</span>
-                                        <span>${{ number_format($itemsSubtotal, 2) }}</span>
+                                        <span>RM{{ number_format($itemsSubtotal, 2) }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between mb-2">
                                         <span>Labor Fee:</span>
-                                        <span>${{ number_format($order->labor_fee, 2) }}</span>
+                                        <span>RM{{ number_format($order->labor_fee, 2) }}</span>
                                     </div>
                                     <hr>
                                     <div class="d-flex justify-content-between">
                                         <strong>Total Amount:</strong>
-                                        <strong>${{ number_format($order->amount, 2) }}</strong>
+                                        <strong>RM{{ number_format($order->amount, 2) }}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -126,8 +126,8 @@
                                             <span class="badge bg-info">{{ $item->supplier_contact_person }}</span>
                                         </td>
                                         <td>{{ $item->quantity }}</td>
-                                        <td>${{ number_format($item->price, 2) }}</td>
-                                        <td>${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                        <td>RM{{ number_format($item->price, 2) }}</td>
+                                        <td>RM{{ number_format($item->quantity * $item->price, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -139,15 +139,15 @@
                                 @endphp
                                 <tr>
                                     <th colspan="4" class="text-end">Items Subtotal:</th>
-                                    <th>${{ number_format($itemsTotal, 2) }}</th>
+                                    <th>RM{{ number_format($itemsTotal, 2) }}</th>
                                 </tr>
                                 <tr>
                                     <th colspan="4" class="text-end">Labor Fee:</th>
-                                    <th>${{ number_format($order->labor_fee, 2) }}</th>
+                                    <th>RM{{ number_format($order->labor_fee, 2) }}</th>
                                 </tr>
                                 <tr class="table-active">
                                     <th colspan="4" class="text-end">Total:</th>
-                                    <th>${{ number_format($order->amount, 2) }}</th>
+                                    <th>RM{{ number_format($order->amount, 2) }}</th>
                                 </tr>
                             </tfoot>
                         </table>
