@@ -172,7 +172,7 @@
                                 </select>
                             </div>
                             <div class="col-auto">
-                                <label for="quick_range" class="form-label">Quick Date Range</label>
+                                <label for="quick_range" class="form-label">Date start</label>
                                 <select id="quick_range" class="form-control">
                                     <option value="">-- Select --</option>
                                     <option value="this_week">This Week</option>
