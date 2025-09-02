@@ -177,7 +177,7 @@
         <div class="date-section">
             <div class="date-header">
                 {{ \Carbon\Carbon::parse($date)->format('l, M d, Y') }} 
-                ({{ $dayOrders->count() }} orders - ${{ number_format($dayOrders->sum('amount'), 2) }})
+                ({{ $dayOrders->count() }} orders - RM{{ number_format($dayOrders->sum('amount'), 2) }})
             </div>
             
             <table class="orders-table">
