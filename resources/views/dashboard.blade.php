@@ -172,7 +172,7 @@
     <!-- Recent Inventory Movements -->
     <div class="card mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Recent Inventory Movements</h5>
+            <h5 class="mb-0">Today Inventory Movements</h5>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -184,7 +184,6 @@
                             <th>Type</th>
                             <th>Quantity</th>
                             <th>Supplier</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -205,13 +204,6 @@
                                 </td>
                                 <td>{{ abs($movement->quantity) }}</td>
                                 <td>{{ $movement->product?->supplier?->contact_person ?? 'N/A' }}</td>
-                                <td>
-                                    <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
-                                        class="btn btn-sm btn-outline-primary" title="View Details">
-                                         <i class="bi bi-eye"></i>
-                                     </a>
-                                     
-                                </td>
                                 
                             </tr>
                         @empty
