@@ -119,7 +119,7 @@
             <div class="info-section">
                 <h6>Summary</h6>
                 <p><strong>Total Items:</strong> {{ $order->orderItems->sum('quantity') }}</p>
-                <p><strong>Total Amount:</strong> ${{ number_format($order->amount, 2) }}</p>
+                <p><strong>Total Amount:</strong> RM{{ number_format($order->amount, 2) }}</p>
             </div>
         </div>
 
@@ -146,7 +146,7 @@
                             <small>{{ $item->supplier_contact_person }}</small>
                         </td>
                         <td>{{ $item->quantity }}</td>
-                        <td>${{ number_format($item->price, 2) }}</td>
+                        <td>RM{{ number_format($item->price, 2) }}</td>
                         <td>{{ number_format($item->quantity, 0) }}</td>
                     </tr>
                 @endforeach
@@ -165,15 +165,15 @@
                         @endphp
                         <tr>
                             <td><strong>Items Subtotal:</strong></td>
-                            <td class="text-end">${{ number_format($itemsSubtotal, 2) }}</td>
+                            <td class="text-end">RM{{ number_format($itemsSubtotal, 2) }}</td>
                         </tr>
                         <tr>
                             <td><strong>Labor Fee:</strong></td>
-                            <td class="text-end">${{ number_format($order->labor_fee, 2) }}</td>
+                            <td class="text-end">RM{{ number_format($order->labor_fee, 2) }}</td>
                         </tr>
                         <tr class="total-row">
                             <td><strong>TOTAL:</strong></td>
-                            <td class="text-end"><strong>${{ number_format($order->amount, 2) }}</strong></td>
+                            <td class="text-end"><strong>RM{{ number_format($order->amount, 2) }}</strong></td>
                         </tr>
                     </table>
                 </div>

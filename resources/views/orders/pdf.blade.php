@@ -157,7 +157,7 @@
         </div>
         <div class="summary-row">
             <span class="summary-label">Total Amount:</span>
-            ${{ number_format($totalAmount, 2) }}
+            RM{{ number_format($totalAmount, 2) }}
         </div>
         <div class="summary-row">
             <span class="summary-label">Total Items Sold:</span>
@@ -230,16 +230,16 @@
                                     {{ $item->supplier_contact_person }}
                                 </td>
                                 <td class="qty">{{ $item->quantity }}</td>
-                                <td class="price">${{ number_format($item->price, 2) }}</td>
-                                <td class="subtotal">${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                <td class="price">RM{{ number_format($item->price, 2) }}</td>
+                                <td class="subtotal">RM{{ number_format($item->quantity * $item->price, 2) }}</td>
                                 <td style="text-align: right;">
                                     @if($index === 0)
-                                        ${{ number_format($order->labor_fee ?? 0, 2) }}
+                                        RM{{ number_format($order->labor_fee ?? 0, 2) }}
                                     @endif
                                 </td>
                                 <td class="amount">
                                     @if($index === 0)
-                                        ${{ number_format($order->amount, 2) }}
+                                        RM{{ number_format($order->amount, 2) }}
                                     @endif
                                 </td>
                             </tr>
@@ -250,10 +250,10 @@
                                 <strong>Order Total ({{ $order->orderItems->sum('quantity') }} items):</strong>
                             </td>
                             <td style="text-align: right;">
-                                <strong>${{ number_format($order->labor_fee ?? 0, 2) }}</strong>
+                                <strong>RM{{ number_format($order->labor_fee ?? 0, 2) }}</strong>
                             </td>
                             <td class="amount">
-                                <strong>${{ number_format($order->amount, 2) }}</strong>
+                                <strong>RM{{ number_format($order->amount, 2) }}</strong>
                             </td>
                         </tr>
                         <!-- Spacer row for visual separation -->

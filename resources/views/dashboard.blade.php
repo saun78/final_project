@@ -145,7 +145,7 @@
                     @endforeach
                 </div> --}}
                 <svg class="icon" width="38" height="38" viewBox="0 0 38 38" style="position:absolute;right:1rem;top:2.8rem;opacity:0.8;" xmlns="http://www.w3.org/2000/svg">
-  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" font-size="36" font-family="Arial, Helvetica, sans-serif" font-weight="400" fill="#fff">$</text>
+                <i class="bi bi-graph-up-arrow icon" style="position:absolute;right:1rem;top:2.8rem;opacity:0.8;"></i>
 </svg>
                 <a href="{{ route('reports.profit') }}" class="btn btn-light btn-sm w-100" style="margin-top:1.6rem;">View Details</a>
             </div>
@@ -172,25 +172,25 @@
     <!-- Recent Inventory Movements -->
     <div class="card mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Today Inventory Movements</h5>
+            <h5 class="mb-0">Recent Inventory Movements</h5>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>Time</th>
+                            <th>Date</th>
                             <th>Product</th>
                             <th>Type</th>
                             <th>Quantity</th>
                             <th>Supplier</th>
-                            <!-- <th>Actions</th> -->
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($recentMovements as $movement)
                             <tr>
-                                <td>{{ $movement->movement_date->format('H:i') }}</td>
+                                <td>{{ $movement->movement_date->format('Y-m-d H:i') }}</td>
                                 <td>{{ $movement->product?->name ?? 'Unknown Product' }}</td>
                                 <td>
                                     @if($movement->movement_type == 'stock_in')
@@ -199,12 +199,6 @@
                                         <span class="badge bg-danger">Out</span>
                                     @elseif($movement->movement_type == 'stock_out')
                                         <span class="badge bg-warning">Out</span>
-                                    @elseif($movement->movement_type == 'adjustment')
-                                        @if($movement->quantity > 0)
-                                            <span class="badge bg-info">Restored</span>
-                                        @else
-                                            <span class="badge bg-secondary">Adjusted</span>
-                                        @endif
                                     @else
                                         <span class="badge bg-secondary">{{ ucfirst($movement->movement_type) }}</span>
                                     @endif
@@ -212,10 +206,10 @@
                                 <td>{{ abs($movement->quantity) }}</td>
                                 <td>{{ $movement->product?->supplier?->contact_person ?? 'N/A' }}</td>
                                 <td>
-                                    <!-- <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
+                                    <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
                                         class="btn btn-sm btn-outline-primary" title="View Details">
                                          <i class="bi bi-eye"></i>
-                                     </a> -->
+                                     </a>
                                      
                                 </td>
                                 
