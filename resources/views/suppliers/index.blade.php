@@ -317,7 +317,8 @@
                         <label for="contact_number" class="form-label">Contact Number</label>
                         <input type="text" class="form-control @error('contact_number') is-invalid @enderror" 
                                id="contact_number" name="contact_number" required 
-                               placeholder="e.g. +1-234-567-8900" value="{{ old('contact_number') }}">
+                               placeholder="e.g. +6011 1111 1111" value="{{ old('contact_number') }}"
+                               minlength="10" maxlength="12" pattern="[0-9]+">
                         @error('contact_number')
                             <div class="invalid-feedback">
                                 {{ $message }}

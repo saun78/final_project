@@ -22,7 +22,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="contact_num" class="form-label">Contact Number</label>
-                            <input type="text" class="form-control @error('contact_num') is-invalid @enderror" id="contact_num" name="contact_num" value="{{ old('contact_num') }}" required>
+                            <input type="text" class="form-control @error('contact_num') is-invalid @enderror" id="contact_num" name="contact_num" value="{{ old('contact_num') }}" minlength="10" maxlength="12" pattern="[0-9]+" required>
                             @error('contact_num')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

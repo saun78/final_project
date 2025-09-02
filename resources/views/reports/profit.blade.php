@@ -48,7 +48,7 @@
                                 <label for="end_date" class="form-label">End Date</label>
                                 <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $endDate }}">
                             </div>
-                            <div class="col-auto">
+                            <!-- <div class="col-auto">
                                 <label for="payment_method" class="form-label">Payment Method</label>
                                 <select name="payment_method" id="payment_method" class="form-control">
                                     <option value="">All</option>
@@ -56,7 +56,7 @@
                                     <option value="bank_transfer" {{ request('payment_method') == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
                                     <option value="tng_wallet" {{ request('payment_method') == 'tng_wallet' ? 'selected' : '' }}>TNG Wallet</option>
                                 </select>
-                            </div>
+                            </div> -->
                             <div class="col-auto d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">Search</button>
                                 <a href="{{ route('reports.profit') }}" class="btn btn-secondary">Reset</a>
