@@ -184,7 +184,7 @@
                             <th>Type</th>
                             <th>Quantity</th>
                             <th>Supplier</th>
-                            <th>Actions</th>
+                            <!-- <th>Actions</th> -->
                         </tr>
                     </thead>
                     <tbody>
@@ -212,10 +212,10 @@
                                 <td>{{ abs($movement->quantity) }}</td>
                                 <td>{{ $movement->product?->supplier?->contact_person ?? 'N/A' }}</td>
                                 <td>
-                                    <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
+                                    <!-- <a href="{{ route('inventory-movements.show', ['movement' => $movement->id, 'page' => request('page')]) }}"
                                         class="btn btn-sm btn-outline-primary" title="View Details">
                                          <i class="bi bi-eye"></i>
-                                     </a>
+                                     </a> -->
                                      
                                 </td>
                                 
