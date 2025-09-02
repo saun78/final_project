@@ -172,14 +172,14 @@
     <!-- Recent Inventory Movements -->
     <div class="card mb-4">
         <div class="card-header bg-white">
-            <h5 class="mb-0">Recent Inventory Movements</h5>
+            <h5 class="mb-0">Today Inventory Movements</h5>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>Date</th>
+                            <th>Time</th>
                             <th>Product</th>
                             <th>Type</th>
                             <th>Quantity</th>
@@ -190,7 +190,7 @@
                     <tbody>
                         @forelse($recentMovements as $movement)
                             <tr>
-                                <td>{{ $movement->movement_date->format('Y-m-d H:i') }}</td>
+                                <td>{{ $movement->movement_date->format('H:i') }}</td>
                                 <td>{{ $movement->product?->name ?? 'Unknown Product' }}</td>
                                 <td>
                                     @if($movement->movement_type == 'stock_in')
