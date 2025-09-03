@@ -144,10 +144,11 @@
                                 {
                                     label: 'Bank Transfer',
                                     data: bankTransferAmounts,
-                                    borderColor: 'rgba(153, 102, 255, 1)',
-                                    backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                                    borderColor: 'rgba(255, 0, 0, 1)',        // 红色边框
+                                    backgroundColor: 'rgba(255, 0, 0, 0.1)',  // 红色背景（透明）
                                     fill: false,
                                     tension: 0.1
+
                                 }
                             ]
                         },
@@ -239,7 +240,7 @@
 
                     <div class="row mb-4">
                         <div class="col-md-3">
-                            <div class="card bg-primary text-white">
+                            <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Total Sales Amount</h5>
                                     <h2 class="card-text">RM{{ number_format($totalAmount, 2) }}</h2>
@@ -251,7 +252,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-success text-white">
+                            <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Cash Total</h5>
                                     <h3 class="card-text">RM{{ number_format($cashTotal, 2) }}</h3>
@@ -263,7 +264,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-info text-white">
+                            <div class="card bg-warning text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">TNG Total</h5>
                                     <h3 class="card-text">RM{{ number_format($tngTotal, 2) }}</h3>
@@ -275,7 +276,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-warning text-white">
+                            <div class="card bg-danger text-white">
                                 <div class="card-body">
                                     <h5 class="card-title">Bank Transfer Total</h5>
                                     <h3 class="card-text">RM{{ number_format($bankTransferTotal, 2) }}</h3>
