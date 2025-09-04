@@ -6,7 +6,7 @@
 </p>
 # System User Guide
 
-img width="975" height="548" alt="image" src="https://github.com/saun78/final_project/blob/main/Image/brand.png" />
+<img width="975" height="548" alt="image" src="https://github.com/saun78/final_project/blob/main/Image/brand.png" />
 
 ## Login Page
 - Enter **Username: admin** and **Password: 123123123** to log in.
