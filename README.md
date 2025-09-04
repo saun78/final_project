@@ -8,7 +8,7 @@
 </p>
 # System User Guide
 
-<img width="975" height="549" alt="image" src="https://github.com/user-attachments/assets/2f32e128-f3ba-4953-81b6-07f382852453" />
+
 
 ## Login Page
 - Enter **Username: admin** and **Password: 123123123** to log in.
