@@ -6,56 +6,78 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
+# System User Guide
 
-## About Laravel
+## Login Page
+- Enter **Username: admin** and **Password: 123123123** to log in.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Dashboard Page
+- View the **pie chart** showing the current month data.  
+- Check the **summary report chart** for overall performance.  
+- Look at the **profit report chart** for profit analysis.  
+- Watch the **red alert section** to see which products are low in stock.  
+- Scroll to the bottom to see **today’s inventory movement**.  
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Products Page
+- Switch between **Grid View** and **Table View** to see product listings.  
+- Click **Add Product** to register a new product.  
+- Use **Edit Product** to update product information.  
+- Select **View Detail** to see more information about a product.  
+- Open **Batch View** to check product batches.  
+- Use **Stock In** to add stock.  
+- Click **Delete** to remove a product.  
+- Use the **Search and Filter** options by category, brand, supplier, or name.  
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Receipts Page
+- Click **Create Receipt** to add a new receipt.  
+- Select **View Detail** to check receipt information.  
+- Use **Export** to download receipts in PDF or Excel format.  
+- Edit only the **Payment Method** and **Labor Fee** in receipts.  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Add Page (Category, Brand, Supplier)
+- Use **Category Page** to add, manage, and view categories.  
+- Use **Brand Page** to add, manage, and view brands.  
+- Use **Supplier Page** to add, manage, and view suppliers.  
+- All categories, brands, and suppliers are linked to products.  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Schedule Page
+- Create a **Schedule** to record appointments or tasks.  
+- The schedule column will show **red** if the date has passed.  
+- The schedule column will show **green** if the date is in the future.  
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## Top Selling Page
+- View all products that have been sold.  
+- Check which products are **selling best**.  
+- See **sales records** for sold products.  
+- Check the **total product count** for all products.  
+- Use **Search by Date** to find sales records for a specific product.  
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Summary Report Page
+- View **daily earnings details**.  
+- See the **total sales amount** updated day by day.  
+- Check the **bottom section** for the total earnings in one day.  
+- Click **View Detail** to see the receipts for that day.  
+- Click a **receipt** to open its full details.  
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Product Profit Page
+- View the **daily cost**, **daily profit**, and **daily sales**.  
+- Use **Search by Date** to find records for specific days.  
+- At the bottom, check the **daily profit report**.  
+- Click **Show Details** to see which products contributed to the profit.  
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
