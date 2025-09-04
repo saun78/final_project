@@ -7,7 +7,7 @@
 # System User Guide
 
 
-<img width="975" height="548" alt="image" src="https://github.com/user-attachments/assets/7b085244-b0bf-453a-a277-3a3a9e9b1b83" />
+[<img width="975" height="548" alt="image" src="https://github.com/user-attachments/assets/7b085244-b0bf-453a-a277-3a3a9e9b1b83" />](https://github.com/saun78/final_project/blob/main/Image/brand.png)
 
 ## Login Page
 - Enter **Username: admin** and **Password: 123123123** to log in.
