@@ -13,7 +13,6 @@
 - Enter **Username: admin** and **Password: 123123123** to log in.
 
 ---
-<img width="975" height="548" alt="image" src="https://github.com/user-attachments/assets/11273137-c5a8-41ed-8927-d785a9edb06c" />
 
 ## Dashboard Page
 - View the **pie chart** showing the current month data.  
